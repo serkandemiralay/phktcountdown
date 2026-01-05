@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phuket Tatili Geri Sayım</title>
+
+  <style>
+    :root{
+      --sky:#bff1ff;
+      --sun:#ffe3a6;
+      --pink:#ffd0e6;
+
+      --ink:#10233a;
+      --muted:#526173;
+
+      --glass: rgba(255,255,255,.55);
+      --stroke: rgba(255,255,255,.72);
+      --shadow: 0 18px 55px rgba(0,0,0,.14);
+
+      --sea: rgba(38, 216, 186, .95);
+      --coral: rgba(255, 146, 94, .95);
+      --twilight: rgba(137, 164, 255, .95);
+
+      --radius: 22px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--ink);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding: 22px;
+      overflow:hidden;
+
+      background:
+        radial-gradient(1200px 900px at 12% 12%, var(--pink), transparent 55%),
+        radial-gradient(1200px 900px at 92% 18%, var(--sky), transparent 55%),
+        radial-gradient(900px 900px at 55% 90%, var(--sun), transparent 55%),
+        #fff;
+    }
+
+    /* floating blobs */
+    .blob{
+      position:absolute;
+      width: 520px;
+      height: 520px;
+      filter: blur(26px);
+      opacity:.34;
+      border-radius: 42% 58% 63% 37% / 48% 40% 60% 52%;
+      animation: float 10s ease-in-out infinite;
+      pointer-events:none;
+      z-index:0;
+    }
+    .b1{ left:-160px; top:-120px; background: linear-gradient(135deg, var(--sea), var(--coral)); }
+    .b2{ right:-190px; top:60px; background: linear-gradient(135deg, var(--twilight), var(--sea)); animation-duration: 12s; }
+    .b3{ left:120px; bottom:-260px; background: linear-gradient(135deg, var(--coral), var(--twilight)); animation-duration: 11s; }
+
+    @keyframes float{
+      0%,100%{ transform: translate(0,0) rotate(0deg) scale(1); }
+      50%{ transform: translate(30px, -18px) rotate(6deg) scale(1.05); }
+    }
+
+    /* little palm svg decoration */
+    .palm{
+      position:absolute;
+      right: 18px;
+      bottom: 14px;
+      width: 140px;
+      opacity: .20;
+      z-index: 0;
+      pointer-events:none;
+      transform: rotate(-6deg);
+    }
+    .palm2{
+      position:absolute;
+      left: 16px;
+      bottom: 18px;
+      width: 120px;
+      opacity: .16;
+      z-index: 0;
+      pointer-events:none;
+      transform: rotate(7deg) scaleX(-1);
+    }
+
+    .shell{
+      width: min(1100px, 100%);
+      position:relative;
+      z-index:1;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
+    }
+    @media (max-width: 920px){
+      .grid2{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: linear-gradient(120deg, rgba(255,255,255,.88), rgba(255,255,255,0));
+      opacity:.35;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    header{
+      padding: 22px 22px 10px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      position:relative;
+      z-index:1;
+    }
+    h1{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height:1.35;
+    }
+    .badge{
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      background: rgba(255,255,255,.66);
+      border: 1px solid rgba(255,255,255,.82);
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      white-space:nowrap;
+    }
+    .content{ padding: 10px 22px 22px; position:relative; z-index:1; }
+
+    /* countdown tiles */
+    .tiles{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+    @media (max-width: 520px){
+      .tiles{ grid-template-columns: repeat(2, 1fr); }
+    }
+    .tile{
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(255,255,255,.80);
+      border-radius: 18px;
+      padding: 14px 12px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .tile::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(240px 140px at 30% 10%, rgba(38,216,186,.18), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .num{
+      position:relative;
+      z-index:1;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      line-height: 1.1;
+    }
+    .lbl{
+      position:relative;
+      z-index:1;
+      margin-top:6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .bigline{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(255,255,255,.86);
+      font-weight: 900;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .bigline small{
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* buttons */
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
+    .btn{
+      position:relative;
+      cursor:pointer;
+      border:none;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing:.2px;
+      box-shadow: 0 16px 34px rgba(0,0,0,.12);
+      transform: translateZ(0);
+      transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+      overflow:hidden;
+      user-select:none;
+    }
+    .btn:hover{
+      transform: translateY(-1px) scale(1.01);
+      filter: brightness(1.03);
+      box-shadow: 0 18px 40px rgba(0,0,0,.14);
+    }
+    .btn:active{
+      transform: translateY(1px) scale(.99);
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, var(--coral), var(--sea));
+      color: #0f172a;
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.74);
+      color: #0f172a;
+      border: 1px solid rgba(255,255,255,.86);
+      box-shadow: 0 12px 28px rgba(0,0,0,.10);
+    }
+    /* shine */
+    .btn::before{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-30%;
+      width: 60%;
+      height: 180%;
+      background: linear-gradient(120deg, rgba(255,255,255,.65), rgba(255,255,255,0));
+      transform: rotate(18deg) translateX(-130%);
+      transition: transform .45s ease;
+      opacity:.55;
+      pointer-events:none;
+    }
+    .btn:hover::before{
+      transform: rotate(18deg) translateX(280%);
+    }
+    /* ripple */
+    .ripple{
+      position:absolute;
+      border-radius:999px;
+      transform: scale(0);
+      animation: ripple .55s ease-out;
+      background: rgba(255,255,255,.55);
+      pointer-events:none;
+    }
+    @keyframes ripple{
+      to{ transform: scale(18); opacity:0; }
+    }
+
+    /* timeline */
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .item{
+      background: rgba(255,255,255,.60);
+      border: 1px solid rgba(255,255,255,.80);
+      border-radius: 18px;
+      padding: 12px 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .item::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(260px 140px at 10% 0%, rgba(255,146,94,.12), transparent 55%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .itemTop{
+      position:relative;
+      z-index:1;
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .tag{
+      font-size: 12px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.86);
+      background: rgba(255,255,255,.70);
+      white-space:nowrap;
+    }
+    .tag.ok{ background: rgba(38,216,186,.20); }
+    .tag.now{ background: rgba(255,146,94,.22); }
+    .tag.next{ background: rgba(137,164,255,.20); }
+
+    .item h3{
+      margin:0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing:.2px;
+    }
+    .meta{
+      position:relative;
+      z-index:1;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.35;
+    }
+
+    .party{
+      display:none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(255,255,255,.86);
+      font-weight: 900;
+      animation: pop .6s ease both;
+    }
+    .party.show{ display:block; }
+    @keyframes pop{
+      from{ transform: translateY(8px); opacity:0; }
+      to{ transform: translateY(0); opacity:1; }
+    }
+
+    footer{
+      padding: 14px 22px 20px;
+      color: rgba(0,0,0,.55);
+      font-size: 12px;
+      position:relative;
+      z-index:1;
+    }
+
+    /* Confetti canvas */
+    canvas#confetti{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      z-index: 999;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <!-- decorative palms (simple svg) -->
+  <svg class="palm" viewBox="0 0 200 200" aria-hidden="true">
+    <path d="M108 70c20-30 58-28 70-7-32-7-50 6-70 7Z" fill="currentColor"/>
+    <path d="M98 70c-10-36-45-47-68-31 28 8 44 26 68 31Z" fill="currentColor"/>
+    <path d="M105 78c30-10 60 5 70 28-32-18-52-20-70-28Z" fill="currentColor"/>
+    <path d="M98 78c-25 0-48 20-50 44 20-26 30-33 50-44Z" fill="currentColor"/>
+    <path d="M102 80c-8 30-8 70-4 110h12c-5-35-6-75-1-110Z" fill="currentColor"/>
+  </svg>
+
+  <svg class="palm2" viewBox="0 0 200 200" aria-hidden="true">
+    <path d="M108 70c20-30 58-28 70-7-32-7-50 6-70 7Z" fill="currentColor"/>
+    <path d="M98 70c-10-36-45-47-68-31 28 8 44 26 68 31Z" fill="currentColor"/>
+    <path d="M105 78c30-10 60 5 70 28-32-18-52-20-70-28Z" fill="currentColor"/>
+    <path d="M98 78c-25 0-48 20-50 44 20-26 30-33 50-44Z" fill="currentColor"/>
+    <path d="M102 80c-8 30-8 70-4 110h12c-5-35-6-75-1-110Z" fill="currentColor"/>
+  </svg>
+
+  <main class="shell">
+    <div class="grid2">
+
+      <!-- Countdown card -->
+      <section class="card">
+        <header>
+          <div>
+            <h1>🌴 Phuket Tatili — Geri Sayım</h1>
+            <p class="sub" id="subtitle">En yakın uçuş adımına geri sayıyoruz…</p>
+          </div>
+          <div class="badge">🌙 Istanbul saati</div>
+        </header>
+
+        <div class="content">
+          <div class="bigline" id="nextLine">
+            <span>⏳ Yükleniyor…</span>
+            <small></small>
+          </div>
+
+          <div class="tiles" aria-label="Geri sayım">
+            <div class="tile"><div class="num" id="d">0</div><div class="lbl">Gün</div></div>
+            <div class="tile"><div class="num" id="h">00</div><div class="lbl">Saat</div></div>
+            <div class="tile"><div class="num" id="m">00</div><div class="lbl">Dakika</div></div>
+            <div class="tile"><div class="num" id="s">00</div><div class="lbl">Saniye</div></div>
+          </div>
+
+          <div class="party" id="party">🎉 Phuket’e vardınız! (Deniz + pad thai + gün batımı 😄)</div>
+
+          <div class="btns">
+            <button class="btn primary" id="icsBtn" type="button">📅 Takvime ekle (.ics)</button>
+            <button class="btn ghost" id="jumpBtn" type="button">🧭 En yakın adıma git</button>
+          </div>
+
+          <p class="sub" style="margin-top:12px">
+            Not: Saatler **verdiğin ülke yerel saatine göre** tanımlandı (İstanbul +03:00, Hindistan +05:30, Phuket +07:00).
+          </p>
+        </div>
+
+        <footer>🌊 Phuket vibes • tropik sunset • konfeti modu</footer>
+      </section>
+
+      <!-- Timeline card -->
+      <aside class="card" id="timelineCard">
+        <header>
+          <div>
+            <h1>🗺️ Uçuş Planı</h1>
+            <p class="sub">Adım adım: İstanbul → Hindistan (aktarma) → Phuket → dönüş</p>
+          </div>
+          <div class="badge" id="nowBadge">🕒 şimdi</div>
+        </header>
+
+        <div class="content">
+          <div class="list" id="list"></div>
+        </div>
+
+        <footer>İyi yolculuklar! 🧳</footer>
+      </aside>
+
+    </div>
+  </main>
+
+<script>
+  // ------------------------
+  // Trip data (fixed)
+  // ------------------------
+  // IMPORTANT: Times are stored with explicit UTC offsets to respect local time zones.
+ const events = [
+  {
+    id: "IST_DEP",
+    title: "İstanbul Havalimanı — Kalkış",
+    detail: "Uçuş başlıyor ✈️",
+    iso: "2026-01-19T20:00:00+03:00",
+    location: "İstanbul (IST) — TR",
+    emoji: "🛫"
+  },
+  {
+    id: "IN_ARR_1",
+    title: "Hindistan — İniş (Aktarma)",
+    detail: "Aktarma / bekleme",
+    iso: "2026-01-20T04:45:00+05:30",
+    location: "Hindistan — IN",
+    emoji: "🛬"
+  },
+  {
+    id: "IN_DEP_2",
+    title: "Hindistan — Kalkış (Phuket’e)",
+    detail: "Son düzlük 😄",
+    iso: "2026-01-20T15:50:00+05:30",
+    location: "Hindistan — IN",
+    emoji: "🛫"
+  },
+  {
+    id: "HKT_ARR",
+    title: "Phuket — Varış",
+    detail: "Tatil başlıyor! 🌴",
+    iso: "2026-01-20T21:45:00+07:00",
+    location: "Phuket (HKT) — TH",
+    emoji: "🏝️"
+  },
+  {
+    id: "HKT_DEP",
+    title: "Phuket — Dönüş Kalkış",
+    detail: "Güle güle Phuket 🥲",
+    iso: "2026-01-28T22:50:00+07:00",
+    location: "Phuket (HKT) — TH",
+    emoji: "🛫"
+  },
+  {
+    id: "IN_ARR_2",
+    title: "Hindistan — İniş (Aktarma)",
+    detail: "Aktarma",
+    iso: "2026-01-29T01:50:00+05:30",
+    location: "Hindistan — IN",
+    emoji: "🛬"
+  },
+  {
+    id: "IN_DEP_3",
+    title: "Hindistan — Kalkış (İstanbul’a)",
+    detail: "Eve dönüş",
+    iso: "2026-01-29T06:55:00+05:30",
+    location: "Hindistan — IN",
+    emoji: "🛫"
+  },
+  {
+    id: "IST_ARR",
+    title: "İstanbul — Varış",
+    detail: "Hoş geldiniz 🧿",
+    iso: "2026-01-29T11:35:00+03:00",
+    location: "İstanbul (IST) — TR",
+    emoji: "🏁"
+  },
+].map(e => ({...e, date: new Date(e.iso)}));
+
+
+  // ------------------------
+  // Helpers
+  // ------------------------
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    subtitle: $("subtitle"),
+    nextLine: $("nextLine"),
+    d: $("d"), h: $("h"), m: $("m"), s: $("s"),
+    list: $("list"),
+    nowBadge: $("nowBadge"),
+    party: $("party"),
+    icsBtn: $("icsBtn"),
+    jumpBtn: $("jumpBtn"),
+  };
+
+  function pad2(n){ return String(n).padStart(2, "0"); }
+
+  function diffParts(ms){
+    const total = Math.max(0, ms);
+    const sec = Math.floor(total / 1000);
+    const days = Math.floor(sec / (3600 * 24));
+    const hours = Math.floor((sec % (3600 * 24)) / 3600);
+    const mins = Math.floor((sec % 3600) / 60);
+    const secs = sec % 60;
+    return { days, hours, mins, secs };
+  }
+
+  function formatTR(dt, timeZone){
+    // Turkish display in a specific time zone
+    return new Intl.DateTimeFormat("tr-TR", {
+      timeZone,
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+      weekday: "long",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(dt);
+  }
+
+  function tzFromIso(iso){
+    // quick mapping based on known offsets in your inputs
+    if (iso.endsWith("+03:00")) return "Europe/Istanbul";
+    if (iso.endsWith("+05:30")) return "Asia/Kolkata";
+    if (iso.endsWith("+07:00")) return "Asia/Bangkok"; // Phuket uses ICT; Bangkok TZ works.
+    return "Europe/Istanbul";
+  }
+
+  function statusFor(dt, now){
+    if (dt.getTime() < now.getTime()) return "done";
+    return "upcoming";
+  }
+
+  function nextEventIndex(now){
+    return events.findIndex(e => e.date.getTime() > now.getTime());
+  }
+
+  // ------------------------
+  // Render timeline
+  // ------------------------
+  function renderTimeline(now){
+    els.list.innerHTML = "";
+
+    const idx = nextEventIndex(now);
+    const nextId = idx >= 0 ? events[idx].id : null;
+
+    events.forEach((e, i) => {
+      const tz = tzFromIso(e.iso);
+      const st = statusFor(e.date, now);
+      const isNext = (e.id === nextId);
+
+      const tagClass = isNext ? "next" : (st === "done" ? "ok" : "");
+      const tagText = isNext ? "Sıradaki" : (st === "done" ? "Tamamlandı" : "Yaklaşıyor");
+
+      const item = document.createElement("div");
+      item.className = "item";
+      item.id = "ev_" + e.id;
+
+      // show BOTH: local time of the event + Istanbul time
+      const localStr = formatTR(e.date, tz);
+      const istStr = formatTR(e.date, "Europe/Istanbul");
+
+      item.innerHTML = `
+        <div class="itemTop">
+          <div>
+            <h3>${e.emoji} ${e.title}</h3>
+          </div>
+          <div class="tag ${tagClass}">${tagText}</div>
+        </div>
+        <div class="meta">
+          <div><b>Yerel saat:</b> ${localStr} <span style="opacity:.8">(${tz})</span></div>
+          <div><b>İstanbul saati:</b> ${istStr}</div>
+          <div style="margin-top:6px">${e.detail} • <span style="opacity:.9">${e.location}</span></div>
+        </div>
+      `;
+
+      els.list.appendChild(item);
+    });
+
+    els.nowBadge.textContent = "🕒 " + formatTR(now, "Europe/Istanbul");
+  }
+
+  // ------------------------
+  // Countdown / next step line
+  // ------------------------
+  let confettiPlayed = false;
+
+  function updateCountdown(){
+    const now = new Date();
+    const idx = nextEventIndex(now);
+
+    renderTimeline(now);
+
+    // If trip is fully over:
+    if(idx < 0){
+      els.subtitle.textContent = "Tüm uçuşlar tamamlandı. Fotoğraflar gelsin 📸";
+      els.nextLine.innerHTML = `<span>🏁 Yolculuk bitti</span><small>İstanbul’a varış tamamlandı</small>`;
+      els.d.textContent = "0";
+      els.h.textContent = "00";
+      els.m.textContent = "00";
+      els.s.textContent = "00";
+      return;
+    }
+
+    const next = events[idx];
+    const ms = next.date.getTime() - now.getTime();
+    const p = diffParts(ms);
+
+    els.d.textContent = p.days;
+    els.h.textContent = pad2(p.hours);
+    els.m.textContent = pad2(p.mins);
+    els.s.textContent = pad2(p.secs);
+
+    // Headline
+    const tz = tzFromIso(next.iso);
+    const localStr = formatTR(next.date, tz);
+    els.subtitle.textContent = "En yakın adım:";
+    els.nextLine.innerHTML = `
+      <span>${next.emoji} <b>${next.title}</b></span>
+      <small>${localStr}</small>
+    `;
+
+    // Confetti when Phuket arrival passes (HKT_ARR)
+    const hktArr = events.find(e => e.id === "HKT_ARR")?.date?.getTime() ?? Infinity;
+    if(now.getTime() >= hktArr){
+      els.party.classList.add("show");
+      if(!confettiPlayed){
+        confettiPlayed = true;
+        burstConfetti();
+      }
+    }
+  }
+
+  // ------------------------
+  // Confetti (small, lightweight)
+  // ------------------------
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  function resizeCanvas(){
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  function burstConfetti(){
+    const W = window.innerWidth, H = window.innerHeight;
+    const pieces = [];
+    const count = 180;
+
+    for(let i=0;i<count;i++){
+      pieces.push({
+        x: Math.random()*W,
+        y: -20 - Math.random()*H*0.2,
+        vx: (Math.random()-0.5)*4,
+        vy: 2 + Math.random()*5,
+        r: 2 + Math.random()*4,
+        rot: Math.random()*Math.PI,
+        vr: (Math.random()-0.5)*0.2,
+        life: 140 + Math.random()*80,
+        // random bright-ish color
+        c: `hsla(${Math.floor(Math.random()*360)}, 90%, 60%, .9)`
+      });
+    }
+
+    let frame = 0;
+    function draw(){
+      frame++;
+      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+      pieces.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.vy += 0.02; // gravity
+        p.life -= 1;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.r, -p.r, p.r*2.2, p.r*1.4);
+        ctx.restore();
+      });
+
+      // remove dead
+      for(let i=pieces.length-1;i>=0;i--){
+        if(pieces[i].life <= 0 || pieces[i].y > H + 60) pieces.splice(i,1);
+      }
+
+      if(pieces.length > 0 && frame < 360) requestAnimationFrame(draw);
+      else ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+    }
+    requestAnimationFrame(draw);
+  }
+
+  // ------------------------
+  // Buttons: ripple + actions
+  // ------------------------
+  function attachRipples(){
+    document.querySelectorAll(".btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const span = document.createElement("span");
+        span.className = "ripple";
+        span.style.left = x + "px";
+        span.style.top = y + "px";
+        span.style.width = "14px";
+        span.style.height = "14px";
+
+        btn.appendChild(span);
+        span.addEventListener("animationend", () => span.remove());
+      });
+    });
+  }
+  attachRipples();
+
+  // ICS generator (all events)
+  function toICSDate(dt){
+    // ICS uses UTC format: YYYYMMDDTHHMMSSZ
+    const y = dt.getUTCFullYear();
+    const mo = pad2(dt.getUTCMonth()+1);
+    const da = pad2(dt.getUTCDate());
+    const hh = pad2(dt.getUTCHours());
+    const mm = pad2(dt.getUTCMinutes());
+    const ss = pad2(dt.getUTCSeconds());
+    return `${y}${mo}${da}T${hh}${mm}${ss}Z`;
+  }
+
+  function downloadICS(){
+    const lines = [];
+    lines.push("BEGIN:VCALENDAR");
+    lines.push("VERSION:2.0");
+    lines.push("PRODID:-//Phuket Countdown//TR//EN");
+    lines.push("CALSCALE:GREGORIAN");
+    lines.push("METHOD:PUBLISH");
+
+    events.forEach((e) => {
+      const uid = `${e.id}-${e.date.getTime()}@phuket-countdown`;
+      const start = toICSDate(e.date);
+      // 20 min default duration
+      const end = toICSDate(new Date(e.date.getTime() + 20*60*1000));
+      const summary = `${e.emoji} ${e.title}`;
+      const desc = `${e.detail} - ${e.location}`;
+      lines.push("BEGIN:VEVENT");
+      lines.push(`UID:${uid}`);
+      lines.push(`DTSTAMP:${toICSDate(new Date())}`);
+      lines.push(`DTSTART:${start}`);
+      lines.push(`DTEND:${end}`);
+      lines.push(`SUMMARY:${summary}`);
+      lines.push(`DESCRIPTION:${desc.replace(/\n/g,"\\n")}`);
+      lines.push("END:VEVENT");
+    });
+
+    lines.push("END:VCALENDAR");
+
+    const blob = new Blob([lines.join("\r\n")], {type:"text/calendar;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "phuket-ucus-plani.ics";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("icsBtn").addEventListener("click", downloadICS);
+
+  document.getElementById("jumpBtn").addEventListener("click", () => {
+    const now = new Date();
+    const idx = nextEventIndex(now);
+    const id = idx >= 0 ? "ev_" + events[idx].id : "ev_" + events[events.length-1].id;
+    const el = document.getElementById(id);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+  // ------------------------
+  // Start
+  // ------------------------
+  updateCountdown();
+  setInterval(updateCountdown, 250);
+</script>
+</body>
+</html>
