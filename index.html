@@ -2,8 +2,14 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Phuket Tatili Geri Sayım</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Phuket Tatili • Geri Sayım</title>
+
+  <!-- iPhone / PWA polish -->
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Phuket">
 
   <style>
     :root{
@@ -11,12 +17,8 @@
       --sun:#ffe3a6;
       --pink:#ffd0e6;
 
-      --ink:#10233a;
+      --ink:#071a2f;
       --muted:#526173;
-
-      --glass: rgba(255,255,255,.55);
-      --stroke: rgba(255,255,255,.72);
-      --shadow: 0 18px 55px rgba(0,0,0,.14);
 
       --sea: rgba(38, 216, 186, .95);
       --coral: rgba(255, 146, 94, .95);
@@ -26,20 +28,25 @@
     }
 
     *{ box-sizing:border-box; }
+
+    /* ✅ iPhone scroll fix */
+    html, body { height: 100%; }
     body{
       margin:0;
       min-height:100vh;
+      overflow-x:hidden;
+      overflow-y:auto;
+      -webkit-overflow-scrolling: touch;
+
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color: var(--ink);
+
       display:flex;
       justify-content:center;
-      align-items:center;
+      align-items:flex-start;
       padding: 22px;
-        margin:0;
-  min-height:100vh;
-  overflow-x:hidden;
-  overflow-y:auto;
-  -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(22px + env(safe-area-inset-bottom));
+      position:relative;
 
       background:
         radial-gradient(1200px 900px at 12% 12%, var(--pink), transparent 55%),
@@ -48,49 +55,109 @@
         #fff;
     }
 
-    /* floating blobs */
+    /* Aurora overlay */
+    .aurora{
+      position:fixed;
+      inset:-40%;
+      background:
+        radial-gradient(closest-side at 30% 40%, rgba(38,216,186,.22), transparent 60%),
+        radial-gradient(closest-side at 70% 30%, rgba(255,146,94,.18), transparent 60%),
+        radial-gradient(closest-side at 50% 70%, rgba(137,164,255,.18), transparent 60%);
+      filter: blur(28px);
+      opacity:.75;
+      mix-blend-mode: multiply;
+      animation: aurora 18s ease-in-out infinite;
+      pointer-events:none;
+      z-index:0;
+    }
+    @keyframes aurora{
+      0%,100%{ transform: translate(-2%, 1%) rotate(0deg) scale(1); }
+      50%{ transform: translate(3%, -2%) rotate(10deg) scale(1.05); }
+    }
+
+    /* Floating blobs */
     .blob{
-      position:absolute;
+      position:fixed;
       width: 520px;
       height: 520px;
       filter: blur(26px);
-      opacity:.34;
+      opacity:.22;
       border-radius: 42% 58% 63% 37% / 48% 40% 60% 52%;
       animation: float 10s ease-in-out infinite;
       pointer-events:none;
       z-index:0;
     }
-    .b1{ left:-160px; top:-120px; background: linear-gradient(135deg, var(--sea), var(--coral)); }
-    .b2{ right:-190px; top:60px; background: linear-gradient(135deg, var(--twilight), var(--sea)); animation-duration: 12s; }
+    .b1{ left:-170px; top:-140px; background: linear-gradient(135deg, var(--sea), var(--coral)); }
+    .b2{ right:-210px; top:70px; background: linear-gradient(135deg, var(--twilight), var(--sea)); animation-duration: 12s; }
     .b3{ left:120px; bottom:-260px; background: linear-gradient(135deg, var(--coral), var(--twilight)); animation-duration: 11s; }
-
     @keyframes float{
       0%,100%{ transform: translate(0,0) rotate(0deg) scale(1); }
       50%{ transform: translate(30px, -18px) rotate(6deg) scale(1.05); }
     }
 
-    /* little palm svg decoration */
-    .palm{
-      position:absolute;
-      right: 18px;
-      bottom: 14px;
-      width: 140px;
-      opacity: .20;
-      z-index: 0;
+    /* Soft bokeh particles */
+    .bokeh{
+      position:fixed;
+      inset:0;
       pointer-events:none;
-      transform: rotate(-6deg);
+      z-index:0;
+      opacity:.55;
+      background-image:
+        radial-gradient(10px 10px at 12% 20%, rgba(255,255,255,.65), transparent 60%),
+        radial-gradient(16px 16px at 82% 22%, rgba(255,255,255,.55), transparent 60%),
+        radial-gradient(12px 12px at 72% 78%, rgba(255,255,255,.45), transparent 60%),
+        radial-gradient(18px 18px at 28% 78%, rgba(255,255,255,.55), transparent 60%),
+        radial-gradient(14px 14px at 54% 48%, rgba(255,255,255,.35), transparent 60%);
+      animation: drift 14s ease-in-out infinite;
     }
-    .palm2{
-      position:absolute;
-      left: 16px;
-      bottom: 18px;
-      width: 120px;
-      opacity: .16;
-      z-index: 0;
-      pointer-events:none;
-      transform: rotate(7deg) scaleX(-1);
+    @keyframes drift{
+      0%,100%{ transform: translate(0,0); }
+      50%{ transform: translate(10px,-8px); }
     }
 
+    /* Waves */
+    .waves{
+      position:fixed;
+      left:0; right:0; bottom:-10px;
+      height: 160px;
+      pointer-events:none;
+      z-index:0;
+      opacity:.55;
+    }
+    .wave{
+      position:absolute;
+      left:-20%;
+      width: 140%;
+      height: 100%;
+      background-repeat: repeat-x;
+      background-size: 1200px 160px;
+      filter: blur(.1px);
+      transform: translateZ(0);
+    }
+    .wave.w1{
+      bottom: 0;
+      opacity:.55;
+      background-image: radial-gradient(closest-side at 50% 60%, rgba(38,216,186,.22), rgba(38,216,186,0) 70%);
+      animation: waveMove 12s linear infinite;
+    }
+    .wave.w2{
+      bottom: 12px;
+      opacity:.45;
+      background-image: radial-gradient(closest-side at 50% 60%, rgba(255,146,94,.18), rgba(255,146,94,0) 70%);
+      animation: waveMove 16s linear infinite reverse;
+    }
+    .wave.w3{
+      bottom: 26px;
+      opacity:.35;
+      background-image: radial-gradient(closest-side at 50% 60%, rgba(137,164,255,.18), rgba(137,164,255,0) 70%);
+      animation: waveMove 20s linear infinite;
+    }
+    @keyframes waveMove{
+      from{ transform: translateX(0); }
+      to{ transform: translateX(-20%); }
+    }
+
+    /* App shell */
     .shell{
       width: min(1100px, 100%);
       position:relative;
@@ -106,24 +173,70 @@
       .grid2{ grid-template-columns: 1fr; }
     }
 
+    /* -----------------------
+       PREMIUM GLASS UPGRADE
+       ----------------------- */
     .card{
-      background: var(--glass);
-      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(255,255,255,.38);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      overflow:hidden;
+      box-shadow:
+        0 26px 70px rgba(0,0,0,.18),
+        0 0 0 1px rgba(255,255,255,.35) inset,
+        0 0 28px rgba(38,216,186,.18),
+        0 0 34px rgba(255,146,94,.14);
       position:relative;
+      overflow:hidden;
+      transform: translateZ(0);
     }
+
+    @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))){
+      .card{
+        -webkit-backdrop-filter: blur(18px) saturate(160%);
+        backdrop-filter: blur(18px) saturate(160%);
+      }
+    }
+
+    /* shimmer */
     .card::before{
       content:"";
       position:absolute;
-      inset:-2px;
-      background: linear-gradient(120deg, rgba(255,255,255,.88), rgba(255,255,255,0));
-      opacity:.35;
+      inset:-40%;
+      background: linear-gradient(120deg,
+        rgba(255,255,255,.0) 0%,
+        rgba(255,255,255,.25) 25%,
+        rgba(255,255,255,.0) 55%);
+      transform: translateX(-30%) rotate(10deg);
+      animation: shimmer 7.5s ease-in-out infinite;
       pointer-events:none;
+      opacity:.55;
       z-index:0;
+    }
+    @keyframes shimmer{
+      0%,100%{ transform: translateX(-35%) rotate(10deg); opacity:.35; }
+      50%{ transform: translateX(35%) rotate(10deg); opacity:.70; }
+    }
+
+    /* noise / grain */
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.10;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+      z-index:0;
+    }
+
+    /* iPhone touch devices: stronger glass */
+    @media (hover: none) and (pointer: coarse){
+      .card{
+        background: rgba(255,255,255,.28);
+        -webkit-backdrop-filter: blur(22px) saturate(175%);
+        backdrop-filter: blur(22px) saturate(175%);
+      }
     }
 
     header{
@@ -150,37 +263,62 @@
       padding: 8px 12px;
       border-radius: 999px;
       font-size: 13px;
-      background: rgba(255,255,255,.66);
-      border: 1px solid rgba(255,255,255,.82);
+      background: rgba(255,255,255,.40);
+      border: 1px solid rgba(255,255,255,.35);
       box-shadow: 0 10px 30px rgba(0,0,0,.08);
       white-space:nowrap;
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
     }
     .content{ padding: 10px 22px 22px; position:relative; z-index:1; }
 
-    /* countdown tiles */
+    /* Countdown line */
+    .bigline{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.40);
+      border: 1px solid rgba(255,255,255,.35);
+      font-weight: 900;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
+    }
+    .bigline small{
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* tiles */
     .tiles{
       display:grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin-top: 8px;
+      margin-top: 10px;
     }
     @media (max-width: 520px){
       .tiles{ grid-template-columns: repeat(2, 1fr); }
     }
     .tile{
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(255,255,255,.80);
+      background: rgba(255,255,255,.40);
+      border: 1px solid rgba(255,255,255,.35);
       border-radius: 18px;
       padding: 14px 12px;
       text-align:center;
       position:relative;
       overflow:hidden;
+      -webkit-backdrop-filter: blur(14px) saturate(145%);
+      backdrop-filter: blur(14px) saturate(145%);
     }
     .tile::after{
       content:"";
       position:absolute;
-      inset:0;
-      background: radial-gradient(240px 140px at 30% 10%, rgba(38,216,186,.18), transparent 60%);
+      inset:-10%;
+      background: radial-gradient(260px 160px at 30% 10%, rgba(38,216,186,.20), transparent 60%);
       opacity:.9;
       pointer-events:none;
     }
@@ -188,9 +326,10 @@
       position:relative;
       z-index:1;
       font-size: 34px;
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing: .5px;
       line-height: 1.1;
+      text-shadow: 0 10px 30px rgba(0,0,0,.10);
     }
     .lbl{
       position:relative;
@@ -198,27 +337,10 @@
       margin-top:6px;
       font-size: 13px;
       color: var(--muted);
-    }
-
-    .bigline{
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(255,255,255,.86);
-      font-weight: 900;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .bigline small{
       font-weight: 700;
-      color: var(--muted);
     }
 
-    /* buttons */
+    /* Buttons */
     .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
     .btn{
       position:relative;
@@ -226,7 +348,7 @@
       border:none;
       padding: 12px 14px;
       border-radius: 16px;
-      font-weight: 900;
+      font-weight: 950;
       font-size: 14px;
       letter-spacing:.2px;
       box-shadow: 0 16px 34px rgba(0,0,0,.12);
@@ -237,7 +359,7 @@
     }
     .btn:hover{
       transform: translateY(-1px) scale(1.01);
-      filter: brightness(1.03);
+      filter: brightness(1.04);
       box-shadow: 0 18px 40px rgba(0,0,0,.14);
     }
     .btn:active{
@@ -245,14 +367,19 @@
       box-shadow: 0 10px 24px rgba(0,0,0,.12);
     }
     .btn.primary{
-      background: linear-gradient(135deg, var(--coral), var(--sea));
-      color: #0f172a;
+      background: linear-gradient(135deg, rgba(255,146,94,.98), rgba(38,216,186,.98));
+      color: #061627;
+      box-shadow:
+        0 18px 45px rgba(0,0,0,.18),
+        0 0 0 1px rgba(255,255,255,.22) inset;
     }
     .btn.ghost{
-      background: rgba(255,255,255,.74);
-      color: #0f172a;
-      border: 1px solid rgba(255,255,255,.86);
+      background: rgba(255,255,255,.40);
+      color: #061627;
+      border: 1px solid rgba(255,255,255,.35);
       box-shadow: 0 12px 28px rgba(0,0,0,.10);
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
     }
     /* shine */
     .btn::before{
@@ -262,7 +389,7 @@
       left:-30%;
       width: 60%;
       height: 180%;
-      background: linear-gradient(120deg, rgba(255,255,255,.65), rgba(255,255,255,0));
+      background: linear-gradient(120deg, rgba(255,255,255,.70), rgba(255,255,255,0));
       transform: rotate(18deg) translateX(-130%);
       transition: transform .45s ease;
       opacity:.55;
@@ -284,7 +411,7 @@
       to{ transform: scale(18); opacity:0; }
     }
 
-    /* timeline */
+    /* Timeline */
     .list{
       display:flex;
       flex-direction:column;
@@ -292,18 +419,20 @@
       margin-top: 6px;
     }
     .item{
-      background: rgba(255,255,255,.60);
-      border: 1px solid rgba(255,255,255,.80);
+      background: rgba(255,255,255,.36);
+      border: 1px solid rgba(255,255,255,.35);
       border-radius: 18px;
       padding: 12px 12px;
       position:relative;
       overflow:hidden;
+      -webkit-backdrop-filter: blur(14px) saturate(145%);
+      backdrop-filter: blur(14px) saturate(145%);
     }
     .item::after{
       content:"";
       position:absolute;
-      inset:0;
-      background: radial-gradient(260px 140px at 10% 0%, rgba(255,146,94,.12), transparent 55%);
+      inset:-10%;
+      background: radial-gradient(300px 170px at 10% 0%, rgba(255,146,94,.14), transparent 55%);
       pointer-events:none;
       opacity:.9;
     }
@@ -317,21 +446,23 @@
     }
     .tag{
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 950;
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.86);
-      background: rgba(255,255,255,.70);
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.40);
       white-space:nowrap;
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      backdrop-filter: blur(10px) saturate(140%);
     }
-    .tag.ok{ background: rgba(38,216,186,.20); }
-    .tag.now{ background: rgba(255,146,94,.22); }
-    .tag.next{ background: rgba(137,164,255,.20); }
+    .tag.ok{ background: rgba(38,216,186,.18); }
+    .tag.next{ background: rgba(137,164,255,.18); }
+    .tag.soon{ background: rgba(255,146,94,.18); }
 
     .item h3{
       margin:0;
       font-size: 14px;
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing:.2px;
     }
     .meta{
@@ -341,6 +472,7 @@
       color: var(--muted);
       font-size: 13px;
       line-height:1.35;
+      font-weight: 650;
     }
 
     .party{
@@ -348,10 +480,12 @@
       margin-top: 12px;
       padding: 12px 14px;
       border-radius: 16px;
-      background: rgba(255,255,255,.76);
-      border: 1px solid rgba(255,255,255,.86);
-      font-weight: 900;
+      background: rgba(255,255,255,.46);
+      border: 1px solid rgba(255,255,255,.35);
+      font-weight: 950;
       animation: pop .6s ease both;
+      -webkit-backdrop-filter: blur(14px) saturate(145%);
+      backdrop-filter: blur(14px) saturate(145%);
     }
     .party.show{ display:block; }
     @keyframes pop{
@@ -365,6 +499,7 @@
       font-size: 12px;
       position:relative;
       z-index:1;
+      font-weight: 650;
     }
 
     /* Confetti canvas */
@@ -374,38 +509,35 @@
       pointer-events:none;
       z-index: 999;
     }
+
+    /* Reduce motion accessibility */
+    @media (prefers-reduced-motion: reduce){
+      .aurora, .blob, .bokeh, .wave{ animation: none !important; }
+      .card::before{ animation: none !important; }
+    }
   </style>
 </head>
 
 <body>
   <canvas id="confetti"></canvas>
 
+  <div class="aurora"></div>
+  <div class="bokeh"></div>
   <div class="blob b1"></div>
   <div class="blob b2"></div>
   <div class="blob b3"></div>
 
-  <!-- decorative palms (simple svg) -->
-  <svg class="palm" viewBox="0 0 200 200" aria-hidden="true">
-    <path d="M108 70c20-30 58-28 70-7-32-7-50 6-70 7Z" fill="currentColor"/>
-    <path d="M98 70c-10-36-45-47-68-31 28 8 44 26 68 31Z" fill="currentColor"/>
-    <path d="M105 78c30-10 60 5 70 28-32-18-52-20-70-28Z" fill="currentColor"/>
-    <path d="M98 78c-25 0-48 20-50 44 20-26 30-33 50-44Z" fill="currentColor"/>
-    <path d="M102 80c-8 30-8 70-4 110h12c-5-35-6-75-1-110Z" fill="currentColor"/>
-  </svg>
-
-  <svg class="palm2" viewBox="0 0 200 200" aria-hidden="true">
-    <path d="M108 70c20-30 58-28 70-7-32-7-50 6-70 7Z" fill="currentColor"/>
-    <path d="M98 70c-10-36-45-47-68-31 28 8 44 26 68 31Z" fill="currentColor"/>
-    <path d="M105 78c30-10 60 5 70 28-32-18-52-20-70-28Z" fill="currentColor"/>
-    <path d="M98 78c-25 0-48 20-50 44 20-26 30-33 50-44Z" fill="currentColor"/>
-    <path d="M102 80c-8 30-8 70-4 110h12c-5-35-6-75-1-110Z" fill="currentColor"/>
-  </svg>
+  <div class="waves" aria-hidden="true">
+    <div class="wave w1"></div>
+    <div class="wave w2"></div>
+    <div class="wave w3"></div>
+  </div>
 
   <main class="shell">
     <div class="grid2">
 
       <!-- Countdown card -->
-      <section class="card">
+      <section class="card js-tilt">
         <header>
           <div>
             <h1>🌴 Phuket Tatili — Geri Sayım</h1>
@@ -435,20 +567,20 @@
           </div>
 
           <p class="sub" style="margin-top:12px">
-            Not: Saatler **verdiğin ülke yerel saatine göre** tanımlandı (İstanbul +03:00, Hindistan +05:30, Phuket +07:00).
+            Not: Saatler verdiğin ülke yerel saatine göre tanımlandı
+            (İstanbul +03:00, Hindistan +05:30, Phuket +07:00).
           </p>
         </div>
 
-
+     
       </section>
 
       <!-- Timeline card -->
-      <aside class="card" id="timelineCard">
+      <aside class="card js-tilt" id="timelineCard">
         <header>
           <div>
             <h1>🗺️ Uçuş Planı</h1>
-            <p class="sub">Adım adım: İstanbul → Hindistan (aktarma) → Phuket → dönüş</p>
-          </div>
+                     </div>
           <div class="badge" id="nowBadge">🕒 şimdi</div>
         </header>
 
@@ -466,74 +598,74 @@
   // ------------------------
   // Trip data (fixed)
   // ------------------------
-  // IMPORTANT: Times are stored with explicit UTC offsets to respect local time zones.
- const events = [
-  {
-    id: "IST_DEP",
-    title: "İstanbul Havalimanı — Kalkış",
-    detail: "",
-    iso: "2026-01-19T20:00:00+03:00",
-    location: "İstanbul (IST) — TR",
-    emoji: "🛫"
-  },
-  {
-    id: "IN_ARR_1",
-    title: "Hindistan — İniş (Aktarma)",
-    detail: "Aktarma / bekleme",
-    iso: "2026-01-20T04:45:00+05:30",
-    location: "Hindistan — IN",
-    emoji: "🛬"
-  },
-  {
-    id: "IN_DEP_2",
-    title: "Hindistan — Kalkış (Phuket’e)",
-    detail: "",
-    iso: "2026-01-20T15:50:00+05:30",
-    location: "Hindistan — IN",
-    emoji: "🛫"
-  },
-  {
-    id: "HKT_ARR",
-    title: "Phuket — Varış",
-    detail: "Tatil başlıyor! 🌴",
-    iso: "2026-01-20T21:45:00+07:00",
-    location: "Phuket (HKT) — TH",
-    emoji: "🏝️"
-  },
-  {
-    id: "HKT_DEP",
-    title: "Phuket — Dönüş Kalkış",
-    detail: "",
-    iso: "2026-01-28T22:50:00+07:00",
-    location: "Phuket (HKT) — TH",
-    emoji: "🛫"
-  },
-  {
-    id: "IN_ARR_2",
-    title: "Hindistan — İniş (Aktarma)",
-    detail: "Aktarma",
-    iso: "2026-01-29T01:50:00+05:30",
-    location: "Hindistan — IN",
-    emoji: "🛬"
-  },
-  {
-    id: "IN_DEP_3",
-    title: "Hindistan — Kalkış (İstanbul’a)",
-    detail: "",
-    iso: "2026-01-29T06:55:00+05:30",
-    location: "Hindistan — IN",
-    emoji: "🛫"
-  },
-  {
-    id: "IST_ARR",
-    title: "İstanbul — Varış",
-    detail: "",
-    iso: "2026-01-29T11:35:00+03:00",
-    location: "İstanbul (IST) — TR",
-    emoji: "🏁"
-  },
-].map(e => ({...e, date: new Date(e.iso)}));
-
+  // Times stored with explicit UTC offsets to respect local time zones.
+  // ✅ Corrected: First leg is Jan 19 (not Jan 10).
+  const events = [
+    {
+      id: "IST_DEP",
+      title: "İstanbul Havalimanı — Kalkış",
+      detail: "",
+      iso: "2026-01-19T20:00:00+03:00",
+      location: "İstanbul (IST) — TR",
+      emoji: "🛫"
+    },
+    {
+      id: "IN_ARR_1",
+      title: "Hindistan — İniş (Aktarma)",
+      detail: "Aktarma / bekleme",
+      iso: "2026-01-20T04:45:00+05:30",
+      location: "Hindistan — IN",
+      emoji: "🛬"
+    },
+    {
+      id: "IN_DEP_2",
+      title: "Hindistan — Kalkış (Phuket’e)",
+      detail: "",
+      iso: "2026-01-20T15:50:00+05:30",
+      location: "Hindistan — IN",
+      emoji: "🛫"
+    },
+    {
+      id: "HKT_ARR",
+      title: "Phuket — Varış",
+      detail: "",
+      iso: "2026-01-20T21:45:00+07:00",
+      location: "Phuket (HKT) — TH",
+      emoji: "🏝️"
+    },
+    {
+      id: "HKT_DEP",
+      title: "Phuket — Dönüş Kalkış",
+      detail: "",
+      iso: "2026-01-28T22:50:00+07:00",
+      location: "Phuket (HKT) — TH",
+      emoji: "🛫"
+    },
+    {
+      id: "IN_ARR_2",
+      title: "Hindistan — İniş (Aktarma)",
+      detail: "Aktarma",
+      iso: "2026-01-29T01:50:00+05:30",
+      location: "Hindistan — IN",
+      emoji: "🛬"
+    },
+    {
+      id: "IN_DEP_3",
+      title: "Hindistan — Kalkış (İstanbul’a)",
+      detail: "",
+      iso: "2026-01-29T06:55:00+05:30",
+      location: "Hindistan — IN",
+      emoji: "🛫"
+    },
+    {
+      id: "IST_ARR",
+      title: "İstanbul — Varış",
+      detail: "",
+      iso: "2026-01-29T11:35:00+03:00",
+      location: "İstanbul (IST) — TR",
+      emoji: "🏁"
+    },
+  ].map(e => ({...e, date: new Date(e.iso)}));
 
   // ------------------------
   // Helpers
@@ -563,7 +695,6 @@
   }
 
   function formatTR(dt, timeZone){
-    // Turkish display in a specific time zone
     return new Intl.DateTimeFormat("tr-TR", {
       timeZone,
       year: "numeric",
@@ -576,16 +707,10 @@
   }
 
   function tzFromIso(iso){
-    // quick mapping based on known offsets in your inputs
     if (iso.endsWith("+03:00")) return "Europe/Istanbul";
     if (iso.endsWith("+05:30")) return "Asia/Kolkata";
     if (iso.endsWith("+07:00")) return "Asia/Bangkok"; // Phuket uses ICT; Bangkok TZ works.
     return "Europe/Istanbul";
-  }
-
-  function statusFor(dt, now){
-    if (dt.getTime() < now.getTime()) return "done";
-    return "upcoming";
   }
 
   function nextEventIndex(now){
@@ -597,40 +722,34 @@
   // ------------------------
   function renderTimeline(now){
     els.list.innerHTML = "";
-
     const idx = nextEventIndex(now);
     const nextId = idx >= 0 ? events[idx].id : null;
 
-    events.forEach((e, i) => {
+    events.forEach((e) => {
       const tz = tzFromIso(e.iso);
-      const st = statusFor(e.date, now);
-      const isNext = (e.id === nextId);
+      const done = e.date.getTime() < now.getTime();
+      const isNext = e.id === nextId;
 
-      const tagClass = isNext ? "next" : (st === "done" ? "ok" : "");
-      const tagText = isNext ? "Sıradaki" : (st === "done" ? "Tamamlandı" : "Yaklaşıyor");
+      const tagClass = isNext ? "next" : (done ? "ok" : "soon");
+      const tagText  = isNext ? "Sıradaki" : (done ? "Tamamlandı" : "Yaklaşıyor");
+
+      const localStr = formatTR(e.date, tz);
+      const istStr   = formatTR(e.date, "Europe/Istanbul");
 
       const item = document.createElement("div");
       item.className = "item";
       item.id = "ev_" + e.id;
-
-      // show BOTH: local time of the event + Istanbul time
-      const localStr = formatTR(e.date, tz);
-      const istStr = formatTR(e.date, "Europe/Istanbul");
-
       item.innerHTML = `
         <div class="itemTop">
-          <div>
-            <h3>${e.emoji} ${e.title}</h3>
-          </div>
+          <div><h3>${e.emoji} ${e.title}</h3></div>
           <div class="tag ${tagClass}">${tagText}</div>
         </div>
         <div class="meta">
-          <div><b>Yerel saat:</b> ${localStr} <span style="opacity:.8">(${tz})</span></div>
+          <div><b>Yerel saat:</b> ${localStr} <span style="opacity:.75">(${tz})</span></div>
           <div><b>İstanbul saati:</b> ${istStr}</div>
           <div style="margin-top:6px">${e.detail} • <span style="opacity:.9">${e.location}</span></div>
         </div>
       `;
-
       els.list.appendChild(item);
     });
 
@@ -638,7 +757,7 @@
   }
 
   // ------------------------
-  // Countdown / next step line
+  // Countdown + confetti trigger
   // ------------------------
   let confettiPlayed = false;
 
@@ -648,7 +767,6 @@
 
     renderTimeline(now);
 
-    // If trip is fully over:
     if(idx < 0){
       els.subtitle.textContent = "Tüm uçuşlar tamamlandı. Fotoğraflar gelsin 📸";
       els.nextLine.innerHTML = `<span>🏁 Yolculuk bitti</span><small>İstanbul’a varış tamamlandı</small>`;
@@ -668,58 +786,60 @@
     els.m.textContent = pad2(p.mins);
     els.s.textContent = pad2(p.secs);
 
-    // Headline
     const tz = tzFromIso(next.iso);
     const localStr = formatTR(next.date, tz);
+
     els.subtitle.textContent = "En yakın adım:";
     els.nextLine.innerHTML = `
       <span>${next.emoji} <b>${next.title}</b></span>
       <small>${localStr}</small>
     `;
 
-    // Confetti when Phuket arrival passes (HKT_ARR)
+    // Confetti when Phuket arrival passes
     const hktArr = events.find(e => e.id === "HKT_ARR")?.date?.getTime() ?? Infinity;
     if(now.getTime() >= hktArr){
       els.party.classList.add("show");
       if(!confettiPlayed){
         confettiPlayed = true;
-        burstConfetti();
+        burstConfetti(true);
       }
     }
   }
 
   // ------------------------
-  // Confetti (small, lightweight)
+  // Confetti (enhanced)
   // ------------------------
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
+
   function resizeCanvas(){
-    canvas.width = window.innerWidth * devicePixelRatio;
-    canvas.height = window.innerHeight * devicePixelRatio;
+    const dpr = devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
     canvas.style.width = window.innerWidth + "px";
     canvas.style.height = window.innerHeight + "px";
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
   }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  function burstConfetti(){
+  function burstConfetti(extra){
     const W = window.innerWidth, H = window.innerHeight;
     const pieces = [];
-    const count = 180;
+    const count = extra ? 260 : 180;
 
     for(let i=0;i<count;i++){
       pieces.push({
         x: Math.random()*W,
-        y: -20 - Math.random()*H*0.2,
-        vx: (Math.random()-0.5)*4,
-        vy: 2 + Math.random()*5,
-        r: 2 + Math.random()*4,
+        y: -20 - Math.random()*H*0.25,
+        vx: (Math.random()-0.5)*5,
+        vy: 2 + Math.random()*6,
+        r: 2 + Math.random()*5,
         rot: Math.random()*Math.PI,
-        vr: (Math.random()-0.5)*0.2,
-        life: 140 + Math.random()*80,
-        // random bright-ish color
-        c: `hsla(${Math.floor(Math.random()*360)}, 90%, 60%, .9)`
+        vr: (Math.random()-0.5)*0.25,
+        life: 150 + Math.random()*110,
+        c: `hsla(${Math.floor(Math.random()*360)}, 92%, 62%, .92)`,
+        shape: Math.random() < 0.25 ? "circle" : "rect"
       });
     }
 
@@ -727,27 +847,34 @@
     function draw(){
       frame++;
       ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+
       pieces.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
         p.rot += p.vr;
-        p.vy += 0.02; // gravity
+        p.vy += 0.025; // gravity
         p.life -= 1;
 
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rot);
         ctx.fillStyle = p.c;
-        ctx.fillRect(-p.r, -p.r, p.r*2.2, p.r*1.4);
+
+        if(p.shape === "circle"){
+          ctx.beginPath();
+          ctx.arc(0,0,p.r,0,Math.PI*2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(-p.r, -p.r, p.r*2.4, p.r*1.5);
+        }
         ctx.restore();
       });
 
-      // remove dead
       for(let i=pieces.length-1;i>=0;i--){
-        if(pieces[i].life <= 0 || pieces[i].y > H + 60) pieces.splice(i,1);
+        if(pieces[i].life <= 0 || pieces[i].y > H + 80) pieces.splice(i,1);
       }
 
-      if(pieces.length > 0 && frame < 360) requestAnimationFrame(draw);
+      if(pieces.length > 0 && frame < 420) requestAnimationFrame(draw);
       else ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
     }
     requestAnimationFrame(draw);
@@ -777,9 +904,10 @@
   }
   attachRipples();
 
+  // ------------------------
   // ICS generator (all events)
+  // ------------------------
   function toICSDate(dt){
-    // ICS uses UTC format: YYYYMMDDTHHMMSSZ
     const y = dt.getUTCFullYear();
     const mo = pad2(dt.getUTCMonth()+1);
     const da = pad2(dt.getUTCDate());
@@ -787,6 +915,14 @@
     const mm = pad2(dt.getUTCMinutes());
     const ss = pad2(dt.getUTCSeconds());
     return `${y}${mo}${da}T${hh}${mm}${ss}Z`;
+  }
+
+  function escapeICS(str){
+    return String(str)
+      .replace(/\\/g, "\\\\")
+      .replace(/\n/g, "\\n")
+      .replace(/,/g, "\\,")
+      .replace(/;/g, "\\;");
   }
 
   function downloadICS(){
@@ -800,17 +936,17 @@
     events.forEach((e) => {
       const uid = `${e.id}-${e.date.getTime()}@phuket-countdown`;
       const start = toICSDate(e.date);
-      // 20 min default duration
       const end = toICSDate(new Date(e.date.getTime() + 20*60*1000));
       const summary = `${e.emoji} ${e.title}`;
       const desc = `${e.detail} - ${e.location}`;
+
       lines.push("BEGIN:VEVENT");
       lines.push(`UID:${uid}`);
       lines.push(`DTSTAMP:${toICSDate(new Date())}`);
       lines.push(`DTSTART:${start}`);
       lines.push(`DTEND:${end}`);
-      lines.push(`SUMMARY:${summary}`);
-      lines.push(`DESCRIPTION:${desc.replace(/\n/g,"\\n")}`);
+      lines.push(`SUMMARY:${escapeICS(summary)}`);
+      lines.push(`DESCRIPTION:${escapeICS(desc)}`);
       lines.push("END:VEVENT");
     });
 
@@ -836,6 +972,34 @@
     const el = document.getElementById(id);
     if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
   });
+
+  // ------------------------
+  // Optional desktop-only 3D tilt (disabled on iPhone)
+  // ------------------------
+  (function setupTilt(){
+    const isTouch = matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if(isTouch) return;
+
+    document.querySelectorAll(".js-tilt").forEach(card => {
+      let raf = null;
+      function onMove(e){
+        if(raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          const rx = (-y * 6).toFixed(2);
+          const ry = (x * 6).toFixed(2);
+          card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        });
+      }
+      function reset(){
+        card.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
+      }
+      card.addEventListener("mousemove", onMove);
+      card.addEventListener("mouseleave", reset);
+    });
+  })();
 
   // ------------------------
   // Start
