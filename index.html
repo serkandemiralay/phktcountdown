@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="tr">
 <head>
@@ -15,6 +14,7 @@
     .input { width:100%; box-sizing:border-box; background:#0f1730; border:1px solid var(--border); color:var(--text); padding:9px 10px; border-radius:10px; font-size:12px; }
     .search { flex:1; min-width:240px; }
     .select { width:auto; min-width:180px; }
+    .selectSmall { width:auto; min-width:170px; }
     button { background:transparent; border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; font-size:12px; }
     button:hover { border-color: var(--accent); }
     button.primary { background: rgba(122,162,255,.12); border-color: rgba(122,162,255,.35); }
@@ -45,8 +45,7 @@
     <h1>Okullar • Konum Bul & Haritada Göster</h1>
     <div class="sub">
       Ev koordinatı: <span class="mono">40.932218, 29.126709</span><br>
-      Her okul kartında <b>Konum Bul</b> butonuna basınca okul sağdaki haritada ev ile birlikte gösterilir.
-      Ayrıca <b>navigasyon süresi</b> (dk) hesaplanır.
+      Karttan <b>Konum Bul</b> ile okul haritada gösterilir. Üstten seçtiğin <b>ulaşım moduna göre süre</b> (dk) hesaplanır.
     </div>
   </header>
 
@@ -54,6 +53,13 @@
     <!-- Semt/İlçe dropdown -->
     <select id="districtSelect" class="input select">
       <option value="">Tümü</option>
+    </select>
+
+    <!-- Ulaşım modu dropdown -->
+    <select id="modeSelect" class="input selectSmall" title="Ulaşım modu">
+      <option value="DRIVING">🚗 Araç</option>
+      <option value="WALKING">🚶 Yürüme</option>
+      <option value="TRANSIT">🚌 Toplu taşıma</option>
     </select>
 
     <input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Kadıköy...)">
@@ -74,8 +80,8 @@
      ***********************/
     const GOOGLE_KEY = "AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA"; // <-- buraya key
     const HOME = { lat: 40.932218, lng: 29.126709, label: "Ev" };
-    const CACHE_KEY = "school_google_places_cache_btn_v2"; // v2: süre de cache'leniyor
-    const BIAS_RADIUS_M = 25000; // ev çevresinde arama bias
+    const CACHE_KEY = "school_google_places_cache_btn_v3"; // v3: süreler mode bazlı
+    const BIAS_RADIUS_M = 25000;
 
     /***********************
      * 2) OKULLAR
@@ -139,14 +145,17 @@
       try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch { return {}; }
     }
     function saveCache(obj) { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
-    let geoCache = loadCache();
+
     // geoCache[id] örnek:
     // {
     //   lat,lng,formattedAddress,query,ts,
-    //   durationText, durationSec,
-    //   durationTrafficText, durationTrafficSec,
-    //   durationTs
+    //   times: {
+    //     DRIVING: { durationText, durationSec, trafficText, trafficSec, ts },
+    //     WALKING: { durationText, durationSec, ts },
+    //     TRANSIT: { durationText, durationSec, ts }
+    //   }
     // }
+    let geoCache = loadCache();
 
     /***********************
      * 4) HELPERS
@@ -155,6 +164,7 @@
     const filterEl = document.getElementById("filter");
     const statusEl = document.getElementById("status");
     const districtSelectEl = document.getElementById("districtSelect");
+    const modeSelectEl = document.getElementById("modeSelect");
 
     function setStatus(t){ statusEl.textContent = t; }
 
@@ -186,6 +196,33 @@
         districts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
     }
 
+    function currentMode() {
+      const v = (modeSelectEl.value || "DRIVING").trim();
+      if (v === "WALKING" || v === "TRANSIT" || v === "DRIVING") return v;
+      return "DRIVING";
+    }
+
+    function modeLabel(mode){
+      if (mode === "DRIVING") return "🚗 Araç";
+      if (mode === "WALKING") return "🚶 Yürüme";
+      if (mode === "TRANSIT") return "🚌 Toplu taşıma";
+      return mode;
+    }
+
+    function getCachedTime(rec, mode){
+      if (!rec?.times?.[mode]) return null;
+      return rec.times[mode];
+    }
+
+    function getBestTimeText(rec, mode){
+      const t = getCachedTime(rec, mode);
+      if (!t) return null;
+      // Araçta trafik varsa onu bas
+      if (mode === "DRIVING" && t.trafficText) return t.trafficText;
+      if (t.durationText) return t.durationText;
+      return null;
+    }
+
     /***********************
      * 5) GOOGLE MAPS / PLACES / DIRECTIONS
      ***********************/
@@ -205,7 +242,6 @@
 
       placesService = new google.maps.places.PlacesService(gmap);
       directionsService = new google.maps.DirectionsService();
-
       infoWin = new google.maps.InfoWindow();
 
       homeMarker = new google.maps.Marker({
@@ -214,7 +250,7 @@
         title: HOME.label
       });
 
-      setStatus("Hazır. Semt seçebilir veya arayabilir, sonra 'Konum Bul' diyebilirsin.");
+      setStatus("Hazır. Semt + mod seç, sonra karttan 'Konum Bul' veya 'Süre Hesapla' kullan.");
       render();
     };
 
@@ -235,20 +271,26 @@
       });
     }
 
-    // ✅ YENİ: Navigasyon süresi (dk) hesapla
-    // Trafikli süre: leg.duration_in_traffic (varsa), yoksa leg.duration
-    function getTravelTimeTo(lat, lng) {
+    // Navigasyon süresi hesapla (mode bazlı)
+    function getTravelTimeTo(lat, lng, mode) {
       return new Promise((resolve) => {
         if (!directionsService) { resolve(null); return; }
 
         const req = {
           origin: new google.maps.LatLng(HOME.lat, HOME.lng),
           destination: new google.maps.LatLng(lat, lng),
-          travelMode: google.maps.TravelMode.DRIVING,
-          drivingOptions: {
-            departureTime: new Date() // şimdi -> duration_in_traffic gelsin
-          }
+          travelMode: google.maps.TravelMode[mode] || google.maps.TravelMode.DRIVING
         };
+
+        // Trafik sadece DRIVING + departureTime ile gelir
+        if (mode === "DRIVING") {
+          req.drivingOptions = { departureTime: new Date() };
+        }
+
+        // TRANSIT için de departureTime faydalı
+        if (mode === "TRANSIT") {
+          req.transitOptions = { departureTime: new Date() };
+        }
 
         directionsService.route(req, (result, status) => {
           try {
@@ -264,9 +306,9 @@
             resolve({
               durationText: normal?.text || "",
               durationSec: normal?.value ?? null,
-              durationTrafficText: traffic?.text || "",
-              durationTrafficSec: traffic?.value ?? null,
-              durationTs: Date.now()
+              trafficText: (mode === "DRIVING" ? (traffic?.text || "") : ""),
+              trafficSec: (mode === "DRIVING" ? (traffic?.value ?? null) : null),
+              ts: Date.now()
             });
           } catch {
             resolve(null);
@@ -299,11 +341,9 @@
       }
 
       const km = haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng).toFixed(2);
-
-      // Süre etiketleri
-      const tTraffic = rec.durationTrafficText ? `⏱️ Trafik: ${escapeHtml(rec.durationTrafficText)}` : "";
-      const tNormal = rec.durationText ? `⏱️ Süre: ${escapeHtml(rec.durationText)}` : "";
-      const timeLine = tTraffic || tNormal ? `<br><small>${tTraffic || tNormal}</small>` : "";
+      const mode = currentMode();
+      const t = getBestTimeText(rec, mode);
+      const timeLine = t ? `<br><small><b>${escapeHtml(modeLabel(mode))}:</b> ⏱️ ${escapeHtml(t)}</small>` : "";
 
       const html =
         `<b>${escapeHtml(school.name)}</b><br>` +
@@ -351,6 +391,34 @@
         .map(x => x.s);
     }
 
+    async function ensureTimeForSchool(school) {
+      const rec = geoCache[school.id];
+      if (!rec?.lat || !rec?.lng) return false;
+
+      const mode = currentMode();
+      const existing = getCachedTime(rec, mode);
+      if (existing?.durationText || (mode === "DRIVING" && existing?.trafficText)) {
+        return true; // zaten var
+      }
+
+      setStatus(`Süre hesaplanıyor (${modeLabel(mode)}): ${school.name}`);
+      const tt = await getTravelTimeTo(rec.lat, rec.lng, mode);
+      if (!tt) {
+        setStatus("Süre hesaplanamadı. (Rota bulunamadı veya API kısıtı olabilir)");
+        return false;
+      }
+
+      geoCache[school.id] = {
+        ...rec,
+        times: {
+          ...(rec.times || {}),
+          [mode]: tt
+        }
+      };
+      saveCache(geoCache);
+      return true;
+    }
+
     function render() {
       const visible = getFilteredSchoolsSorted();
       listEl.innerHTML = "";
@@ -363,6 +431,8 @@
         return;
       }
 
+      const mode = currentMode();
+
       for (const s of visible) {
         const card = document.createElement("div");
         card.className = "card";
@@ -372,21 +442,24 @@
         const d = distanceKmForSchool(s);
         const distLabel = (typeof d === "number") ? `${d.toFixed(2)} km` : "—";
 
-        // Süre label (trafik varsa onu bas)
-        let timeLabel = "—";
-        if (rec?.durationTrafficText) timeLabel = rec.durationTrafficText;
-        else if (rec?.durationText) timeLabel = rec.durationText;
+        const timeText = getBestTimeText(rec, mode); // yoksa null
 
         const top = document.createElement("div");
         top.className = "row";
 
         const left = document.createElement("div");
+
+        // Süre badge’i sadece süre varsa göster
+        const timeBadgeHtml = timeText
+          ? `<span class="badge">${escapeHtml(modeLabel(mode))}: <span class="km">⏱️ ${escapeHtml(timeText)}</span></span>`
+          : ``;
+
         left.innerHTML = `
           <div class="title">${escapeHtml(s.name)}</div>
           <div class="meta">
             <span class="badge">${escapeHtml(s.district)}</span>
             <span class="badge">Mesafe: <span class="km">${escapeHtml(distLabel)}</span></span>
-            <span class="badge">Süre: <span class="km">${escapeHtml(timeLabel)}</span></span>
+            ${timeBadgeHtml}
           </div>
         `;
 
@@ -415,6 +488,14 @@
         const btnForget = document.createElement("button");
         btnForget.textContent = "Bu Okulu Unut";
 
+        // Konum var ama seçili mod için süre yoksa: "Süre Hesapla"
+        const btnTime = document.createElement("button");
+        btnTime.textContent = "Süre Hesapla";
+
+        const hasCoords = !!(rec?.lat && rec?.lng);
+        const hasTimeForMode = !!getBestTimeText(rec, mode);
+        const showTimeBtn = hasCoords && !hasTimeForMode;
+
         const meta2 = document.createElement("div");
         meta2.className = "meta";
         meta2.style.marginTop = "10px";
@@ -440,7 +521,7 @@
             const lat = r.geometry.location.lat();
             const lng = r.geometry.location.lng();
 
-            // Önce konumu cache'e yaz
+            // Konumu cache'e yaz
             const found = {
               lat,
               lng,
@@ -449,22 +530,16 @@
               ts: Date.now()
             };
 
-            geoCache[s.id] = { ...(geoCache[s.id] || {}), ...found };
+            const prev = geoCache[s.id] || {};
+            geoCache[s.id] = { ...prev, ...found, times: (prev.times || {}) };
             saveCache(geoCache);
 
-            setStatus("Süre hesaplanıyor: " + s.name);
+            // Seçili mod için süre hesapla (tek sefer)
+            await ensureTimeForSchool(s);
 
-            // ✅ Navigasyon süresi hesapla
-            const tt = await getTravelTimeTo(lat, lng);
-            if (tt) {
-              geoCache[s.id] = { ...(geoCache[s.id] || {}), ...tt };
-              saveCache(geoCache);
-            }
-
-            // Haritada ev + okul göster
+            // Haritada göster
             showHomeAndSchoolOnMap(s, geoCache[s.id]);
 
-            // Listeyi güncelle
             render();
             setStatus("Gösterildi: " + s.name);
           } catch (e) {
@@ -476,6 +551,21 @@
           }
         };
 
+        btnTime.onclick = async () => {
+          btnTime.disabled = true;
+          btnTime.textContent = "Hesaplanıyor...";
+          try {
+            const ok = await ensureTimeForSchool(s);
+            if (ok) {
+              render();
+              setStatus(`Süre güncellendi (${modeLabel(currentMode())}): ${s.name}`);
+            }
+          } finally {
+            btnTime.disabled = false;
+            btnTime.textContent = "Süre Hesapla";
+          }
+        };
+
         btnForget.onclick = () => {
           delete geoCache[s.id];
           saveCache(geoCache);
@@ -484,6 +574,7 @@
         };
 
         controls.appendChild(btnFind);
+        if (showTimeBtn) controls.appendChild(btnTime);
         controls.appendChild(btnForget);
 
         card.appendChild(top);
@@ -500,6 +591,10 @@
      ***********************/
     filterEl.addEventListener("input", render);
     districtSelectEl.addEventListener("change", render);
+    modeSelectEl.addEventListener("change", () => {
+      setStatus(`Ulaşım modu: ${modeLabel(currentMode())}`);
+      render();
+    });
 
     document.getElementById("btnClearMarkers").onclick = () => {
       clearMapMarkers(true);
