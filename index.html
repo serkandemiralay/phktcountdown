@@ -1,4 +1,4 @@
-AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
+
 <!doctype html>
 <html lang="tr">
 <head>
@@ -46,11 +46,12 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
     <div class="sub">
       Ev koordinatı: <span class="mono">40.932218, 29.126709</span><br>
       Her okul kartında <b>Konum Bul</b> butonuna basınca okul sağdaki haritada ev ile birlikte gösterilir.
+      Ayrıca <b>navigasyon süresi</b> (dk) hesaplanır.
     </div>
   </header>
 
   <div class="topbar">
-    <!-- YENİ: Semt/İlçe dropdown -->
+    <!-- Semt/İlçe dropdown -->
     <select id="districtSelect" class="input select">
       <option value="">Tümü</option>
     </select>
@@ -73,7 +74,7 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
      ***********************/
     const GOOGLE_KEY = "AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA"; // <-- buraya key
     const HOME = { lat: 40.932218, lng: 29.126709, label: "Ev" };
-    const CACHE_KEY = "school_google_places_cache_btn_v1";
+    const CACHE_KEY = "school_google_places_cache_btn_v2"; // v2: süre de cache'leniyor
     const BIAS_RADIUS_M = 25000; // ev çevresinde arama bias
 
     /***********************
@@ -132,30 +133,20 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
     ];
 
     /***********************
-     * 2.1) YENİ: Semt dropdown doldur
-     ***********************/
-    const districtSelectEl = document.getElementById("districtSelect");
-
-    function normalizeDistrict(d) { return String(d || "").trim(); }
-
-    function initDistrictDropdown() {
-      const districts = Array.from(new Set(schools.map(s => normalizeDistrict(s.district))))
-        .filter(Boolean)
-        .sort((a,b) => a.localeCompare(b, "tr"));
-
-      // seçenekleri sıfırla (Tümü kalsın)
-      districtSelectEl.innerHTML = `<option value="">Tümü</option>` +
-        districts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
-    }
-
-    /***********************
      * 3) CACHE
      ***********************/
     function loadCache() {
       try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch { return {}; }
     }
     function saveCache(obj) { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
-    let geoCache = loadCache(); // { [id]: {lat,lng,formattedAddress,query,ts} }
+    let geoCache = loadCache();
+    // geoCache[id] örnek:
+    // {
+    //   lat,lng,formattedAddress,query,ts,
+    //   durationText, durationSec,
+    //   durationTrafficText, durationTrafficSec,
+    //   durationTs
+    // }
 
     /***********************
      * 4) HELPERS
@@ -163,6 +154,8 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
     const listEl = document.getElementById("list");
     const filterEl = document.getElementById("filter");
     const statusEl = document.getElementById("status");
+    const districtSelectEl = document.getElementById("districtSelect");
+
     function setStatus(t){ statusEl.textContent = t; }
 
     function escapeHtml(str) {
@@ -183,10 +176,20 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
       return haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng);
     }
 
+    function initDistrictDropdown() {
+      const districts = Array.from(new Set(schools.map(s => (s.district || "").trim())))
+        .filter(Boolean)
+        .sort((a,b) => a.localeCompare(b, "tr"));
+
+      districtSelectEl.innerHTML =
+        `<option value="">Tümü</option>` +
+        districts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+    }
+
     /***********************
-     * 5) GOOGLE MAPS / PLACES
+     * 5) GOOGLE MAPS / PLACES / DIRECTIONS
      ***********************/
-    let gmap, placesService;
+    let gmap, placesService, directionsService;
     let homeMarker;
     let schoolMarkers = {}; // id -> marker
     let infoWin;
@@ -201,6 +204,8 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
       });
 
       placesService = new google.maps.places.PlacesService(gmap);
+      directionsService = new google.maps.DirectionsService();
+
       infoWin = new google.maps.InfoWindow();
 
       homeMarker = new google.maps.Marker({
@@ -209,7 +214,7 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
         title: HOME.label
       });
 
-      setStatus("Hazır. Bir okulun kartındaki 'Konum Bul' butonuna bas.");
+      setStatus("Hazır. Semt seçebilir veya arayabilir, sonra 'Konum Bul' diyebilirsin.");
       render();
     };
 
@@ -226,6 +231,46 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
             return;
           }
           resolve(results[0]);
+        });
+      });
+    }
+
+    // ✅ YENİ: Navigasyon süresi (dk) hesapla
+    // Trafikli süre: leg.duration_in_traffic (varsa), yoksa leg.duration
+    function getTravelTimeTo(lat, lng) {
+      return new Promise((resolve) => {
+        if (!directionsService) { resolve(null); return; }
+
+        const req = {
+          origin: new google.maps.LatLng(HOME.lat, HOME.lng),
+          destination: new google.maps.LatLng(lat, lng),
+          travelMode: google.maps.TravelMode.DRIVING,
+          drivingOptions: {
+            departureTime: new Date() // şimdi -> duration_in_traffic gelsin
+          }
+        };
+
+        directionsService.route(req, (result, status) => {
+          try {
+            if (status !== google.maps.DirectionsStatus.OK || !result?.routes?.[0]?.legs?.[0]) {
+              resolve(null);
+              return;
+            }
+            const leg = result.routes[0].legs[0];
+
+            const normal = leg.duration ? { text: leg.duration.text, value: leg.duration.value } : null;
+            const traffic = leg.duration_in_traffic ? { text: leg.duration_in_traffic.text, value: leg.duration_in_traffic.value } : null;
+
+            resolve({
+              durationText: normal?.text || "",
+              durationSec: normal?.value ?? null,
+              durationTrafficText: traffic?.text || "",
+              durationTrafficSec: traffic?.value ?? null,
+              durationTs: Date.now()
+            });
+          } catch {
+            resolve(null);
+          }
         });
       });
     }
@@ -254,10 +299,17 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
       }
 
       const km = haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng).toFixed(2);
+
+      // Süre etiketleri
+      const tTraffic = rec.durationTrafficText ? `⏱️ Trafik: ${escapeHtml(rec.durationTrafficText)}` : "";
+      const tNormal = rec.durationText ? `⏱️ Süre: ${escapeHtml(rec.durationText)}` : "";
+      const timeLine = tTraffic || tNormal ? `<br><small>${tTraffic || tNormal}</small>` : "";
+
       const html =
         `<b>${escapeHtml(school.name)}</b><br>` +
         `<small>${escapeHtml(rec.formattedAddress || "")}</small><br>` +
-        `<small><b>Mesafe:</b> ${escapeHtml(km)} km</small>`;
+        `<small><b>Mesafe:</b> ${escapeHtml(km)} km</small>` +
+        timeLine;
 
       schoolMarkers[school.id].addListener("click", () => {
         infoWin.setContent(html);
@@ -311,13 +363,19 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
         return;
       }
 
-      // (İstersen burada “x okul gösteriliyor” gibi bir status da basabiliriz)
       for (const s of visible) {
         const card = document.createElement("div");
         card.className = "card";
 
+        const rec = geoCache[s.id];
+
         const d = distanceKmForSchool(s);
         const distLabel = (typeof d === "number") ? `${d.toFixed(2)} km` : "—";
+
+        // Süre label (trafik varsa onu bas)
+        let timeLabel = "—";
+        if (rec?.durationTrafficText) timeLabel = rec.durationTrafficText;
+        else if (rec?.durationText) timeLabel = rec.durationText;
 
         const top = document.createElement("div");
         top.className = "row";
@@ -328,6 +386,7 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
           <div class="meta">
             <span class="badge">${escapeHtml(s.district)}</span>
             <span class="badge">Mesafe: <span class="km">${escapeHtml(distLabel)}</span></span>
+            <span class="badge">Süre: <span class="km">${escapeHtml(timeLabel)}</span></span>
           </div>
         `;
 
@@ -356,7 +415,6 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
         const btnForget = document.createElement("button");
         btnForget.textContent = "Bu Okulu Unut";
 
-        const rec = geoCache[s.id];
         const meta2 = document.createElement("div");
         meta2.className = "meta";
         meta2.style.marginTop = "10px";
@@ -379,19 +437,34 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
               return;
             }
 
+            const lat = r.geometry.location.lat();
+            const lng = r.geometry.location.lng();
+
+            // Önce konumu cache'e yaz
             const found = {
-              lat: r.geometry.location.lat(),
-              lng: r.geometry.location.lng(),
+              lat,
+              lng,
               formattedAddress: r.formatted_address || "",
               query,
               ts: Date.now()
             };
 
-            geoCache[s.id] = found;
+            geoCache[s.id] = { ...(geoCache[s.id] || {}), ...found };
             saveCache(geoCache);
 
-            showHomeAndSchoolOnMap(s, found);
+            setStatus("Süre hesaplanıyor: " + s.name);
 
+            // ✅ Navigasyon süresi hesapla
+            const tt = await getTravelTimeTo(lat, lng);
+            if (tt) {
+              geoCache[s.id] = { ...(geoCache[s.id] || {}), ...tt };
+              saveCache(geoCache);
+            }
+
+            // Haritada ev + okul göster
+            showHomeAndSchoolOnMap(s, geoCache[s.id]);
+
+            // Listeyi güncelle
             render();
             setStatus("Gösterildi: " + s.name);
           } catch (e) {
@@ -458,7 +531,7 @@ AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
       document.head.appendChild(s);
     }
 
-    // Başlat (önce dropdown'u doldur)
+    // Başlat
     initDistrictDropdown();
     loadGoogleScript();
   </script>
