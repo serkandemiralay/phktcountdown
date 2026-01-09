@@ -1,1011 +1,304 @@
-<!doctype html>
-<html lang="tr">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Phuket Tatili • Geri Sayım</title>
-
-  <!-- iPhone / PWA polish -->
-  <meta name="theme-color" content="#ffffff">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Phuket">
-
-  <style>
-    :root{
-      --sky:#bff1ff;
-      --sun:#ffe3a6;
-      --pink:#ffd0e6;
-
-      --ink:#071a2f;
-      --muted:#526173;
-
-      --sea: rgba(38, 216, 186, .95);
-      --coral: rgba(255, 146, 94, .95);
-      --twilight: rgba(137, 164, 255, .95);
-
-      --radius: 22px;
-    }
-
-    *{ box-sizing:border-box; }
-
-    /* ✅ iPhone scroll fix */
-    html, body { height: 100%; }
-    body{
-      margin:0;
-      min-height:100vh;
-      overflow-x:hidden;
-      overflow-y:auto;
-      -webkit-overflow-scrolling: touch;
-
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color: var(--ink);
-
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      padding: 22px;
-      padding-bottom: calc(22px + env(safe-area-inset-bottom));
-      position:relative;
-
-      background:
-        radial-gradient(1200px 900px at 12% 12%, var(--pink), transparent 55%),
-        radial-gradient(1200px 900px at 92% 18%, var(--sky), transparent 55%),
-        radial-gradient(900px 900px at 55% 90%, var(--sun), transparent 55%),
-        #fff;
-    }
-
-    /* Aurora overlay */
-    .aurora{
-      position:fixed;
-      inset:-40%;
-      background:
-        radial-gradient(closest-side at 30% 40%, rgba(38,216,186,.22), transparent 60%),
-        radial-gradient(closest-side at 70% 30%, rgba(255,146,94,.18), transparent 60%),
-        radial-gradient(closest-side at 50% 70%, rgba(137,164,255,.18), transparent 60%);
-      filter: blur(28px);
-      opacity:.75;
-      mix-blend-mode: multiply;
-      animation: aurora 18s ease-in-out infinite;
-      pointer-events:none;
-      z-index:0;
-    }
-    @keyframes aurora{
-      0%,100%{ transform: translate(-2%, 1%) rotate(0deg) scale(1); }
-      50%{ transform: translate(3%, -2%) rotate(10deg) scale(1.05); }
-    }
-
-    /* Floating blobs */
-    .blob{
-      position:fixed;
-      width: 520px;
-      height: 520px;
-      filter: blur(26px);
-      opacity:.22;
-      border-radius: 42% 58% 63% 37% / 48% 40% 60% 52%;
-      animation: float 10s ease-in-out infinite;
-      pointer-events:none;
-      z-index:0;
-    }
-    .b1{ left:-170px; top:-140px; background: linear-gradient(135deg, var(--sea), var(--coral)); }
-    .b2{ right:-210px; top:70px; background: linear-gradient(135deg, var(--twilight), var(--sea)); animation-duration: 12s; }
-    .b3{ left:120px; bottom:-260px; background: linear-gradient(135deg, var(--coral), var(--twilight)); animation-duration: 11s; }
-    @keyframes float{
-      0%,100%{ transform: translate(0,0) rotate(0deg) scale(1); }
-      50%{ transform: translate(30px, -18px) rotate(6deg) scale(1.05); }
-    }
-
-    /* Soft bokeh particles */
-    .bokeh{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-      opacity:.55;
-      background-image:
-        radial-gradient(10px 10px at 12% 20%, rgba(255,255,255,.65), transparent 60%),
-        radial-gradient(16px 16px at 82% 22%, rgba(255,255,255,.55), transparent 60%),
-        radial-gradient(12px 12px at 72% 78%, rgba(255,255,255,.45), transparent 60%),
-        radial-gradient(18px 18px at 28% 78%, rgba(255,255,255,.55), transparent 60%),
-        radial-gradient(14px 14px at 54% 48%, rgba(255,255,255,.35), transparent 60%);
-      animation: drift 14s ease-in-out infinite;
-    }
-    @keyframes drift{
-      0%,100%{ transform: translate(0,0); }
-      50%{ transform: translate(10px,-8px); }
-    }
-
-    /* Waves */
-    .waves{
-      position:fixed;
-      left:0; right:0; bottom:-10px;
-      height: 160px;
-      pointer-events:none;
-      z-index:0;
-      opacity:.55;
-    }
-    .wave{
-      position:absolute;
-      left:-20%;
-      width: 140%;
-      height: 100%;
-      background-repeat: repeat-x;
-      background-size: 1200px 160px;
-      filter: blur(.1px);
-      transform: translateZ(0);
-    }
-    .wave.w1{
-      bottom: 0;
-      opacity:.55;
-      background-image: radial-gradient(closest-side at 50% 60%, rgba(38,216,186,.22), rgba(38,216,186,0) 70%);
-      animation: waveMove 12s linear infinite;
-    }
-    .wave.w2{
-      bottom: 12px;
-      opacity:.45;
-      background-image: radial-gradient(closest-side at 50% 60%, rgba(255,146,94,.18), rgba(255,146,94,0) 70%);
-      animation: waveMove 16s linear infinite reverse;
-    }
-    .wave.w3{
-      bottom: 26px;
-      opacity:.35;
-      background-image: radial-gradient(closest-side at 50% 60%, rgba(137,164,255,.18), rgba(137,164,255,0) 70%);
-      animation: waveMove 20s linear infinite;
-    }
-    @keyframes waveMove{
-      from{ transform: translateX(0); }
-      to{ transform: translateX(-20%); }
-    }
-
-    /* App shell */
-    .shell{
-      width: min(1100px, 100%);
-      position:relative;
-      z-index:1;
-    }
-
-    .grid2{
-      display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 16px;
-    }
-    @media (max-width: 920px){
-      .grid2{ grid-template-columns: 1fr; }
-    }
-
-    /* -----------------------
-       PREMIUM GLASS UPGRADE
-       ----------------------- */
-    .card{
-      background: rgba(255,255,255,.34);
-      border: 1px solid rgba(255,255,255,.38);
-      border-radius: var(--radius);
-      box-shadow:
-        0 26px 70px rgba(0,0,0,.18),
-        0 0 0 1px rgba(255,255,255,.35) inset,
-        0 0 28px rgba(38,216,186,.18),
-        0 0 34px rgba(255,146,94,.14);
-      position:relative;
-      overflow:hidden;
-      transform: translateZ(0);
-    }
-
-    @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))){
-      .card{
-        -webkit-backdrop-filter: blur(18px) saturate(160%);
-        backdrop-filter: blur(18px) saturate(160%);
-      }
-    }
-
-    /* shimmer */
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background: linear-gradient(120deg,
-        rgba(255,255,255,.0) 0%,
-        rgba(255,255,255,.25) 25%,
-        rgba(255,255,255,.0) 55%);
-      transform: translateX(-30%) rotate(10deg);
-      animation: shimmer 7.5s ease-in-out infinite;
-      pointer-events:none;
-      opacity:.55;
-      z-index:0;
-    }
-    @keyframes shimmer{
-      0%,100%{ transform: translateX(-35%) rotate(10deg); opacity:.35; }
-      50%{ transform: translateX(35%) rotate(10deg); opacity:.70; }
-    }
-
-    /* noise / grain */
-    .card::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      opacity:.10;
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay;
-      z-index:0;
-    }
-
-    /* iPhone touch devices: stronger glass */
-    @media (hover: none) and (pointer: coarse){
-      .card{
-        background: rgba(255,255,255,.28);
-        -webkit-backdrop-filter: blur(22px) saturate(175%);
-        backdrop-filter: blur(22px) saturate(175%);
-      }
-    }
-
-    header{
-      padding: 22px 22px 10px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-      position:relative;
-      z-index:1;
-    }
-    h1{
-      margin:0;
-      font-size: 22px;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin:6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height:1.35;
-    }
-    .badge{
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      background: rgba(255,255,255,.40);
-      border: 1px solid rgba(255,255,255,.35);
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
-      white-space:nowrap;
-      -webkit-backdrop-filter: blur(12px) saturate(140%);
-      backdrop-filter: blur(12px) saturate(140%);
-    }
-    .content{ padding: 10px 22px 22px; position:relative; z-index:1; }
-
-    /* Countdown line */
-    .bigline{
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.40);
-      border: 1px solid rgba(255,255,255,.35);
-      font-weight: 900;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px;
-      align-items:center;
-      justify-content:space-between;
-      -webkit-backdrop-filter: blur(12px) saturate(140%);
-      backdrop-filter: blur(12px) saturate(140%);
-    }
-    .bigline small{
-      font-weight: 700;
-      color: var(--muted);
-    }
-
-    /* tiles */
-    .tiles{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 10px;
-    }
-    @media (max-width: 520px){
-      .tiles{ grid-template-columns: repeat(2, 1fr); }
-    }
-    .tile{
-      background: rgba(255,255,255,.40);
-      border: 1px solid rgba(255,255,255,.35);
-      border-radius: 18px;
-      padding: 14px 12px;
-      text-align:center;
-      position:relative;
-      overflow:hidden;
-      -webkit-backdrop-filter: blur(14px) saturate(145%);
-      backdrop-filter: blur(14px) saturate(145%);
-    }
-    .tile::after{
-      content:"";
-      position:absolute;
-      inset:-10%;
-      background: radial-gradient(260px 160px at 30% 10%, rgba(38,216,186,.20), transparent 60%);
-      opacity:.9;
-      pointer-events:none;
-    }
-    .num{
-      position:relative;
-      z-index:1;
-      font-size: 34px;
-      font-weight: 950;
-      letter-spacing: .5px;
-      line-height: 1.1;
-      text-shadow: 0 10px 30px rgba(0,0,0,.10);
-    }
-    .lbl{
-      position:relative;
-      z-index:1;
-      margin-top:6px;
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    /* Buttons */
-    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
-    .btn{
-      position:relative;
-      cursor:pointer;
-      border:none;
-      padding: 12px 14px;
-      border-radius: 16px;
-      font-weight: 950;
-      font-size: 14px;
-      letter-spacing:.2px;
-      box-shadow: 0 16px 34px rgba(0,0,0,.12);
-      transform: translateZ(0);
-      transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
-      overflow:hidden;
-      user-select:none;
-    }
-    .btn:hover{
-      transform: translateY(-1px) scale(1.01);
-      filter: brightness(1.04);
-      box-shadow: 0 18px 40px rgba(0,0,0,.14);
-    }
-    .btn:active{
-      transform: translateY(1px) scale(.99);
-      box-shadow: 0 10px 24px rgba(0,0,0,.12);
-    }
-    .btn.primary{
-      background: linear-gradient(135deg, rgba(255,146,94,.98), rgba(38,216,186,.98));
-      color: #061627;
-      box-shadow:
-        0 18px 45px rgba(0,0,0,.18),
-        0 0 0 1px rgba(255,255,255,.22) inset;
-    }
-    .btn.ghost{
-      background: rgba(255,255,255,.40);
-      color: #061627;
-      border: 1px solid rgba(255,255,255,.35);
-      box-shadow: 0 12px 28px rgba(0,0,0,.10);
-      -webkit-backdrop-filter: blur(12px) saturate(140%);
-      backdrop-filter: blur(12px) saturate(140%);
-    }
-    /* shine */
-    .btn::before{
-      content:"";
-      position:absolute;
-      top:-40%;
-      left:-30%;
-      width: 60%;
-      height: 180%;
-      background: linear-gradient(120deg, rgba(255,255,255,.70), rgba(255,255,255,0));
-      transform: rotate(18deg) translateX(-130%);
-      transition: transform .45s ease;
-      opacity:.55;
-      pointer-events:none;
-    }
-    .btn:hover::before{
-      transform: rotate(18deg) translateX(280%);
-    }
-    /* ripple */
-    .ripple{
-      position:absolute;
-      border-radius:999px;
-      transform: scale(0);
-      animation: ripple .55s ease-out;
-      background: rgba(255,255,255,.55);
-      pointer-events:none;
-    }
-    @keyframes ripple{
-      to{ transform: scale(18); opacity:0; }
-    }
-
-    /* Timeline */
-    .list{
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .item{
-      background: rgba(255,255,255,.36);
-      border: 1px solid rgba(255,255,255,.35);
-      border-radius: 18px;
-      padding: 12px 12px;
-      position:relative;
-      overflow:hidden;
-      -webkit-backdrop-filter: blur(14px) saturate(145%);
-      backdrop-filter: blur(14px) saturate(145%);
-    }
-    .item::after{
-      content:"";
-      position:absolute;
-      inset:-10%;
-      background: radial-gradient(300px 170px at 10% 0%, rgba(255,146,94,.14), transparent 55%);
-      pointer-events:none;
-      opacity:.9;
-    }
-    .itemTop{
-      position:relative;
-      z-index:1;
-      display:flex;
-      gap: 10px;
-      align-items:flex-start;
-      justify-content:space-between;
-    }
-    .tag{
-      font-size: 12px;
-      font-weight: 950;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.35);
-      background: rgba(255,255,255,.40);
-      white-space:nowrap;
-      -webkit-backdrop-filter: blur(10px) saturate(140%);
-      backdrop-filter: blur(10px) saturate(140%);
-    }
-    .tag.ok{ background: rgba(38,216,186,.18); }
-    .tag.next{ background: rgba(137,164,255,.18); }
-    .tag.soon{ background: rgba(255,146,94,.18); }
-
-    .item h3{
-      margin:0;
-      font-size: 14px;
-      font-weight: 950;
-      letter-spacing:.2px;
-    }
-    .meta{
-      position:relative;
-      z-index:1;
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height:1.35;
-      font-weight: 650;
-    }
-
-    .party{
-      display:none;
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.46);
-      border: 1px solid rgba(255,255,255,.35);
-      font-weight: 950;
-      animation: pop .6s ease both;
-      -webkit-backdrop-filter: blur(14px) saturate(145%);
-      backdrop-filter: blur(14px) saturate(145%);
-    }
-    .party.show{ display:block; }
-    @keyframes pop{
-      from{ transform: translateY(8px); opacity:0; }
-      to{ transform: translateY(0); opacity:1; }
-    }
-
-    footer{
-      padding: 14px 22px 20px;
-      color: rgba(0,0,0,.55);
-      font-size: 12px;
-      position:relative;
-      z-index:1;
-      font-weight: 650;
-    }
-
-    /* Confetti canvas */
-    canvas#confetti{
-      position: fixed;
-      inset: 0;
-      pointer-events:none;
-      z-index: 999;
-    }
-
-    /* Reduce motion accessibility */
-    @media (prefers-reduced-motion: reduce){
-      .aurora, .blob, .bokeh, .wave{ animation: none !important; }
-      .card::before{ animation: none !important; }
-    }
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.2">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
   </style>
 </head>
-
 <body>
-  <canvas id="confetti"></canvas>
-
-  <div class="aurora"></div>
-  <div class="bokeh"></div>
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-
-  <div class="waves" aria-hidden="true">
-    <div class="wave w1"></div>
-    <div class="wave w2"></div>
-    <div class="wave w3"></div>
-  </div>
-
-  <main class="shell">
-    <div class="grid2">
-
-      <!-- Countdown card -->
-      <section class="card js-tilt">
-        <header>
-          <div>
-            <h1>🌴 Phuket Tatili — Geri Sayım</h1>
-            <p class="sub" id="subtitle">En yakın uçuş adımına geri sayıyoruz…</p>
-          </div>
-          <div class="badge">🌙 Istanbul saati</div>
-        </header>
-
-        <div class="content">
-          <div class="bigline" id="nextLine">
-            <span>⏳ Yükleniyor…</span>
-            <small></small>
-          </div>
-
-          <div class="tiles" aria-label="Geri sayım">
-            <div class="tile"><div class="num" id="d">0</div><div class="lbl">Gün</div></div>
-            <div class="tile"><div class="num" id="h">00</div><div class="lbl">Saat</div></div>
-            <div class="tile"><div class="num" id="m">00</div><div class="lbl">Dakika</div></div>
-            <div class="tile"><div class="num" id="s">00</div><div class="lbl">Saniye</div></div>
-          </div>
-
-          <div class="party" id="party">🎉 Phuket’e vardınız! (Deniz + pad thai + gün batımı 😄)</div>
-
-          <div class="btns">
-            <button class="btn primary" id="icsBtn" type="button">📅 Takvime ekle (.ics)</button>
-            <button class="btn ghost" id="jumpBtn" type="button">🧭 En yakın adıma git</button>
-          </div>
-
-          <p class="sub" style="margin-top:12px">
-            Not: Saatler verdiğin ülke yerel saatine göre tanımlandı
-            (İstanbul +03:00, Hindistan +05:30, Phuket +07:00).
-          </p>
-        </div>
-
-     
-      </section>
-
-      <!-- Timeline card -->
-      <aside class="card js-tilt" id="timelineCard">
-        <header>
-          <div>
-            <h1>🗺️ Uçuş Planı</h1>
-                     </div>
-          <div class="badge" id="nowBadge">🕒 şimdi</div>
-        </header>
-
-        <div class="content">
-          <div class="list" id="list"></div>
-        </div>
-
-        <footer>İyi yolculuklar! 🧳</footer>
-      </aside>
-
-    </div>
-  </main>
-
-<script>
-  // ------------------------
-  // Trip data (fixed)
-  // ------------------------
-  // Times stored with explicit UTC offsets to respect local time zones.
-  // ✅ Corrected: First leg is Jan 19 (not Jan 10).
-  const events = [
-    {
-      id: "IST_DEP",
-      title: "İstanbul Havalimanı — Kalkış",
-      detail: "",
-      iso: "2026-01-19T20:00:00+03:00",
-      location: "İstanbul (IST) — TR",
-      emoji: "🛫"
-    },
-    {
-      id: "IN_ARR_1",
-      title: "Hindistan — İniş (Aktarma)",
-      detail: "Aktarma / bekleme",
-      iso: "2026-01-20T04:45:00+05:30",
-      location: "Hindistan — IN",
-      emoji: "🛬"
-    },
-    {
-      id: "IN_DEP_2",
-      title: "Hindistan — Kalkış (Phuket’e)",
-      detail: "",
-      iso: "2026-01-20T15:50:00+05:30",
-      location: "Hindistan — IN",
-      emoji: "🛫"
-    },
-    {
-      id: "HKT_ARR",
-      title: "Phuket — Varış",
-      detail: "",
-      iso: "2026-01-20T21:45:00+07:00",
-      location: "Phuket (HKT) — TH",
-      emoji: "🏝️"
-    },
-    {
-      id: "HKT_DEP",
-      title: "Phuket — Dönüş Kalkış",
-      detail: "",
-      iso: "2026-01-28T22:50:00+07:00",
-      location: "Phuket (HKT) — TH",
-      emoji: "🛫"
-    },
-    {
-      id: "IN_ARR_2",
-      title: "Hindistan — İniş (Aktarma)",
-      detail: "Aktarma",
-      iso: "2026-01-29T01:50:00+05:30",
-      location: "Hindistan — IN",
-      emoji: "🛬"
-    },
-    {
-      id: "IN_DEP_3",
-      title: "Hindistan — Kalkış (İstanbul’a)",
-      detail: "",
-      iso: "2026-01-29T06:55:00+05:30",
-      location: "Hindistan — IN",
-      emoji: "🛫"
-    },
-    {
-      id: "IST_ARR",
-      title: "İstanbul — Varış",
-      detail: "",
-      iso: "2026-01-29T11:35:00+03:00",
-      location: "İstanbul (IST) — TR",
-      emoji: "🏁"
-    },
-  ].map(e => ({...e, date: new Date(e.iso)}));
-
-  // ------------------------
-  // Helpers
-  // ------------------------
-  const $ = (id) => document.getElementById(id);
-  const els = {
-    subtitle: $("subtitle"),
-    nextLine: $("nextLine"),
-    d: $("d"), h: $("h"), m: $("m"), s: $("s"),
-    list: $("list"),
-    nowBadge: $("nowBadge"),
-    party: $("party"),
-    icsBtn: $("icsBtn"),
-    jumpBtn: $("jumpBtn"),
-  };
-
-  function pad2(n){ return String(n).padStart(2, "0"); }
-
-  function diffParts(ms){
-    const total = Math.max(0, ms);
-    const sec = Math.floor(total / 1000);
-    const days = Math.floor(sec / (3600 * 24));
-    const hours = Math.floor((sec % (3600 * 24)) / 3600);
-    const mins = Math.floor((sec % 3600) / 60);
-    const secs = sec % 60;
-    return { days, hours, mins, secs };
-  }
-
-  function formatTR(dt, timeZone){
-    return new Intl.DateTimeFormat("tr-TR", {
-      timeZone,
-      year: "numeric",
-      month: "long",
-      day: "2-digit",
-      weekday: "long",
-      hour: "2-digit",
-      minute: "2-digit"
-    }).format(dt);
-  }
-
-  function tzFromIso(iso){
-    if (iso.endsWith("+03:00")) return "Europe/Istanbul";
-    if (iso.endsWith("+05:30")) return "Asia/Kolkata";
-    if (iso.endsWith("+07:00")) return "Asia/Bangkok"; // Phuket uses ICT; Bangkok TZ works.
-    return "Europe/Istanbul";
-  }
-
-  function nextEventIndex(now){
-    return events.findIndex(e => e.date.getTime() > now.getTime());
-  }
-
-  // ------------------------
-  // Render timeline
-  // ------------------------
-  function renderTimeline(now){
-    els.list.innerHTML = "";
-    const idx = nextEventIndex(now);
-    const nextId = idx >= 0 ? events[idx].id : null;
-
-    events.forEach((e) => {
-      const tz = tzFromIso(e.iso);
-      const done = e.date.getTime() < now.getTime();
-      const isNext = e.id === nextId;
-
-      const tagClass = isNext ? "next" : (done ? "ok" : "soon");
-      const tagText  = isNext ? "Sıradaki" : (done ? "Tamamlandı" : "Yaklaşıyor");
-
-      const localStr = formatTR(e.date, tz);
-      const istStr   = formatTR(e.date, "Europe/Istanbul");
-
-      const item = document.createElement("div");
-      item.className = "item";
-      item.id = "ev_" + e.id;
-      item.innerHTML = `
-        <div class="itemTop">
-          <div><h3>${e.emoji} ${e.title}</h3></div>
-          <div class="tag ${tagClass}">${tagText}</div>
-        </div>
-        <div class="meta">
-          <div><b>Yerel saat:</b> ${localStr} <span style="opacity:.75">(${tz})</span></div>
-          <div><b>İstanbul saati:</b> ${istStr}</div>
-          <div style="margin-top:6px">${e.detail} • <span style="opacity:.9">${e.location}</span></div>
-        </div>
-      `;
-      els.list.appendChild(item);
-    });
-
-    els.nowBadge.textContent = "🕒 " + formatTR(now, "Europe/Istanbul");
-  }
-
-  // ------------------------
-  // Countdown + confetti trigger
-  // ------------------------
-  let confettiPlayed = false;
-
-  function updateCountdown(){
-    const now = new Date();
-    const idx = nextEventIndex(now);
-
-    renderTimeline(now);
-
-    if(idx < 0){
-      els.subtitle.textContent = "Tüm uçuşlar tamamlandı. Fotoğraflar gelsin 📸";
-      els.nextLine.innerHTML = `<span>🏁 Yolculuk bitti</span><small>İstanbul’a varış tamamlandı</small>`;
-      els.d.textContent = "0";
-      els.h.textContent = "00";
-      els.m.textContent = "00";
-      els.s.textContent = "00";
-      return;
-    }
-
-    const next = events[idx];
-    const ms = next.date.getTime() - now.getTime();
-    const p = diffParts(ms);
-
-    els.d.textContent = p.days;
-    els.h.textContent = pad2(p.hours);
-    els.m.textContent = pad2(p.mins);
-    els.s.textContent = pad2(p.secs);
-
-    const tz = tzFromIso(next.iso);
-    const localStr = formatTR(next.date, tz);
-
-    els.subtitle.textContent = "En yakın adım:";
-    els.nextLine.innerHTML = `
-      <span>${next.emoji} <b>${next.title}</b></span>
-      <small>${localStr}</small>
-    `;
-
-    // Confetti when Phuket arrival passes
-    const hktArr = events.find(e => e.id === "HKT_ARR")?.date?.getTime() ?? Infinity;
-    if(now.getTime() >= hktArr){
-      els.party.classList.add("show");
-      if(!confettiPlayed){
-        confettiPlayed = true;
-        burstConfetti(true);
-      }
-    }
-  }
-
-  // ------------------------
-  // Confetti (enhanced)
-  // ------------------------
-  const canvas = document.getElementById("confetti");
-  const ctx = canvas.getContext("2d");
-
-  function resizeCanvas(){
-    const dpr = devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
-
-  function burstConfetti(extra){
-    const W = window.innerWidth, H = window.innerHeight;
-    const pieces = [];
-    const count = extra ? 260 : 180;
-
-    for(let i=0;i<count;i++){
-      pieces.push({
-        x: Math.random()*W,
-        y: -20 - Math.random()*H*0.25,
-        vx: (Math.random()-0.5)*5,
-        vy: 2 + Math.random()*6,
-        r: 2 + Math.random()*5,
-        rot: Math.random()*Math.PI,
-        vr: (Math.random()-0.5)*0.25,
-        life: 150 + Math.random()*110,
-        c: `hsla(${Math.floor(Math.random()*360)}, 92%, 62%, .92)`,
-        shape: Math.random() < 0.25 ? "circle" : "rect"
-      });
-    }
-
-    let frame = 0;
-    function draw(){
-      frame++;
-      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
-
-      pieces.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vr;
-        p.vy += 0.025; // gravity
-        p.life -= 1;
-
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.fillStyle = p.c;
-
-        if(p.shape === "circle"){
-          ctx.beginPath();
-          ctx.arc(0,0,p.r,0,Math.PI*2);
-          ctx.fill();
-        } else {
-          ctx.fillRect(-p.r, -p.r, p.r*2.4, p.r*1.5);
-        }
-        ctx.restore();
-      });
-
-      for(let i=pieces.length-1;i>=0;i--){
-        if(pieces[i].life <= 0 || pieces[i].y > H + 80) pieces.splice(i,1);
-      }
-
-      if(pieces.length > 0 && frame < 420) requestAnimationFrame(draw);
-      else ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
-    }
-    requestAnimationFrame(draw);
-  }
-
-  // ------------------------
-  // Buttons: ripple + actions
-  // ------------------------
-  function attachRipples(){
-    document.querySelectorAll(".btn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const span = document.createElement("span");
-        span.className = "ripple";
-        span.style.left = x + "px";
-        span.style.top = y + "px";
-        span.style.width = "14px";
-        span.style.height = "14px";
-
-        btn.appendChild(span);
-        span.addEventListener("animationend", () => span.remove());
-      });
-    });
-  }
-  attachRipples();
-
-  // ------------------------
-  // ICS generator (all events)
-  // ------------------------
-  function toICSDate(dt){
-    const y = dt.getUTCFullYear();
-    const mo = pad2(dt.getUTCMonth()+1);
-    const da = pad2(dt.getUTCDate());
-    const hh = pad2(dt.getUTCHours());
-    const mm = pad2(dt.getUTCMinutes());
-    const ss = pad2(dt.getUTCSeconds());
-    return `${y}${mo}${da}T${hh}${mm}${ss}Z`;
-  }
-
-  function escapeICS(str){
-    return String(str)
-      .replace(/\\/g, "\\\\")
-      .replace(/\n/g, "\\n")
-      .replace(/,/g, "\\,")
-      .replace(/;/g, "\\;");
-  }
-
-  function downloadICS(){
-    const lines = [];
-    lines.push("BEGIN:VCALENDAR");
-    lines.push("VERSION:2.0");
-    lines.push("PRODID:-//Phuket Countdown//TR//EN");
-    lines.push("CALSCALE:GREGORIAN");
-    lines.push("METHOD:PUBLISH");
-
-    events.forEach((e) => {
-      const uid = `${e.id}-${e.date.getTime()}@phuket-countdown`;
-      const start = toICSDate(e.date);
-      const end = toICSDate(new Date(e.date.getTime() + 20*60*1000));
-      const summary = `${e.emoji} ${e.title}`;
-      const desc = `${e.detail} - ${e.location}`;
-
-      lines.push("BEGIN:VEVENT");
-      lines.push(`UID:${uid}`);
-      lines.push(`DTSTAMP:${toICSDate(new Date())}`);
-      lines.push(`DTSTART:${start}`);
-      lines.push(`DTEND:${end}`);
-      lines.push(`SUMMARY:${escapeICS(summary)}`);
-      lines.push(`DESCRIPTION:${escapeICS(desc)}`);
-      lines.push("END:VEVENT");
-    });
-
-    lines.push("END:VCALENDAR");
-
-    const blob = new Blob([lines.join("\r\n")], {type:"text/calendar;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "phuket-ucus-plani.ics";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  document.getElementById("icsBtn").addEventListener("click", downloadICS);
-
-  document.getElementById("jumpBtn").addEventListener("click", () => {
-    const now = new Date();
-    const idx = nextEventIndex(now);
-    const id = idx >= 0 ? "ev_" + events[idx].id : "ev_" + events[events.length-1].id;
-    const el = document.getElementById(id);
-    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
-  });
-
-  // ------------------------
-  // Optional desktop-only 3D tilt (disabled on iPhone)
-  // ------------------------
-  (function setupTilt(){
-    const isTouch = matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if(isTouch) return;
-
-    document.querySelectorAll(".js-tilt").forEach(card => {
-      let raf = null;
-      function onMove(e){
-        if(raf) cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-          const r = card.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width - 0.5;
-          const y = (e.clientY - r.top) / r.height - 0.5;
-          const rx = (-y * 6).toFixed(2);
-          const ry = (x * 6).toFixed(2);
-          card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
-        });
-      }
-      function reset(){
-        card.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
-      }
-      card.addEventListener("mousemove", onMove);
-      card.addEventListener("mouseleave", reset);
-    });
-  })();
-
-  // ------------------------
-  // Start
-  // ------------------------
-  updateCountdown();
-  setInterval(updateCountdown, 250);
-</script>
+<p class="p1">&lt;!doctype html&gt;</p>
+<p class="p1">&lt;html lang="tr"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width,initial-scale=1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Okul Listesi + Harita&lt;/title&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Leaflet (OpenStreetMap) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link</p>
+<p class="p1"><span class="Apple-converted-space">    </span>rel="stylesheet"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="</p>
+<p class="p1"><span class="Apple-converted-space">    </span>crossorigin=""</p>
+<p class="p1"><span class="Apple-converted-space">  </span>/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root { --bg:#0b1220; --card:#121a2b; --muted:#a8b3cf; --text:#e9efff; --accent:#7aa2ff; --border:#23304d; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>header { padding:18px 18px 12px; border-bottom:1px solid var(--border); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>h1 { margin:0; font-size:18px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.sub { margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.layout { display:grid; grid-template-columns: 420px 1fr; gap:12px; height: calc(100vh - 74px); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>@media (max-width: 980px) { .layout { grid-template-columns: 1fr; height:auto; } #map { height: 55vh; } }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.panel { padding:12px; overflow:auto; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.row { display:flex; align-items:center; justify-content:space-between; gap:10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.title { font-weight:700; font-size:14px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.meta { color:var(--muted); font-size:12px; margin-top:4px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button { background:transparent; border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; font-size:12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:hover { border-color: var(--accent); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button.primary { background: rgba(122,162,255,.12); border-color: rgba(122,162,255,.35); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.input { width:100%; box-sizing:border-box; margin-top:10px; background:#0f1730; border:1px solid var(--border); color:var(--text); padding:9px 10px; border-radius:10px; font-size:12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hint { margin-top:8px; color:var(--muted); font-size:12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.topbar { display:flex; gap:10px; align-items:center; margin: 12px 12px 0; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.search { flex:1; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>#map { height:100%; width:100%; border-left:1px solid var(--border); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.badge { font-size:11px; color: var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status { margin: 0 12px 12px; color: var(--muted); font-size: 12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.small { font-size:11px; color: var(--muted); margin-top: 6px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>a { color: var(--accent); text-decoration: none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>a:hover { text-decoration: underline; }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;header&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Okul Listesi (İmam Hatip Hariç) • Harita&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="sub"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>“Haritada Göster” ile okul adı + ilçe + İstanbul üzerinden konumu arar ve işaretler.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Yanlış çıkarsa alttaki “Konum/Adres” alanını detaylandırıp tekrar deneyin.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="topbar"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Zümrütevler, Kadıköy...)"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="clearMarkers" class="primary"&gt;Haritayı Temizle&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="status" id="status"&gt;Hazır.&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="layout"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="panel" id="list"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="map"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Leaflet JS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script</p>
+<p class="p1"><span class="Apple-converted-space">    </span>src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="</p>
+<p class="p1"><span class="Apple-converted-space">    </span>crossorigin=""</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 1) OKUL VERİSİ (İmam Hatip olanlar çıkarıldı)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// İsterseniz her okul için "address" alanını daha detaylı doldurun (mahalle/sokak vs.)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const schools = [</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// MALTEPE</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "Adnan Kahveci Ortaokulu", address: "Adnan Kahveci Ortaokulu, Maltepe, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "Celal Avşar Ortaokulu", address: "Celal Avşar Ortaokulu, Maltepe, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "Küçükyalı Mesleki ve Teknik Anadolu Lisesi", address: "Küçükyalı Mesleki ve Teknik Anadolu Lisesi, Maltepe, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "Muhsine Zeynep Ortaokulu", address: "Muhsine Zeynep Ortaokulu, Maltepe, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "Mutluhan-Uzunal-Çolakoğlu Ortaokulu", address: "Mutluhan-Uzunal-Çolakoğlu Ortaokulu, Maltepe, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "Suzan Ahmet Yalkın Ortaokulu", address: "Suzan Ahmet Yalkın Ortaokulu, Maltepe, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "TOKİ Maltepe Anadolu Lisesi", address: "TOKİ Maltepe Anadolu Lisesi, Maltepe, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Maltepe", name: "Zümrütevler Anadolu Lisesi", address: "Zümrütevler Anadolu Lisesi, Maltepe, İstanbul" },</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// KADIKÖY</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "Bahariye Ortaokulu", address: "Bahariye Ortaokulu, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "Bostancı Atatürk Ortaokulu", address: "Bostancı Atatürk Ortaokulu, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "Cenap Şahabettin İlkokulu", address: "Cenap Şahabettin İlkokulu, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "Faik Reşit Unat Ortaokulu", address: "Faik Reşit Unat Ortaokulu, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "Halil Türkan Ortaokulu", address: "Halil Türkan Ortaokulu, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "İkbaliye Ortaokulu", address: "İkbaliye Ortaokulu, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "İlhami Ertem Ortaokulu", address: "İlhami Ertem Ortaokulu, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "İstanbul Avni Akyol Güzel Sanatlar Lisesi", address: "İstanbul Avni Akyol Güzel Sanatlar Lisesi, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "Kadıköy Spor Lisesi", address: "Kadıköy Spor Lisesi, Kadıköy, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kadıköy", name: "Reşat Nuri Güntekin Ortaokulu", address: "Reşat Nuri Güntekin Ortaokulu, Kadıköy, İstanbul" },</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// KARTAL (İmam Hatip olmayanlar)</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "100 Yıl Ali Rıza Efendi Ortaokulu", address: "100 Yıl Ali Rıza Efendi Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "Cevizli Ortaokulu", address: "Cevizli Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "Çavuşoğlu Ortaokulu", address: "Çavuşoğlu Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "İbrahim Saime Zıpkın İlkokulu", address: "İbrahim Saime Zıpkın İlkokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "İhsan Zakiroğlu Ortaokulu", address: "İhsan Zakiroğlu Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "Kartal Borsa İstanbul Mesleki ve Teknik Anadolu Lisesi", address: "Kartal Borsa İstanbul Mesleki ve Teknik Anadolu Lisesi, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "Kartal Milli Eğitim Vakfı Ortaokulu", address: "Kartal Milli Eğitim Vakfı Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "Şehit Er Serhat Şanlı Ortaokulu", address: "Şehit Er Serhat Şanlı Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "Şehit Timur Aktemur Ortaokulu", address: "Şehit Timur Aktemur Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "TOKİ Şehit Mustafa Kartal Ortaokulu", address: "TOKİ Şehit Mustafa Kartal Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Kartal", name: "Ülkü Bora Ortaokulu", address: "Ülkü Bora Ortaokulu, Kartal, İstanbul" },</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// PENDİK (İmam Hatip olmayanlar)</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "700. Yıl Ortaokulu", address: "700. Yıl Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Abdullah Acar Ortaokulu", address: "Abdullah Acar Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Alparslan Anadolu Lisesi", address: "Alparslan Anadolu Lisesi, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Cahit Zarifoğlu Ortaokulu", address: "Cahit Zarifoğlu Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Faruk Demirbağ Ortaokulu", address: "Faruk Demirbağ Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Kazım Karabekir Ortaokulu", address: "Kazım Karabekir Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Mehmet Akif Ersoy Ortaokulu", address: "Mehmet Akif Ersoy Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Nuri Demirağ Mesleki ve Teknik Anadolu Lisesi", address: "Nuri Demirağ Mesleki ve Teknik Anadolu Lisesi, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Orhangazi Ortaokulu", address: "Orhangazi Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Öğretmenevleri Ortaokulu", address: "Öğretmenevleri Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Şehit Selçuk Beki Ortaokulu", address: "Şehit Selçuk Beki Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Şeyhli Ortaokulu", address: "Şeyhli Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{ district: "Pendik", name: "Velibaba Ortaokulu", address: "Velibaba Ortaokulu, Pendik, İstanbul" },</p>
+<p class="p1"><span class="Apple-converted-space">    </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 2) Harita kurulumu (başlangıç: Maltepe civarı)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const map = L.map("map", { zoomControl: true }).setView([40.935, 29.135], 12);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>maxZoom: 19,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>attribution: '&amp;copy; OpenStreetMap katkıcıları'</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}).addTo(map);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const markersLayer = L.layerGroup().addTo(map);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 3) Nominatim ile geocoding (okul adı/adres -&gt; lat/lon)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function geocode(query) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const url = "https://nominatim.openstreetmap.org/search?format=json&amp;limit=1&amp;q=" + encodeURIComponent(query);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const res = await fetch(url, {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>headers: {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>// Nominatim kullanımında User-Agent/Referer politikasına dikkat; tarayıcı bazen sınırlar.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>// Bu demo için basit bırakıyoruz.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Accept": "application/json"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!res.ok) throw new Error("Geocoding isteği başarısız: " + res.status);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const data = await res.json();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!data || data.length === 0) return null;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), display: data[0].display_name };</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function setStatus(text) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("status").textContent = text;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 4) Listeyi render et</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const listEl = document.getElementById("list");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const filterEl = document.getElementById("filter");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function createSchoolCard(s) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const card = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>card.className = "card";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const top = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>top.className = "row";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const left = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>left.innerHTML = `&lt;div class="title"&gt;${escapeHtml(s.name)}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="meta"&gt;&lt;span class="badge"&gt;${escapeHtml(s.district)}&lt;/span&gt;&lt;/div&gt;`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const right = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>right.innerHTML = `&lt;span class="badge"&gt;OSM&lt;/span&gt;`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>top.appendChild(left);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>top.appendChild(right);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const addrInput = document.createElement("input");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addrInput.className = "input";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addrInput.value = s.address || `${s.name}, ${s.district}, İstanbul`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addrInput.placeholder = "Konum/Adres (mahalle/sokak ekleyebilirsiniz)";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const controls = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>controls.className = "controls";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const btnShow = document.createElement("button");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>btnShow.className = "primary";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>btnShow.textContent = "Haritada Göster";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const btnCopy = document.createElement("button");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>btnCopy.textContent = "Arama Metnini Kopyala";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const hint = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>hint.className = "hint";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>hint.textContent = "İpucu: Mahalle/Sokak eklerseniz daha doğru sonuç çıkar.";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>btnCopy.onclick = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await navigator.clipboard.writeText(addrInput.value);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>setStatus("Kopyalandı: " + addrInput.value);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>setStatus("Kopyalama başarısız. Tarayıcı izin vermedi.");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>btnShow.onclick = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const q = addrInput.value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!q) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(`Konum aranıyor: ${q}`);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>btnShow.disabled = true;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>btnShow.textContent = "Aranıyor...";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const found = await geocode(q);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (!found) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setStatus("Konum bulunamadı. Adresi daha detaylı yazıp tekrar deneyin.");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const marker = L.marker([found.lat, found.lon]).addTo(markersLayer);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>marker.bindPopup(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`&lt;b&gt;${escapeHtml(s.name)}&lt;/b&gt;&lt;br&gt;` +</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`&lt;small&gt;${escapeHtml(found.display)}&lt;/small&gt;&lt;br&gt;` +</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`&lt;div class="small"&gt;Arama: ${escapeHtml(q)}&lt;/div&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">          </span>).openPopup();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>map.setView([found.lat, found.lon], 15);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>setStatus(`Haritada gösterildi: ${s.name}`);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>console.error(err);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>setStatus("Hata: Konum aranırken sorun oldu. İnternet bağlantısını kontrol edin.");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>btnShow.disabled = false;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>btnShow.textContent = "Haritada Göster";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>controls.appendChild(btnShow);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>controls.appendChild(btnCopy);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>card.appendChild(top);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>card.appendChild(addrInput);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>card.appendChild(controls);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>card.appendChild(hint);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return card;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function render() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const q = (filterEl.value || "").toLowerCase().trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>listEl.innerHTML = "";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const filtered = schools.filter(s =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const hay = (s.name + " " + s.district).toLowerCase();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return !q || hay.includes(q);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (filtered.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const empty = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>empty.className = "card";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>empty.textContent = "Eşleşen okul bulunamadı.";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>listEl.appendChild(empty);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>filtered.forEach(s =&gt; listEl.appendChild(createSchoolCard(s)));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>filterEl.addEventListener("input", render);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("clearMarkers").onclick = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>markersLayer.clearLayers();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setStatus("Harita temizlendi.");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function escapeHtml(str) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return String(str).replace(/[&amp;&lt;&gt;"']/g, (m) =&gt; ({</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"&amp;":"&amp;amp;","&lt;":"&amp;lt;","&gt;":"&amp;gt;",'"':"&amp;quot;","'":"&amp;#039;"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}[m]));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>render();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
 </body>
 </html>
