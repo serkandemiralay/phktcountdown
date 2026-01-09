@@ -1,3 +1,4 @@
+AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA
 <!doctype html>
 <html lang="tr">
 <head>
@@ -13,6 +14,7 @@
     .topbar { display:flex; gap:10px; align-items:center; margin:12px; flex-wrap:wrap; }
     .input { width:100%; box-sizing:border-box; background:#0f1730; border:1px solid var(--border); color:var(--text); padding:9px 10px; border-radius:10px; font-size:12px; }
     .search { flex:1; min-width:240px; }
+    .select { width:auto; min-width:180px; }
     button { background:transparent; border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; font-size:12px; }
     button:hover { border-color: var(--accent); }
     button.primary { background: rgba(122,162,255,.12); border-color: rgba(122,162,255,.35); }
@@ -48,6 +50,11 @@
   </header>
 
   <div class="topbar">
+    <!-- YENİ: Semt/İlçe dropdown -->
+    <select id="districtSelect" class="input select">
+      <option value="">Tümü</option>
+    </select>
+
     <input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Kadıköy...)">
     <button id="btnClearMarkers" class="primary">Haritayı Temizle</button>
     <button id="clearCache" class="danger">Cache Sıfırla</button>
@@ -70,7 +77,7 @@
     const BIAS_RADIUS_M = 25000; // ev çevresinde arama bias
 
     /***********************
-     * 2) OKULLAR (liste filtrelenmiş)
+     * 2) OKULLAR
      ***********************/
     const schools = [
       // MALTEPE
@@ -125,6 +132,23 @@
     ];
 
     /***********************
+     * 2.1) YENİ: Semt dropdown doldur
+     ***********************/
+    const districtSelectEl = document.getElementById("districtSelect");
+
+    function normalizeDistrict(d) { return String(d || "").trim(); }
+
+    function initDistrictDropdown() {
+      const districts = Array.from(new Set(schools.map(s => normalizeDistrict(s.district))))
+        .filter(Boolean)
+        .sort((a,b) => a.localeCompare(b, "tr"));
+
+      // seçenekleri sıfırla (Tümü kalsın)
+      districtSelectEl.innerHTML = `<option value="">Tümü</option>` +
+        districts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+    }
+
+    /***********************
      * 3) CACHE
      ***********************/
     function loadCache() {
@@ -145,9 +169,6 @@
       return String(str).replace(/[&<>"']/g, (m) => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
       }[m]));
-    }
-    function cssEscape(value) {
-      return String(value).replace(/[^a-zA-Z0-9_-]/g, ch => "\\" + ch);
     }
 
     function toRad(x){ return x * Math.PI / 180; }
@@ -222,7 +243,6 @@
     }
 
     function showHomeAndSchoolOnMap(school, rec) {
-      // okul marker
       if (schoolMarkers[school.id]) {
         schoolMarkers[school.id].setPosition({ lat: rec.lat, lng: rec.lng });
       } else {
@@ -244,13 +264,11 @@
         infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
       });
 
-      // bounds: ev + okul
       const bounds = new google.maps.LatLngBounds();
       bounds.extend({ lat: HOME.lat, lng: HOME.lng });
       bounds.extend({ lat: rec.lat, lng: rec.lng });
       gmap.fitBounds(bounds);
 
-      // popup otomatik aç
       infoWin.setContent(html);
       infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
     }
@@ -260,12 +278,16 @@
      ***********************/
     function getFilteredSchoolsSorted() {
       const q = (filterEl.value || "").toLowerCase().trim();
+      const district = (districtSelectEl.value || "").trim();
+
       const filtered = schools.filter(s => {
+        const matchesDistrict = !district || s.district === district;
+        if (!matchesDistrict) return false;
+
         const hay = (s.name + " " + s.district).toLowerCase();
         return !q || hay.includes(q);
       });
 
-      // bulunanlar mesafeye göre, bulunmayanlar en altta
       return filtered
         .map(s => ({ s, d: distanceKmForSchool(s) }))
         .sort((a,b) => {
@@ -289,6 +311,7 @@
         return;
       }
 
+      // (İstersen burada “x okul gösteriliyor” gibi bir status da basabiliriz)
       for (const s of visible) {
         const card = document.createElement("div");
         card.className = "card";
@@ -367,10 +390,8 @@
             geoCache[s.id] = found;
             saveCache(geoCache);
 
-            // Haritada ev + okul göster
             showHomeAndSchoolOnMap(s, found);
 
-            // Listeyi mesafeye göre tekrar sırala & “Bulundu” etiketini güncelle
             render();
             setStatus("Gösterildi: " + s.name);
           } catch (e) {
@@ -405,10 +426,10 @@
      * 7) TOP BAR
      ***********************/
     filterEl.addEventListener("input", render);
+    districtSelectEl.addEventListener("change", render);
 
     document.getElementById("btnClearMarkers").onclick = () => {
       clearMapMarkers(true);
-      // ev marker dursun; gerekirse merkeze dön
       if (gmap) gmap.setCenter({ lat: HOME.lat, lng: HOME.lng });
       if (gmap) gmap.setZoom(12);
     };
@@ -437,7 +458,8 @@
       document.head.appendChild(s);
     }
 
-    // Başlat
+    // Başlat (önce dropdown'u doldur)
+    initDistrictDropdown();
     loadGoogleScript();
   </script>
 </body>
