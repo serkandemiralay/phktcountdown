@@ -57,18 +57,6 @@
       color: var(--muted);
     }
 
-    .routeHeader {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-      padding-bottom:8px;
-      border-bottom:1px solid var(--border);
-    }
-    .routeHeader .title2 { font-weight:700; font-size:12px; color: var(--text); }
-    .routeHeader .hint { font-size:11px; color: var(--muted); }
-
     .addrlabel { margin-top:10px; color:var(--muted); font-size:11px; }
     .controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
@@ -107,6 +95,28 @@
     #directionsPanel .adp-directions { background: transparent !important; }
     #directionsPanel img { filter: brightness(1.3) contrast(1.1); }
     #directionsPanel .adp-step, #directionsPanel .adp-substep { padding: 6px 0; }
+
+    /* === InfoWindow (okul balonu) okunabilirlik === */
+    .gm-style .gm-style-iw-c{
+      padding:0 !important;
+      border-radius:14px !important;
+      background:transparent !important;
+      box-shadow:0 10px 26px rgba(0,0,0,.45) !important;
+    }
+    .gm-style .gm-style-iw-d{ overflow:hidden !important; }
+    .iwCard{
+      background: rgba(11,18,32,.96);
+      color:#e9efff;
+      border:1px solid rgba(35,48,77,.9);
+      border-radius:14px;
+      padding:12px 12px;
+      min-width:240px;
+      max-width:320px;
+      line-height:1.45;
+    }
+    .iwTitle{ font-weight:800; font-size:14px; margin-bottom:6px; }
+    .iwMeta{ color:#a8b3cf; font-size:12px; }
+    .iwRow{ margin-top:8px; font-size:12px; }
   </style>
 </head>
 
@@ -137,9 +147,7 @@
 
     <div class="mapcol">
       <div id="map"></div>
-      <div id="directionsPanel">
-        <!-- başlık JS ile eklenecek -->
-      </div>
+      <div id="directionsPanel"></div>
     </div>
   </div>
 
@@ -271,12 +279,6 @@
       return mode === "TRANSIT" ? "🚌 Toplu taşıma" : "🚗 Araç";
     }
 
-    function ensureRouteHeader() {
-      // Panel içeriği google tarafından doldurulmadan önce başlık eklemek istiyoruz.
-      // DirectionsRenderer paneli tamamen overwrite edebiliyor; bu yüzden header’ı “panelin üstünde” ayrı bir div olarak tutuyoruz.
-      // En garantisi: panelin hemen üstüne sabit header koymak.
-    }
-
     /***********************
      * 5) GOOGLE MAPS / PLACES / DIRECTIONS
      ***********************/
@@ -291,7 +293,13 @@
         zoom: 12,
         mapTypeControl: false,
         streetViewControl: false,
-        fullscreenControl: true
+        fullscreenControl: true,
+        /* Haritadaki arka plan yazı/POI etiketlerini azalt */
+        styles: [
+          { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+          { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
+          { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
+        ]
       });
 
       placesService = new google.maps.places.PlacesService(gmap);
@@ -427,21 +435,47 @@
       const tDrive = bestTimeText(rec, "DRIVING");
       const tTransit = bestTimeText(rec, "TRANSIT");
 
-      const timeLine =
-        (tDrive || tTransit)
-          ? `<br><small>${tDrive ? `<b>🚗 Araç:</b> ⏱️ ${escapeHtml(tDrive)} ` : ""}${tTransit ? `&nbsp;&nbsp;<b>🚌 Toplu:</b> ⏱️ ${escapeHtml(tTransit)}` : ""}</small>`
-          : "";
-
+      /* InfoWindow içeriğini koyu opak kart yap */
       const html =
-        `<b>${escapeHtml(school.name)}</b><br>` +
-        `<small>${escapeHtml(rec.formattedAddress || "")}</small><br>` +
-        `<small><b>Mesafe:</b> ${escapeHtml(km)} km</small>` +
-        timeLine;
+        `<div class="iwCard">` +
+          `<div class="iwTitle">${escapeHtml(school.name)}</div>` +
+          `<div class="iwMeta">${escapeHtml(rec.formattedAddress || "")}</div>` +
+          `<div class="iwRow"><b>Mesafe:</b> ${escapeHtml(km)} km</div>` +
+          ((tDrive || tTransit)
+            ? `<div class="iwRow">` +
+                `${tDrive ? `<b>🚗 Araç:</b> ⏱️ ${escapeHtml(tDrive)} ` : ""}` +
+                `${tTransit ? `&nbsp;&nbsp;<b>🚌 Toplu:</b> ⏱️ ${escapeHtml(tTransit)}` : ""}` +
+              `</div>`
+            : ``) +
+        `</div>`;
 
-      schoolMarkers[school.id].addListener("click", () => {
-        infoWin.setContent(html);
-        infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
-      });
+      // aynı marker'a tekrar tekrar listener eklememek için önce temiz bir flag koy
+      if (!schoolMarkers[school.id].__iwBound) {
+        schoolMarkers[school.id].addListener("click", () => {
+          const r = geoCache[school.id];
+          if (!r) return;
+          const km2 = haversineKm(HOME.lat, HOME.lng, r.lat, r.lng).toFixed(2);
+          const td = bestTimeText(r, "DRIVING");
+          const tt = bestTimeText(r, "TRANSIT");
+
+          const html2 =
+            `<div class="iwCard">` +
+              `<div class="iwTitle">${escapeHtml(school.name)}</div>` +
+              `<div class="iwMeta">${escapeHtml(r.formattedAddress || "")}</div>` +
+              `<div class="iwRow"><b>Mesafe:</b> ${escapeHtml(km2)} km</div>` +
+              ((td || tt)
+                ? `<div class="iwRow">` +
+                    `${td ? `<b>🚗 Araç:</b> ⏱️ ${escapeHtml(td)} ` : ""}` +
+                    `${tt ? `&nbsp;&nbsp;<b>🚌 Toplu:</b> ⏱️ ${escapeHtml(tt)}` : ""}` +
+                  `</div>`
+                : ``) +
+            `</div>`;
+
+          infoWin.setContent(html2);
+          infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
+        });
+        schoolMarkers[school.id].__iwBound = true;
+      }
 
       infoWin.setContent(html);
       infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
