@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Okullar • Evime Göre Yakınlık + Harita</title>
+  <title>Okullar • Yakınlık + Google Static Map</title>
 
-  <!-- Leaflet (OpenStreetMap) -->
+  <!-- Leaflet (interaktif harita için) -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -18,10 +18,8 @@
     header { padding:18px 18px 12px; border-bottom:1px solid var(--border); }
     h1 { margin:0; font-size:18px; }
     .sub { margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }
-
-    .layout { display:grid; grid-template-columns: 460px 1fr; gap:12px; height: calc(100vh - 122px); }
+    .layout { display:grid; grid-template-columns: 520px 1fr; gap:12px; height: calc(100vh - 132px); }
     @media (max-width: 980px) { .layout { grid-template-columns: 1fr; height:auto; } #map { height: 55vh; } }
-
     .panel { padding:12px; overflow:auto; }
     .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; }
     .row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
@@ -33,12 +31,10 @@
     button.primary { background: rgba(122,162,255,.12); border-color: rgba(122,162,255,.35); }
     button.danger { border-color: rgba(255,120,120,.35); background: rgba(255,120,120,.10); }
     button:disabled { opacity:.55; cursor:not-allowed; }
-
     .input { width:100%; box-sizing:border-box; margin-top:10px; background:#0f1730; border:1px solid var(--border); color:var(--text); padding:9px 10px; border-radius:10px; font-size:12px; }
     .hint { margin-top:8px; color:var(--muted); font-size:12px; }
     .topbar { display:flex; gap:10px; align-items:center; margin: 12px; flex-wrap:wrap; }
     .search { flex:1; min-width: 240px; }
-
     #map { height:100%; width:100%; border-left:1px solid var(--border); }
     .badge { font-size:11px; color: var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px; white-space:nowrap; }
     .status { margin: 0 12px 12px; color: var(--muted); font-size: 12px; line-height:1.35; }
@@ -47,21 +43,22 @@
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    img.mapimg { width:100%; border-radius:12px; border:1px solid var(--border); margin-top:8px; display:block; }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Okullar (İmam Hatip Hariç) • Evime Göre Yakınlık + Harita</h1>
+    <h1>Okullar (İmam Hatip Hariç) • Yakınlık + Google Static Map</h1>
     <div class="sub">
-      Ev konumu: <span class="mono">Feyzullah Mahallesi, Sevinç Sokak, Maltepe, İstanbul</span><br>
-      “Toplu Konum Bul” ile okulların koordinatlarını bulur, sonra **yakınlığa göre sıralar** (mesafe: kuş uçuşu).
-      Bulunan koordinatlar tarayıcıda cache’lenir.
+      <b>1)</b> Google Static Maps için API key şart: <span class="mono">YOUR_GOOGLE_MAPS_API_KEY_HERE</span> kısmını değiştir.<br>
+      <b>2)</b> Ev konumu en sağlam yöntemle: <b>koordinat</b> (aşağıdan düzenleyebilirsin).<br>
+      <span class="small">Not: Mesafe “kuş uçuşu (km)”.</span>
     </div>
   </header>
 
   <div class="topbar">
-    <input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Zümrütevler, Kadıköy...)">
+    <input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Kadıköy...)">
     <button id="btnGeocodeAll" class="primary">Toplu Konum Bul</button>
     <button id="btnShowAll" class="primary">Hepsini Haritada Göster</button>
     <button id="clearMarkers">Haritayı Temizle</button>
@@ -84,17 +81,20 @@
 
   <script>
     /***********************
-     * 0) AYARLAR
+     * 0) GOOGLE STATIC MAPS AYARLARI
      ***********************/
-    const HOME_QUERY_DEFAULT = "40.9329, 29.1418";
-    const CACHE_KEY = "school_geo_cache_v1";
-    const HOME_CACHE_KEY = "home_geo_cache_v1";
-
-    // Nominatim'i yormamak için istekler arasında kısa bekleme (ms)
-    const GEOCODE_DELAY_MS = 900;
+    const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE";
+    // Not: Key'i güvenli tutmak için normalde backend önerilir. Bu demo "tek dosya" olduğu için front-end'de.
 
     /***********************
-     * 1) OKUL VERİSİ (İmam Hatip olanlar çıkarıldı)
+     * 1) EV KONUMU (KOORDİNAT - EN GARANTİ)
+     * Google Maps'ten "Burada ne var?" ile alıp buraya yapıştır.
+     ***********************/
+    const HOME_COORD = { lat: 40.9329, lon: 29.1418, label: "Ev Konumu (Feyzullah / Sevinç Sk.)" };
+    // ↑ BURAYI KENDİ KOORDİNATINLA GÜNCELLE (en doğrusu)
+
+    /***********************
+     * 2) OKUL VERİSİ (İmam Hatip olanlar çıkarıldı)
      ***********************/
     const schools = [
       // MALTEPE
@@ -119,7 +119,7 @@
       { id: "kadikoy_spor_lisesi", district: "Kadıköy", name: "Kadıköy Spor Lisesi", address: "Kadıköy Spor Lisesi, Kadıköy, İstanbul" },
       { id: "kadikoy_resat_nuri", district: "Kadıköy", name: "Reşat Nuri Güntekin Ortaokulu", address: "Reşat Nuri Güntekin Ortaokulu, Kadıköy, İstanbul" },
 
-      // KARTAL (İmam Hatip olmayanlar)
+      // KARTAL
       { id: "kartal_100yil_ali_riza", district: "Kartal", name: "100 Yıl Ali Rıza Efendi Ortaokulu", address: "100 Yıl Ali Rıza Efendi Ortaokulu, Kartal, İstanbul" },
       { id: "kartal_cevizli", district: "Kartal", name: "Cevizli Ortaokulu", address: "Cevizli Ortaokulu, Kartal, İstanbul" },
       { id: "kartal_cavusoglu", district: "Kartal", name: "Çavuşoğlu Ortaokulu", address: "Çavuşoğlu Ortaokulu, Kartal, İstanbul" },
@@ -132,7 +132,7 @@
       { id: "kartal_toki_sehit_mustafa", district: "Kartal", name: "TOKİ Şehit Mustafa Kartal Ortaokulu", address: "TOKİ Şehit Mustafa Kartal Ortaokulu, Kartal, İstanbul" },
       { id: "kartal_ulku_bora", district: "Kartal", name: "Ülkü Bora Ortaokulu", address: "Ülkü Bora Ortaokulu, Kartal, İstanbul" },
 
-      // PENDİK (İmam Hatip olmayanlar)
+      // PENDİK
       { id: "pendik_700_yil", district: "Pendik", name: "700. Yıl Ortaokulu", address: "700. Yıl Ortaokulu, Pendik, İstanbul" },
       { id: "pendik_abdullah_acar", district: "Pendik", name: "Abdullah Acar Ortaokulu", address: "Abdullah Acar Ortaokulu, Pendik, İstanbul" },
       { id: "pendik_alparslan_al", district: "Pendik", name: "Alparslan Anadolu Lisesi", address: "Alparslan Anadolu Lisesi, Pendik, İstanbul" },
@@ -149,238 +149,132 @@
     ];
 
     /***********************
-     * 2) CACHE YÖNETİMİ
+     * 3) CACHE
      ***********************/
-    function loadCache(key) {
-      try { return JSON.parse(localStorage.getItem(key) || "{}"); }
-      catch { return {}; }
-    }
-    function saveCache(key, obj) {
-      localStorage.setItem(key, JSON.stringify(obj));
-    }
-
-    let geoCache = loadCache(CACHE_KEY);     // { [schoolId]: {lat, lon, display, query, ts} }
-    let homeCache = loadCache(HOME_CACHE_KEY); // { lat, lon, display, query, ts } veya {}
+    const CACHE_KEY = "school_geo_cache_v2";
+    function loadCache() { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch { return {}; } }
+    function saveCache(obj) { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
+    let geoCache = loadCache(); // { [id]: {lat, lon, display, query, ts} }
 
     /***********************
-     * 3) HARİTA KURULUMU
+     * 4) HARİTA (Leaflet)
      ***********************/
-    const map = L.map("map", { zoomControl: true }).setView([40.935, 29.135], 12);
+    const map = L.map("map").setView([HOME_COORD.lat, HOME_COORD.lon], 12);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap katkıcıları'
     }).addTo(map);
-
     const markersLayer = L.layerGroup().addTo(map);
-    let homeMarker = null;
+
+    function setStatus(t) { document.getElementById("status").textContent = t; }
+
+    // Ev marker
+    const homeMarker = L.marker([HOME_COORD.lat, HOME_COORD.lon]).addTo(markersLayer);
+    homeMarker.bindPopup(`<b>${escapeHtml(HOME_COORD.label)}</b><br><small>${HOME_COORD.lat}, ${HOME_COORD.lon}</small>`);
 
     /***********************
-     * 4) GEOCODING (Nominatim)
+     * 5) Nominatim ile okul geocode (API key gerekmez)
      ***********************/
-    async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    const GEOCODE_DELAY_MS = 900;
+    async function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
     async function geocode(query) {
       const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(query);
       const res = await fetch(url, { headers: { "Accept": "application/json" } });
-      if (!res.ok) throw new Error("Geocoding isteği başarısız: " + res.status);
+      if (!res.ok) throw new Error("Geocoding failed: " + res.status);
       const data = await res.json();
       if (!data || data.length === 0) return null;
       return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), display: data[0].display_name };
     }
 
-    function setStatus(text) {
-      document.getElementById("status").textContent = text;
-    }
-
-    /***********************
-     * 5) MESAFE HESABI (Haversine)
-     ***********************/
-    function toRad(x) { return x * Math.PI / 180; }
-
-    function haversineKm(lat1, lon1, lat2, lon2) {
-      const R = 6371; // km
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a =
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
-    }
-
-    /***********************
-     * 6) EV KONUMUNU HAZIRLA
-     ***********************/
-    const homeInputDefault = HOME_QUERY_DEFAULT;
-
-    async function ensureHomeGeocoded() {
-      i// Eğer query koordinatsa direkt kullan
-if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(HOME_QUERY_DEFAULT)) {
-  const [lat, lon] = HOME_QUERY_DEFAULT.split(",").map(Number);
-  homeCache = { lat, lon, display: "Ev Konumu (manuel)", query: HOME_QUERY_DEFAULT, ts: Date.now() };
-  saveCache(HOME_CACHE_KEY, homeCache);
-  placeHomeMarker(lat, lon, "Ev Konumu (manuel)");
-  return true;
-}
-
-      }
-
-      setStatus("Ev konumu aranıyor (ilk kurulum): " + homeInputDefault);
-      const found = await geocode(homeInputDefault);
-      if (!found) {
-        setStatus("Ev konumu bulunamadı. Lütfen adresi daha detaylı yazın.");
-        return false;
-      }
-
-      homeCache = { ...found, query: homeInputDefault, ts: Date.now() };
-      saveCache(HOME_CACHE_KEY, homeCache);
-      placeHomeMarker(found.lat, found.lon, found.display);
-      setStatus("Ev konumu ayarlandı.");
-      return true;
-    }
-
-    function placeHomeMarker(lat, lon, displayName) {
-      if (homeMarker) markersLayer.removeLayer(homeMarker);
-      homeMarker = L.marker([lat, lon], { title: "Ev Konumu" }).addTo(markersLayer);
-      homeMarker.bindPopup(`<b>Ev Konumu</b><br><small>${escapeHtml(displayName || homeInputDefault)}</small>`);
-
-      map.setView([lat, lon], 13);
-    }
-
-    /***********************
-     * 7) OKUL KONUMLARINI ÇEK + CACHE'LE
-     ***********************/
-    async function geocodeSchoolIfNeeded(school, queryOverride) {
-      const existing = geoCache[school.id];
+    async function geocodeSchoolIfNeeded(s, queryOverride) {
+      const existing = geoCache[s.id];
       if (existing && typeof existing.lat === "number" && typeof existing.lon === "number") return existing;
 
-      const q = (queryOverride || school.address || `${school.name}, ${school.district}, İstanbul`).trim();
+      const q = (queryOverride || s.address || `${s.name}, ${s.district}, İstanbul`).trim();
       const found = await geocode(q);
       if (!found) return null;
 
       const rec = { ...found, query: q, ts: Date.now() };
-      geoCache[school.id] = rec;
-      saveCache(CACHE_KEY, geoCache);
+      geoCache[s.id] = rec;
+      saveCache(geoCache);
       return rec;
     }
 
-    async function geocodeAllVisibleSchools() {
-      const visible = getFilteredSchools();
-      if (visible.length === 0) return;
-
-      const ok = await ensureHomeGeocoded();
-      if (!ok) return;
-
-      let done = 0;
-      for (const s of visible) {
-        done++;
-        setStatus(`Konum bulunuyor: (${done}/${visible.length}) ${s.name}`);
-        try {
-          // kart üzerindeki input'tan daha detaylı adres yazıldıysa onu kullanacağız
-          const input = document.querySelector(`input[data-school-id="${cssEscape(s.id)}"]`);
-          const q = input ? input.value.trim() : s.address;
-
-          const r = await geocodeSchoolIfNeeded(s, q);
-          if (!r) {
-            // bulunamadıysa geç
-          }
-        } catch (e) {
-          console.error(e);
-        }
-        await sleep(GEOCODE_DELAY_MS);
-      }
-
-      setStatus("Toplu konum bulma bitti. Liste yakınlığa göre güncellendi.");
-      render(); // mesafe hesapla + sırala
-    }
-
     /***********************
-     * 8) HARİTAYA MARKER EKLE
+     * 6) MESAFE (Haversine)
      ***********************/
-    function addSchoolMarker(school, rec) {
-      const marker = L.marker([rec.lat, rec.lon]).addTo(markersLayer);
-      const kmText = homeCache && homeCache.lat
-        ? `${haversineKm(homeCache.lat, homeCache.lon, rec.lat, rec.lon).toFixed(2)} km`
-        : "—";
-
-      marker.bindPopup(
-        `<b>${escapeHtml(school.name)}</b><br>` +
-        `<span class="badge">${escapeHtml(school.district)}</span><br>` +
-        `<div style="margin-top:6px"><b>Mesafe:</b> ${escapeHtml(kmText)}</div>` +
-        `<small>${escapeHtml(rec.display || "")}</small><br>` +
-        `<div class="small">Arama: ${escapeHtml(rec.query || "")}</div>`
-      );
-
-      return marker;
+    function toRad(x){ return x * Math.PI / 180; }
+    function haversineKm(lat1, lon1, lat2, lon2){
+      const R = 6371;
+      const dLat = toRad(lat2-lat1);
+      const dLon = toRad(lon2-lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+      return 2*R*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
-
-    async function showAllOnMap() {
-      const ok = await ensureHomeGeocoded();
-      if (!ok) return;
-
-      const visible = getFilteredSchools();
-      if (visible.length === 0) return;
-
-      setStatus("Haritada göstermek için eksik konumlar tamamlanıyor (cache varsa hızlı olur)...");
-      let bounds = L.latLngBounds();
-      bounds.extend([homeCache.lat, homeCache.lon]);
-
-      let done = 0;
-      for (const s of visible) {
-        done++;
-        setStatus(`Haritada hazırlanıyor: (${done}/${visible.length}) ${s.name}`);
-
-        const input = document.querySelector(`input[data-school-id="${cssEscape(s.id)}"]`);
-        const q = input ? input.value.trim() : s.address;
-
-        let rec = geoCache[s.id];
-        if (!rec) {
-          try {
-            rec = await geocodeSchoolIfNeeded(s, q);
-          } catch (e) {
-            console.error(e);
-            rec = null;
-          }
-          await sleep(GEOCODE_DELAY_MS);
-        }
-
-        if (rec) {
-          addSchoolMarker(s, rec);
-          bounds.extend([rec.lat, rec.lon]);
-        }
-      }
-
-      map.fitBounds(bounds.pad(0.15));
-      setStatus("Hepsi haritada gösterildi.");
+    function computeDistanceKm(s) {
+      const rec = geoCache[s.id];
+      if (!rec) return null;
+      return haversineKm(HOME_COORD.lat, HOME_COORD.lon, rec.lat, rec.lon);
     }
 
     /***********************
-     * 9) LİSTE: FILTER + SIRALAMA (yakınlık)
+     * 7) GOOGLE STATIC MAP
+     ***********************/
+    function getGoogleStaticMapUrl(lat, lon, zoom=16, w=640, h=320) {
+      // Not: scale=2 daha net görüntü
+      const base = "https://maps.googleapis.com/maps/api/staticmap";
+      const center = `center=${lat},${lon}`;
+      const size = `size=${w}x${h}`;
+      const z = `zoom=${zoom}`;
+      const scale = "scale=2";
+      const marker = `markers=color:red%7C${lat},${lon}`;
+      const key = `key=${encodeURIComponent(GOOGLE_MAPS_API_KEY)}`;
+      return `${base}?${center}&${z}&${size}&${scale}&${marker}&${key}`;
+    }
+
+    function getGoogleMapsLink(lat, lon) {
+      return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+    }
+
+    /***********************
+     * 8) LİSTE / UI
      ***********************/
     const listEl = document.getElementById("list");
     const filterEl = document.getElementById("filter");
 
     function getFilteredSchools() {
       const q = (filterEl.value || "").toLowerCase().trim();
-      return schools.filter(s => {
-        const hay = (s.name + " " + s.district).toLowerCase();
-        return !q || hay.includes(q);
+      return schools.filter(s => ((s.name + " " + s.district).toLowerCase().includes(q) || !q));
+    }
+
+    function render() {
+      const filtered = getFilteredSchools();
+      const arr = filtered.map(s => ({ s, d: computeDistanceKm(s) }));
+
+      arr.sort((a,b) => {
+        const ad = (typeof a.d === "number") ? a.d : Infinity;
+        const bd = (typeof b.d === "number") ? b.d : Infinity;
+        if (ad !== bd) return ad - bd;
+        return a.s.name.localeCompare(b.s.name, "tr");
       });
+
+      listEl.innerHTML = "";
+      if (arr.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "card";
+        empty.textContent = "Eşleşen okul yok.";
+        listEl.appendChild(empty);
+        return;
+      }
+
+      for (const {s, d} of arr) listEl.appendChild(createSchoolCard(s, d));
     }
 
-    function computeDistanceForSchool(s) {
-      const rec = geoCache[s.id];
-      if (!homeCache || typeof homeCache.lat !== "number" || typeof homeCache.lon !== "number") return null;
-      if (!rec || typeof rec.lat !== "number" || typeof rec.lon !== "number") return null;
-      return haversineKm(homeCache.lat, homeCache.lon, rec.lat, rec.lon);
-    }
-
-    function createSchoolCard(s) {
+    function createSchoolCard(s, distKm) {
       const card = document.createElement("div");
       card.className = "card";
 
-      const distKm = computeDistanceForSchool(s);
       const distLabel = (typeof distKm === "number") ? `${distKm.toFixed(2)} km` : "—";
 
       const top = document.createElement("div");
@@ -396,15 +290,15 @@ if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(HOME_QUERY_DEFAULT)) {
       `;
 
       const right = document.createElement("div");
-      right.innerHTML = `<span class="badge">OSM</span>`;
+      right.innerHTML = `<span class="badge">Google Static</span>`;
 
       top.appendChild(left);
       top.appendChild(right);
 
       const addrInput = document.createElement("input");
       addrInput.className = "input";
-      addrInput.value = (s.address || `${s.name}, ${s.district}, İstanbul`);
-      addrInput.placeholder = "Konum/Adres (mahalle/sokak ekleyebilirsiniz)";
+      addrInput.value = s.address;
+      addrInput.placeholder = "Konum/Adres (gerekirse mahalle/sokak ekle)";
       addrInput.setAttribute("data-school-id", s.id);
 
       const controls = document.createElement("div");
@@ -412,30 +306,30 @@ if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(HOME_QUERY_DEFAULT)) {
 
       const btnFind = document.createElement("button");
       btnFind.className = "primary";
-      btnFind.textContent = "Konumu Bul & Mesafeyi Hesapla";
+      btnFind.textContent = "Konumu Bul + Resmi Göster";
 
-      const btnShow = document.createElement("button");
-      btnShow.textContent = "Haritada Göster";
+      const btnShowLeaflet = document.createElement("button");
+      btnShowLeaflet.textContent = "Interaktif Haritada Göster";
 
-      const btnCopy = document.createElement("button");
-      btnCopy.textContent = "Arama Metnini Kopyala";
+      const btnClearThis = document.createElement("button");
+      btnClearThis.textContent = "Bu Okulu Cache'den Sil";
 
-      const hint = document.createElement("div");
-      hint.className = "hint";
-      hint.textContent = "İpucu: Mahalle/Sokak eklerseniz daha doğru sonuç çıkar.";
+      const preview = document.createElement("div");
+      preview.setAttribute("data-preview", s.id);
 
-      btnCopy.onclick = async () => {
-        try {
-          await navigator.clipboard.writeText(addrInput.value);
-          setStatus("Kopyalandı: " + addrInput.value);
-        } catch {
-          setStatus("Kopyalama başarısız. Tarayıcı izin vermedi.");
-        }
-      };
+      // Cache varsa önizleme otomatik
+      const cached = geoCache[s.id];
+      if (cached) {
+        preview.innerHTML = buildPreviewHtml(s, cached);
+      } else {
+        preview.innerHTML = `<div class="small">Önizleme için önce konumu bul.</div>`;
+      }
 
       btnFind.onclick = async () => {
-        const ok = await ensureHomeGeocoded();
-        if (!ok) return;
+        if (!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY.includes("YOUR_GOOGLE")) {
+          setStatus("Google API key eklemen lazım: GOOGLE_MAPS_API_KEY alanını doldur.");
+          return;
+        }
 
         const q = addrInput.value.trim();
         if (!q) return;
@@ -445,146 +339,186 @@ if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(HOME_QUERY_DEFAULT)) {
         btnFind.textContent = "Aranıyor...";
 
         try {
-          // cache yoksa geocode et
           const rec = await geocodeSchoolIfNeeded(s, q);
           if (!rec) {
-            setStatus("Konum bulunamadı. Adresi daha detaylı yazıp tekrar deneyin.");
+            setStatus("Konum bulunamadı. Adresi daha detaylı yazıp tekrar dene.");
             return;
           }
-
-          const km = haversineKm(homeCache.lat, homeCache.lon, rec.lat, rec.lon);
-          setStatus(`${s.name} bulundu. Mesafe: ${km.toFixed(2)} km`);
-
-          // Listeyi yeniden sırala
-          render();
+          preview.innerHTML = buildPreviewHtml(s, rec);
+          setStatus("Bulundu: " + s.name);
+          render(); // mesafeye göre sıralama güncellensin
         } catch (e) {
           console.error(e);
-          setStatus("Hata: Konum aranırken sorun oldu. İnternet bağlantısını kontrol edin.");
+          setStatus("Hata: Konum aranırken sorun oldu.");
         } finally {
           btnFind.disabled = false;
-          btnFind.textContent = "Konumu Bul & Mesafeyi Hesapla";
+          btnFind.textContent = "Konumu Bul + Resmi Göster";
         }
       };
 
-      btnShow.onclick = async () => {
-        const ok = await ensureHomeGeocoded();
-        if (!ok) return;
-
+      btnShowLeaflet.onclick = async () => {
         const q = addrInput.value.trim();
         if (!q) return;
 
         setStatus("Haritada göstermek için konum aranıyor: " + q);
-        btnShow.disabled = true;
-        btnShow.textContent = "Aranıyor...";
+        btnShowLeaflet.disabled = true;
 
         try {
           let rec = geoCache[s.id];
           if (!rec) rec = await geocodeSchoolIfNeeded(s, q);
-
           if (!rec) {
-            setStatus("Konum bulunamadı. Adresi daha detaylı yazıp tekrar deneyin.");
+            setStatus("Konum bulunamadı.");
             return;
           }
 
-          const marker = addSchoolMarker(s, rec);
-          marker.openPopup();
+          const m = L.marker([rec.lat, rec.lon]).addTo(markersLayer);
+          m.bindPopup(`<b>${escapeHtml(s.name)}</b><br><small>${escapeHtml(rec.display || "")}</small>`).openPopup();
 
           const bounds = L.latLngBounds();
-          bounds.extend([homeCache.lat, homeCache.lon]);
+          bounds.extend([HOME_COORD.lat, HOME_COORD.lon]);
           bounds.extend([rec.lat, rec.lon]);
           map.fitBounds(bounds.pad(0.25));
 
           setStatus("Haritada gösterildi: " + s.name);
         } catch (e) {
           console.error(e);
-          setStatus("Hata: Konum aranırken sorun oldu.");
+          setStatus("Hata oluştu.");
         } finally {
-          btnShow.disabled = false;
-          btnShow.textContent = "Haritada Göster";
+          btnShowLeaflet.disabled = false;
         }
       };
 
+      btnClearThis.onclick = () => {
+        delete geoCache[s.id];
+        saveCache(geoCache);
+        setStatus("Cache silindi: " + s.name);
+        render();
+      };
+
       controls.appendChild(btnFind);
-      controls.appendChild(btnShow);
-      controls.appendChild(btnCopy);
+      controls.appendChild(btnShowLeaflet);
+      controls.appendChild(btnClearThis);
+
+      const hint = document.createElement("div");
+      hint.className = "hint";
+      hint.textContent = "İpucu: Konum yanlış çıkarsa adres alanına mahalle/sokak ekleyip tekrar dene.";
 
       card.appendChild(top);
       card.appendChild(addrInput);
       card.appendChild(controls);
+      card.appendChild(preview);
       card.appendChild(hint);
 
       return card;
     }
 
-    function render() {
-      const filtered = getFilteredSchools();
+    function buildPreviewHtml(s, rec) {
+      const km = haversineKm(HOME_COORD.lat, HOME_COORD.lon, rec.lat, rec.lon).toFixed(2);
+      const imgUrl = getGoogleStaticMapUrl(rec.lat, rec.lon, 16, 640, 320);
+      const link = getGoogleMapsLink(rec.lat, rec.lon);
 
-      // Ev konumu varsa ve bazı okulların konumu varsa => mesafeye göre sırala
-      const withDistances = filtered.map(s => {
-        const d = computeDistanceForSchool(s);
-        return { s, d };
-      });
-
-      withDistances.sort((a, b) => {
-        const ad = (typeof a.d === "number") ? a.d : Number.POSITIVE_INFINITY;
-        const bd = (typeof b.d === "number") ? b.d : Number.POSITIVE_INFINITY;
-        if (ad !== bd) return ad - bd;
-        // mesafe yoksa alfabetik
-        return a.s.name.localeCompare(b.s.name, "tr");
-      });
-
-      listEl.innerHTML = "";
-      if (withDistances.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "card";
-        empty.textContent = "Eşleşen okul bulunamadı.";
-        listEl.appendChild(empty);
-        return;
-      }
-
-      withDistances.forEach(({s}) => listEl.appendChild(createSchoolCard(s)));
+      return `
+        <a href="${link}" target="_blank" rel="noopener">
+          <img class="mapimg" src="${imgUrl}" alt="Harita: ${escapeHtml(s.name)}">
+        </a>
+        <div class="small">
+          <b>Mesafe:</b> ${escapeHtml(km)} km •
+          <span class="mono">${escapeHtml(rec.lat)}, ${escapeHtml(rec.lon)}</span><br>
+          <span>${escapeHtml(rec.display || "")}</span>
+        </div>
+      `;
     }
 
     /***********************
-     * 10) UI BUTONLARI
+     * 9) TOP BAR BUTONLARI
      ***********************/
     filterEl.addEventListener("input", render);
 
     document.getElementById("clearMarkers").onclick = () => {
       markersLayer.clearLayers();
-      homeMarker = null;
-      // Ev markerını tekrar ekleyelim (cache varsa)
-      if (homeCache && typeof homeCache.lat === "number") placeHomeMarker(homeCache.lat, homeCache.lon, homeCache.display);
+      // ev marker'ı geri ekle
+      const hm = L.marker([HOME_COORD.lat, HOME_COORD.lon]).addTo(markersLayer);
+      hm.bindPopup(`<b>${escapeHtml(HOME_COORD.label)}</b><br><small>${HOME_COORD.lat}, ${HOME_COORD.lon}</small>`);
       setStatus("Harita temizlendi.");
     };
 
     document.getElementById("clearCache").onclick = () => {
       localStorage.removeItem(CACHE_KEY);
-      localStorage.removeItem(HOME_CACHE_KEY);
       geoCache = {};
-      homeCache = {};
-      markersLayer.clearLayers();
-      homeMarker = null;
-      setStatus("Cache sıfırlandı. (Konumları tekrar bulmanız gerekecek.)");
+      setStatus("Okul cache sıfırlandı. Konumları tekrar bulmalısın.");
       render();
     };
 
     document.getElementById("btnGeocodeAll").onclick = async () => {
-      disableTopButtons(true);
-      try {
-        await geocodeAllVisibleSchools();
-      } finally {
-        disableTopButtons(false);
+      if (!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY.includes("YOUR_GOOGLE")) {
+        setStatus("Google API key eklemen lazım: GOOGLE_MAPS_API_KEY alanını doldur.");
+        return;
       }
+
+      const visible = getFilteredSchools();
+      if (visible.length === 0) return;
+
+      setStatus("Toplu konum bulma başladı (cache varsa hızlı olur)...");
+      disableTopButtons(true);
+
+      let done = 0;
+      for (const s of visible) {
+        done++;
+        setStatus(`(${done}/${visible.length}) Konum aranıyor: ${s.name}`);
+
+        const input = document.querySelector(`input[data-school-id="${cssEscape(s.id)}"]`);
+        const q = input ? input.value.trim() : s.address;
+
+        if (!geoCache[s.id]) {
+          try {
+            await geocodeSchoolIfNeeded(s, q);
+          } catch (e) {
+            console.error(e);
+          }
+          await sleep(GEOCODE_DELAY_MS);
+        }
+      }
+
+      setStatus("Toplu konum bulma bitti. Liste güncellendi.");
+      disableTopButtons(false);
+      render();
     };
 
     document.getElementById("btnShowAll").onclick = async () => {
+      const visible = getFilteredSchools();
+      if (visible.length === 0) return;
+
+      setStatus("Hepsini haritada göstermek için eksikler tamamlanıyor...");
       disableTopButtons(true);
-      try {
-        await showAllOnMap();
-      } finally {
-        disableTopButtons(false);
+
+      let bounds = L.latLngBounds();
+      bounds.extend([HOME_COORD.lat, HOME_COORD.lon]);
+
+      let done = 0;
+      for (const s of visible) {
+        done++;
+        setStatus(`(${done}/${visible.length}) Haritada: ${s.name}`);
+
+        const input = document.querySelector(`input[data-school-id="${cssEscape(s.id)}"]`);
+        const q = input ? input.value.trim() : s.address;
+
+        let rec = geoCache[s.id];
+        if (!rec) {
+          try { rec = await geocodeSchoolIfNeeded(s, q); }
+          catch (e) { console.error(e); rec = null; }
+          await sleep(GEOCODE_DELAY_MS);
+        }
+
+        if (rec) {
+          const m = L.marker([rec.lat, rec.lon]).addTo(markersLayer);
+          m.bindPopup(`<b>${escapeHtml(s.name)}</b><br><small>${escapeHtml(rec.display || "")}</small>`);
+          bounds.extend([rec.lat, rec.lon]);
+        }
       }
+
+      map.fitBounds(bounds.pad(0.15));
+      setStatus("Hepsi haritada gösterildi.");
+      disableTopButtons(false);
     };
 
     function disableTopButtons(disabled) {
@@ -593,30 +527,22 @@ if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(HOME_QUERY_DEFAULT)) {
     }
 
     /***********************
-     * 11) Yardımcılar
+     * 10) Yardımcılar
      ***********************/
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, (m) => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
       }[m]));
     }
-
-    // CSS selector için güvenli kaçış (id içinde underscore var ama garanti olsun)
     function cssEscape(value) {
-      // Basit kaçış: özel karakterleri backslash ile
       return String(value).replace(/[^a-zA-Z0-9_-]/g, ch => "\\" + ch);
     }
 
     /***********************
-     * 12) Başlangıç
+     * 11) Başlangıç
      ***********************/
-    (async function init() {
-      // Ev konumunu mümkünse hemen kur
-      try {
-        await ensureHomeGeocoded();
-      } catch (e) {
-        console.error(e);
-      }
+    (function init(){
+      setStatus("Ev konumu sabitlendi (koordinat). Okullar için 'Toplu Konum Bul' veya tek tek 'Konumu Bul' kullan.");
       render();
     })();
   </script>
