@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Okullar • Google ile Konum + Static Map</title>
+  <title>Okullar • Konum Bul & Haritada Göster</title>
   <style>
     :root { --bg:#0b1220; --card:#121a2b; --muted:#a8b3cf; --text:#e9efff; --accent:#7aa2ff; --border:#23304d; }
     body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
@@ -27,35 +27,33 @@
     .row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
     .title { font-weight:700; font-size:14px; }
     .meta { color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35; }
-    .badge { font-size:11px; color: var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px; white-space:nowrap; }
+    .badge { font-size:11px; color: var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px; white-space:nowrap; display:inline-block; margin-right:6px; margin-top:6px; }
     .km { font-weight:700; color:var(--text); }
-    .small { font-size:11px; color:var(--muted); margin-top:6px; }
-    img.mapimg { width:100%; border-radius:12px; border:1px solid var(--border); margin-top:8px; display:block; }
     #map { height:100%; width:100%; border-left:1px solid var(--border); background:#0f1730; }
+    .addrlabel { margin-top:10px; color:var(--muted); font-size:11px; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
     a { color: var(--accent); text-decoration:none; }
     a:hover { text-decoration: underline; }
-    .addrlabel { margin-top:10px; color:var(--muted); font-size:11px; }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Okullar • Google ile Konum + Harita Resmi</h1>
+    <h1>Okullar • Konum Bul & Haritada Göster</h1>
     <div class="sub">
-      Not: Bu sayfa <b>Google Maps JavaScript (Places)</b> ile konum bulur ve <b>Google Static Map</b> ile resim gösterir.<br>
-      Key’i tek yerden gir: <span class="mono">const GOOGLE_KEY = "..."</span>
+      Ev koordinatı: <span class="mono">40.932218, 29.126709</span><br>
+      Her okul kartında <b>Konum Bul</b> butonuna basınca okul sağdaki haritada ev ile birlikte gösterilir.
     </div>
   </header>
 
   <div class="topbar">
     <input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Kadıköy...)">
-    <button id="btnGeocodeAll" class="primary">Toplu Konum Bul</button>
-    <button id="btnShowAll" class="primary">Haritada Göster</button>
+    <button id="btnClearMarkers" class="primary">Haritayı Temizle</button>
     <button id="clearCache" class="danger">Cache Sıfırla</button>
   </div>
 
-  <div class="status" id="status">Yükleniyor...</div>
+  <div class="status" id="status">Google yükleniyor...</div>
 
   <div class="layout">
     <div class="panel" id="list"></div>
@@ -64,15 +62,15 @@
 
   <script>
     /***********************
-     * 1) AYARLAR (SADECE BURAYI DOLDUR)
+     * 1) AYARLAR
      ***********************/
-    const GOOGLE_KEY = "AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA";  // <-- SADECE BURAYI DEĞİŞTİR
-    const HOME = { lat: 40.932218     , lng: 29.126709, label: "Ev" }; // istersen kendi koordinatınla düzelt
-    const CACHE_KEY = "school_google_places_cache_v2";
-    const BIAS_RADIUS_M = 25000;
+    const GOOGLE_KEY = "AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA"; // <-- buraya key
+    const HOME = { lat: 40.932218, lng: 29.126709, label: "Ev" };
+    const CACHE_KEY = "school_google_places_cache_btn_v1";
+    const BIAS_RADIUS_M = 25000; // ev çevresinde arama bias
 
     /***********************
-     * 2) OKULLAR
+     * 2) OKULLAR (liste filtrelenmiş)
      ***********************/
     const schools = [
       // MALTEPE
@@ -133,7 +131,7 @@
       try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch { return {}; }
     }
     function saveCache(obj) { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
-    let geoCache = loadCache();
+    let geoCache = loadCache(); // { [id]: {lat,lng,formattedAddress,query,ts} }
 
     /***********************
      * 4) HELPERS
@@ -142,6 +140,7 @@
     const filterEl = document.getElementById("filter");
     const statusEl = document.getElementById("status");
     function setStatus(t){ statusEl.textContent = t; }
+
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, (m) => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
@@ -163,25 +162,13 @@
       return haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng);
     }
 
-    function getStaticMapUrl(lat, lng, zoom=16, w=640, h=320) {
-      const base = "https://maps.googleapis.com/maps/api/staticmap";
-      const center = `center=${lat},${lng}`;
-      const size = `size=${w}x${h}`;
-      const z = `zoom=${zoom}`;
-      const scale = "scale=2";
-      const marker = `markers=color:red%7C${lat},${lng}`;
-      const key = `key=${encodeURIComponent(GOOGLE_KEY)}`;
-      return `${base}?${center}&${z}&${size}&${scale}&${marker}&${key}`;
-    }
-    function getGoogleMapsLink(lat,lng){
-      return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-    }
-
     /***********************
-     * 5) GOOGLE MAPS/PLACES
+     * 5) GOOGLE MAPS / PLACES
      ***********************/
-    let gmap, placesService, homeMarker;
-    let markers = [];
+    let gmap, placesService;
+    let homeMarker;
+    let schoolMarkers = {}; // id -> marker
+    let infoWin;
 
     window.__initMap = function() {
       gmap = new google.maps.Map(document.getElementById("map"), {
@@ -191,7 +178,9 @@
         streetViewControl: false,
         fullscreenControl: true
       });
+
       placesService = new google.maps.places.PlacesService(gmap);
+      infoWin = new google.maps.InfoWindow();
 
       homeMarker = new google.maps.Marker({
         map: gmap,
@@ -199,7 +188,7 @@
         title: HOME.label
       });
 
-      setStatus("Hazır. 'Toplu Konum Bul' ile başlayabilirsin.");
+      setStatus("Hazır. Bir okulun kartındaki 'Konum Bul' butonuna bas.");
       render();
     };
 
@@ -220,50 +209,50 @@
       });
     }
 
-    function buildQueryFromCard(s) {
-      const input = document.querySelector(`input[data-school-id="${cssEscape(s.id)}"]`);
-      const typed = input ? input.value.trim() : "";
-      if (typed) return typed;
-      return `${s.name}, ${s.district}, İstanbul, Türkiye`;
+    function clearMapMarkers(keepHome = true) {
+      for (const id of Object.keys(schoolMarkers)) {
+        schoolMarkers[id].setMap(null);
+        delete schoolMarkers[id];
+      }
+      if (!keepHome && homeMarker) {
+        homeMarker.setMap(null);
+        homeMarker = null;
+      }
+      setStatus("Harita temizlendi.");
     }
 
-    function clearAllMarkers() {
-      for (const m of markers) m.setMap(null);
-      markers = [];
-    }
-
-    function showAllOnMap() {
-      if (!gmap) return;
-      clearAllMarkers();
-
-      const bounds = new google.maps.LatLngBounds();
-      bounds.extend({ lat: HOME.lat, lng: HOME.lng });
-
-      const visible = getFilteredSchoolsSorted();
-      for (const s of visible) {
-        const rec = geoCache[s.id];
-        if (!rec) continue;
-
-        const m = new google.maps.Marker({
+    function showHomeAndSchoolOnMap(school, rec) {
+      // okul marker
+      if (schoolMarkers[school.id]) {
+        schoolMarkers[school.id].setPosition({ lat: rec.lat, lng: rec.lng });
+      } else {
+        schoolMarkers[school.id] = new google.maps.Marker({
           map: gmap,
           position: { lat: rec.lat, lng: rec.lng },
-          title: s.name
+          title: school.name
         });
-
-        const km = haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng).toFixed(2);
-        const info = new google.maps.InfoWindow({
-          content: `<b>${escapeHtml(s.name)}</b><br>
-                    <small>${escapeHtml(rec.formattedAddress || "")}</small><br>
-                    <small><b>Mesafe:</b> ${escapeHtml(km)} km</small>`
-        });
-        m.addListener("click", () => info.open({ map: gmap, anchor: m }));
-
-        markers.push(m);
-        bounds.extend({ lat: rec.lat, lng: rec.lng });
       }
 
+      const km = haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng).toFixed(2);
+      const html =
+        `<b>${escapeHtml(school.name)}</b><br>` +
+        `<small>${escapeHtml(rec.formattedAddress || "")}</small><br>` +
+        `<small><b>Mesafe:</b> ${escapeHtml(km)} km</small>`;
+
+      schoolMarkers[school.id].addListener("click", () => {
+        infoWin.setContent(html);
+        infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
+      });
+
+      // bounds: ev + okul
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend({ lat: HOME.lat, lng: HOME.lng });
+      bounds.extend({ lat: rec.lat, lng: rec.lng });
       gmap.fitBounds(bounds);
-      setStatus("Harita güncellendi.");
+
+      // popup otomatik aç
+      infoWin.setContent(html);
+      infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
     }
 
     /***********************
@@ -276,6 +265,7 @@
         return !q || hay.includes(q);
       });
 
+      // bulunanlar mesafeye göre, bulunmayanlar en altta
       return filtered
         .map(s => ({ s, d: distanceKmForSchool(s) }))
         .sort((a,b) => {
@@ -290,6 +280,14 @@
     function render() {
       const visible = getFilteredSchoolsSorted();
       listEl.innerHTML = "";
+
+      if (!placesService) {
+        const c = document.createElement("div");
+        c.className = "card";
+        c.textContent = "Google Maps yüklenmedi. Key / referrer / API enable kontrol et.";
+        listEl.appendChild(c);
+        return;
+      }
 
       for (const s of visible) {
         const card = document.createElement("div");
@@ -312,6 +310,7 @@
 
         const right = document.createElement("div");
         right.innerHTML = `<span class="badge">Google</span>`;
+
         top.appendChild(left);
         top.appendChild(right);
 
@@ -324,108 +323,109 @@
         addrInput.value = `${s.name}, ${s.district}, İstanbul, Türkiye`;
         addrInput.setAttribute("data-school-id", s.id);
 
-        const preview = document.createElement("div");
-        const rec = geoCache[s.id];
+        const controls = document.createElement("div");
+        controls.className = "controls";
 
-        if (rec) {
-          const km = haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng).toFixed(2);
-          const imgUrl = getStaticMapUrl(rec.lat, rec.lng, 16, 640, 320);
-          const link = getGoogleMapsLink(rec.lat, rec.lng);
-          preview.innerHTML = `
-            <a href="${link}" target="_blank" rel="noopener">
-              <img class="mapimg" src="${imgUrl}" alt="Harita: ${escapeHtml(s.name)}">
-            </a>
-            <div class="small">
-              <b>Mesafe:</b> ${escapeHtml(km)} km •
-              <span class="mono">${escapeHtml(rec.lat)}, ${escapeHtml(rec.lng)}</span><br>
-              <span>${escapeHtml(rec.formattedAddress || "")}</span>
-            </div>
-          `;
-        } else {
-          preview.innerHTML = `<div class="small">Konum henüz bulunmadı.</div>`;
-        }
+        const btnFind = document.createElement("button");
+        btnFind.className = "primary";
+        btnFind.textContent = "Konum Bul";
+
+        const btnForget = document.createElement("button");
+        btnForget.textContent = "Bu Okulu Unut";
+
+        const rec = geoCache[s.id];
+        const meta2 = document.createElement("div");
+        meta2.className = "meta";
+        meta2.style.marginTop = "10px";
+        meta2.innerHTML = rec
+          ? `<span class="badge">Bulundu</span> <span class="badge">${escapeHtml(rec.lat.toFixed(6))}, ${escapeHtml(rec.lng.toFixed(6))}</span>`
+          : `<span class="badge">Bulunmadı</span>`;
+
+        btnFind.onclick = async () => {
+          btnFind.disabled = true;
+          btnFind.textContent = "Aranıyor...";
+          try {
+            const query = addrInput.value.trim();
+            if (!query) return;
+
+            setStatus("Aranıyor: " + s.name);
+
+            const r = await placesTextSearch(query);
+            if (!r || !r.geometry || !r.geometry.location) {
+              setStatus("Bulunamadı. Arama metnini daha detaylı yazıp tekrar dene.");
+              return;
+            }
+
+            const found = {
+              lat: r.geometry.location.lat(),
+              lng: r.geometry.location.lng(),
+              formattedAddress: r.formatted_address || "",
+              query,
+              ts: Date.now()
+            };
+
+            geoCache[s.id] = found;
+            saveCache(geoCache);
+
+            // Haritada ev + okul göster
+            showHomeAndSchoolOnMap(s, found);
+
+            // Listeyi mesafeye göre tekrar sırala & “Bulundu” etiketini güncelle
+            render();
+            setStatus("Gösterildi: " + s.name);
+          } catch (e) {
+            console.error(e);
+            setStatus("Hata oldu. Console'a (F12) bak.");
+          } finally {
+            btnFind.disabled = false;
+            btnFind.textContent = "Konum Bul";
+          }
+        };
+
+        btnForget.onclick = () => {
+          delete geoCache[s.id];
+          saveCache(geoCache);
+          setStatus("Unutuldu: " + s.name);
+          render();
+        };
+
+        controls.appendChild(btnFind);
+        controls.appendChild(btnForget);
 
         card.appendChild(top);
         card.appendChild(addrLabel);
         card.appendChild(addrInput);
-        card.appendChild(preview);
+        card.appendChild(controls);
+        card.appendChild(meta2);
         listEl.appendChild(card);
       }
     }
 
     /***********************
-     * 7) TOPLU KONUM BUL
-     ***********************/
-    async function geocodeAll() {
-      if (!placesService) return;
-
-      const visible = getFilteredSchoolsSorted();
-      let done = 0, okCount = 0, missCount = 0;
-
-      const delay = (ms) => new Promise(r => setTimeout(r, ms));
-
-      for (const s of visible) {
-        done++;
-        setStatus(`(${done}/${visible.length}) Aranıyor: ${s.name}`);
-
-        if (geoCache[s.id]) continue;
-
-        const query = buildQueryFromCard(s);
-        const r = await placesTextSearch(query);
-
-        if (!r || !r.geometry || !r.geometry.location) {
-          missCount++;
-        } else {
-          okCount++;
-          geoCache[s.id] = {
-            lat: r.geometry.location.lat(),
-            lng: r.geometry.location.lng(),
-            placeId: r.place_id || "",
-            formattedAddress: r.formatted_address || "",
-            query,
-            ts: Date.now()
-          };
-          saveCache(geoCache);
-        }
-
-        await delay(250);
-      }
-
-      setStatus(`Bitti. Bulunan: ${okCount}, Bulunamayan: ${missCount}. (Bulunamayanlar için arama metnini detaylandırıp tekrar dene.)`);
-      render();
-    }
-
-    /***********************
-     * 8) EVENTS
+     * 7) TOP BAR
      ***********************/
     filterEl.addEventListener("input", render);
 
-    document.getElementById("btnGeocodeAll").onclick = async () => {
-      disableTopButtons(true);
-      try { await geocodeAll(); }
-      finally { disableTopButtons(false); }
+    document.getElementById("btnClearMarkers").onclick = () => {
+      clearMapMarkers(true);
+      // ev marker dursun; gerekirse merkeze dön
+      if (gmap) gmap.setCenter({ lat: HOME.lat, lng: HOME.lng });
+      if (gmap) gmap.setZoom(12);
     };
-
-    document.getElementById("btnShowAll").onclick = () => showAllOnMap();
 
     document.getElementById("clearCache").onclick = () => {
       localStorage.removeItem(CACHE_KEY);
       geoCache = {};
-      clearAllMarkers();
-      setStatus("Cache sıfırlandı. Tekrar 'Toplu Konum Bul' yap.");
+      clearMapMarkers(true);
+      setStatus("Cache sıfırlandı.");
       render();
     };
 
-    function disableTopButtons(disabled) {
-      document.getElementById("btnGeocodeAll").disabled = disabled;
-      document.getElementById("btnShowAll").disabled = disabled;
-    }
-
     /***********************
-     * 9) GOOGLE SCRIPT LOADER (tek dosya, tek key)
+     * 8) GOOGLE SCRIPT LOADER
      ***********************/
     function loadGoogleScript() {
-      if (!GOOGLE_KEY || GOOGLE_KEY.includes("BURAYA_KEY")) {
+      if (!GOOGLE_KEY || GOOGLE_KEY === "PUT_YOUR_KEY_HERE") {
         setStatus("API key yok. GOOGLE_KEY satırına key’ini yapıştır.");
         return;
       }
@@ -433,16 +433,11 @@
       s.async = true;
       s.defer = true;
       s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GOOGLE_KEY)}&libraries=places&callback=__initMap`;
-      s.onerror = () => setStatus("Google Maps script yüklenemedi. Key/referrer/API enable kontrol et.");
+      s.onerror = () => setStatus("Google Maps yüklenemedi. Key / referrer / API enable kontrol et.");
       document.head.appendChild(s);
     }
 
-    // Cache yazma/okuma
-    function saveCache(obj){ localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
-    function loadCache(){ try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch { return {}; } }
-
     // Başlat
-    setStatus("Google yükleniyor...");
     loadGoogleScript();
   </script>
 </body>
