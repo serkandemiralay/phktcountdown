@@ -10,20 +10,27 @@
     header { padding:18px 18px 12px; border-bottom:1px solid var(--border); }
     h1 { margin:0; font-size:18px; }
     .sub { margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }
+
     .topbar { display:flex; gap:10px; align-items:center; margin:12px; flex-wrap:wrap; }
     .input { width:100%; box-sizing:border-box; background:#0f1730; border:1px solid var(--border); color:var(--text); padding:9px 10px; border-radius:10px; font-size:12px; }
     .search { flex:1; min-width:240px; }
     .select { width:auto; min-width:180px; }
-    .selectSmall { width:auto; min-width:170px; }
+
     button { background:transparent; border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; font-size:12px; }
     button:hover { border-color: var(--accent); }
     button.primary { background: rgba(122,162,255,.12); border-color: rgba(122,162,255,.35); }
     button.danger { border-color: rgba(255,120,120,.35); background: rgba(255,120,120,.10); }
     button:disabled { opacity:.55; cursor:not-allowed; }
+
     .status { margin:0 12px 12px; color:var(--muted); font-size:12px; line-height:1.35; }
 
     .layout { display:grid; grid-template-columns: 520px 1fr; gap:12px; height: calc(100vh - 132px); }
-    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; height:auto; } #map { height: 55vh; } }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; height:auto; }
+      #map { height: 45vh; }
+      #directionsPanel { max-height: 35vh; }
+    }
+
     .panel { padding:12px; overflow:auto; }
     .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; }
     .row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
@@ -31,12 +38,27 @@
     .meta { color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35; }
     .badge { font-size:11px; color: var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px; white-space:nowrap; display:inline-block; margin-right:6px; margin-top:6px; }
     .km { font-weight:700; color:var(--text); }
-    #map { height:100%; width:100%; border-left:1px solid var(--border); background:#0f1730; }
+
+    .mapcol { display:flex; flex-direction:column; height:100%; border-left:1px solid var(--border); }
+    #map { flex: 1 1 auto; width:100%; background:#0f1730; }
+    #directionsPanel {
+      flex: 0 0 auto;
+      max-height: 42%;
+      overflow:auto;
+      background: #0f1730;
+      border-top:1px solid var(--border);
+      padding:10px 12px;
+      color: var(--text);
+      font-size:12px;
+    }
+    #directionsPanel:empty::before {
+      content: "Yol tarifi burada görünecek (bir okul için Konum Bul veya Rota butonları).";
+      color: var(--muted);
+    }
+
     .addrlabel { margin-top:10px; color:var(--muted); font-size:11px; }
     .controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-    a { color: var(--accent); text-decoration:none; }
-    a:hover { text-decoration: underline; }
   </style>
 </head>
 
@@ -45,21 +67,14 @@
     <h1>Okullar • Konum Bul & Haritada Göster</h1>
     <div class="sub">
       Ev koordinatı: <span class="mono">40.932218, 29.126709</span><br>
-      Karttan <b>Konum Bul</b> ile okul haritada gösterilir. Üstten seçtiğin <b>ulaşım moduna göre süre</b> (dk) hesaplanır.
+      <b>Konum Bul</b> → okul bulunur, <b>🚗 Araç + 🚌 Toplu taşıma süreleri</b> hesaplanır.
+      <br>Rota çizimi ve <b>adım adım yol tarifi</b> sağ altta gösterilir.
     </div>
   </header>
 
   <div class="topbar">
-    <!-- Semt/İlçe dropdown -->
     <select id="districtSelect" class="input select">
       <option value="">Tümü</option>
-    </select>
-
-    <!-- Ulaşım modu dropdown -->
-    <select id="modeSelect" class="input selectSmall" title="Ulaşım modu">
-      <option value="DRIVING">🚗 Araç</option>
-      <option value="WALKING">🚶 Yürüme</option>
-      <option value="TRANSIT">🚌 Toplu taşıma</option>
     </select>
 
     <input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Kadıköy...)">
@@ -71,7 +86,11 @@
 
   <div class="layout">
     <div class="panel" id="list"></div>
-    <div id="map"></div>
+
+    <div class="mapcol">
+      <div id="map"></div>
+      <div id="directionsPanel"></div>
+    </div>
   </div>
 
   <script>
@@ -80,7 +99,7 @@
      ***********************/
     const GOOGLE_KEY = "AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA"; // <-- buraya key
     const HOME = { lat: 40.932218, lng: 29.126709, label: "Ev" };
-    const CACHE_KEY = "school_google_places_cache_btn_v3"; // v3: süreler mode bazlı
+    const CACHE_KEY = "school_google_places_cache_btn_v5"; // v5: DRIVING + TRANSIT süreleri
     const BIAS_RADIUS_M = 25000;
 
     /***********************
@@ -147,14 +166,7 @@
     function saveCache(obj) { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
 
     // geoCache[id] örnek:
-    // {
-    //   lat,lng,formattedAddress,query,ts,
-    //   times: {
-    //     DRIVING: { durationText, durationSec, trafficText, trafficSec, ts },
-    //     WALKING: { durationText, durationSec, ts },
-    //     TRANSIT: { durationText, durationSec, ts }
-    //   }
-    // }
+    // { lat,lng,formattedAddress,query,ts, times: { DRIVING:{...}, TRANSIT:{...} } }
     let geoCache = loadCache();
 
     /***********************
@@ -164,7 +176,7 @@
     const filterEl = document.getElementById("filter");
     const statusEl = document.getElementById("status");
     const districtSelectEl = document.getElementById("districtSelect");
-    const modeSelectEl = document.getElementById("modeSelect");
+    const directionsPanelEl = document.getElementById("directionsPanel");
 
     function setStatus(t){ statusEl.textContent = t; }
 
@@ -196,29 +208,14 @@
         districts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
     }
 
-    function currentMode() {
-      const v = (modeSelectEl.value || "DRIVING").trim();
-      if (v === "WALKING" || v === "TRANSIT" || v === "DRIVING") return v;
-      return "DRIVING";
-    }
-
-    function modeLabel(mode){
-      if (mode === "DRIVING") return "🚗 Araç";
-      if (mode === "WALKING") return "🚶 Yürüme";
-      if (mode === "TRANSIT") return "🚌 Toplu taşıma";
-      return mode;
-    }
-
     function getCachedTime(rec, mode){
-      if (!rec?.times?.[mode]) return null;
-      return rec.times[mode];
+      return rec?.times?.[mode] || null;
     }
 
-    function getBestTimeText(rec, mode){
+    function bestTimeText(rec, mode){
       const t = getCachedTime(rec, mode);
       if (!t) return null;
-      // Araçta trafik varsa onu bas
-      if (mode === "DRIVING" && t.trafficText) return t.trafficText;
+      if (mode === "DRIVING" && t.trafficText) return t.trafficText; // varsa trafik
       if (t.durationText) return t.durationText;
       return null;
     }
@@ -226,7 +223,7 @@
     /***********************
      * 5) GOOGLE MAPS / PLACES / DIRECTIONS
      ***********************/
-    let gmap, placesService, directionsService;
+    let gmap, placesService, directionsService, directionsRenderer;
     let homeMarker;
     let schoolMarkers = {}; // id -> marker
     let infoWin;
@@ -242,6 +239,13 @@
 
       placesService = new google.maps.places.PlacesService(gmap);
       directionsService = new google.maps.DirectionsService();
+
+      directionsRenderer = new google.maps.DirectionsRenderer({
+        map: gmap,
+        panel: directionsPanelEl,
+        suppressMarkers: true
+      });
+
       infoWin = new google.maps.InfoWindow();
 
       homeMarker = new google.maps.Marker({
@@ -250,7 +254,7 @@
         title: HOME.label
       });
 
-      setStatus("Hazır. Semt + mod seç, sonra karttan 'Konum Bul' veya 'Süre Hesapla' kullan.");
+      setStatus("Hazır. Semt seç + ara, sonra karttan Konum Bul.");
       render();
     };
 
@@ -271,26 +275,16 @@
       });
     }
 
-    // Navigasyon süresi hesapla (mode bazlı)
+    // süre hesapla (DRIVING / TRANSIT)
     function getTravelTimeTo(lat, lng, mode) {
       return new Promise((resolve) => {
-        if (!directionsService) { resolve(null); return; }
-
         const req = {
           origin: new google.maps.LatLng(HOME.lat, HOME.lng),
           destination: new google.maps.LatLng(lat, lng),
           travelMode: google.maps.TravelMode[mode] || google.maps.TravelMode.DRIVING
         };
-
-        // Trafik sadece DRIVING + departureTime ile gelir
-        if (mode === "DRIVING") {
-          req.drivingOptions = { departureTime: new Date() };
-        }
-
-        // TRANSIT için de departureTime faydalı
-        if (mode === "TRANSIT") {
-          req.transitOptions = { departureTime: new Date() };
-        }
+        if (mode === "DRIVING") req.drivingOptions = { departureTime: new Date() };
+        if (mode === "TRANSIT") req.transitOptions = { departureTime: new Date() };
 
         directionsService.route(req, (result, status) => {
           try {
@@ -299,7 +293,6 @@
               return;
             }
             const leg = result.routes[0].legs[0];
-
             const normal = leg.duration ? { text: leg.duration.text, value: leg.duration.value } : null;
             const traffic = leg.duration_in_traffic ? { text: leg.duration_in_traffic.text, value: leg.duration_in_traffic.value } : null;
 
@@ -317,6 +310,36 @@
       });
     }
 
+    // rota çiz + paneli doldur (mode seçerek)
+    function drawRoute(lat, lng, mode) {
+      return new Promise((resolve) => {
+        const req = {
+          origin: new google.maps.LatLng(HOME.lat, HOME.lng),
+          destination: new google.maps.LatLng(lat, lng),
+          travelMode: google.maps.TravelMode[mode] || google.maps.TravelMode.DRIVING
+        };
+        if (mode === "DRIVING") req.drivingOptions = { departureTime: new Date() };
+        if (mode === "TRANSIT") req.transitOptions = { departureTime: new Date() };
+
+        directionsService.route(req, (result, status) => {
+          if (status !== google.maps.DirectionsStatus.OK || !result) {
+            directionsRenderer.setDirections({ routes: [] });
+            directionsPanelEl.innerHTML = "";
+            resolve(false);
+            return;
+          }
+          directionsRenderer.setDirections(result);
+
+          const bounds = new google.maps.LatLngBounds();
+          bounds.extend({ lat: HOME.lat, lng: HOME.lng });
+          bounds.extend({ lat, lng });
+          gmap.fitBounds(bounds);
+
+          resolve(true);
+        });
+      });
+    }
+
     function clearMapMarkers(keepHome = true) {
       for (const id of Object.keys(schoolMarkers)) {
         schoolMarkers[id].setMap(null);
@@ -326,10 +349,12 @@
         homeMarker.setMap(null);
         homeMarker = null;
       }
-      setStatus("Harita temizlendi.");
+      if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
+      directionsPanelEl.innerHTML = "";
+      setStatus("Harita + rota temizlendi.");
     }
 
-    function showHomeAndSchoolOnMap(school, rec) {
+    function showHomeAndSchoolMarker(school, rec) {
       if (schoolMarkers[school.id]) {
         schoolMarkers[school.id].setPosition({ lat: rec.lat, lng: rec.lng });
       } else {
@@ -341,9 +366,13 @@
       }
 
       const km = haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng).toFixed(2);
-      const mode = currentMode();
-      const t = getBestTimeText(rec, mode);
-      const timeLine = t ? `<br><small><b>${escapeHtml(modeLabel(mode))}:</b> ⏱️ ${escapeHtml(t)}</small>` : "";
+      const tDrive = bestTimeText(rec, "DRIVING");
+      const tTransit = bestTimeText(rec, "TRANSIT");
+
+      const timeLine =
+        (tDrive || tTransit)
+          ? `<br><small>${tDrive ? `<b>🚗 Araç:</b> ⏱️ ${escapeHtml(tDrive)} ` : ""}${tTransit ? `&nbsp;&nbsp;<b>🚌 Toplu:</b> ⏱️ ${escapeHtml(tTransit)}` : ""}</small>`
+          : "";
 
       const html =
         `<b>${escapeHtml(school.name)}</b><br>` +
@@ -356,26 +385,19 @@
         infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
       });
 
-      const bounds = new google.maps.LatLngBounds();
-      bounds.extend({ lat: HOME.lat, lng: HOME.lng });
-      bounds.extend({ lat: rec.lat, lng: rec.lng });
-      gmap.fitBounds(bounds);
-
       infoWin.setContent(html);
       infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
     }
 
     /***********************
-     * 6) RENDER
+     * 6) LISTE / RENDER
      ***********************/
     function getFilteredSchoolsSorted() {
       const q = (filterEl.value || "").toLowerCase().trim();
       const district = (districtSelectEl.value || "").trim();
 
       const filtered = schools.filter(s => {
-        const matchesDistrict = !district || s.district === district;
-        if (!matchesDistrict) return false;
-
+        if (district && s.district !== district) return false;
         const hay = (s.name + " " + s.district).toLowerCase();
         return !q || hay.includes(q);
       });
@@ -391,30 +413,27 @@
         .map(x => x.s);
     }
 
-    async function ensureTimeForSchool(school) {
+    async function ensureTimesForSchool(school) {
       const rec = geoCache[school.id];
       if (!rec?.lat || !rec?.lng) return false;
 
-      const mode = currentMode();
-      const existing = getCachedTime(rec, mode);
-      if (existing?.durationText || (mode === "DRIVING" && existing?.trafficText)) {
-        return true; // zaten var
+      geoCache[school.id] = { ...rec, times: rec.times || {} };
+      const base = geoCache[school.id];
+
+      // DRIVING
+      if (!getCachedTime(base, "DRIVING")?.durationText) {
+        setStatus("🚗 Araç süresi hesaplanıyor: " + school.name);
+        const t1 = await getTravelTimeTo(base.lat, base.lng, "DRIVING");
+        if (t1) base.times.DRIVING = t1;
       }
 
-      setStatus(`Süre hesaplanıyor (${modeLabel(mode)}): ${school.name}`);
-      const tt = await getTravelTimeTo(rec.lat, rec.lng, mode);
-      if (!tt) {
-        setStatus("Süre hesaplanamadı. (Rota bulunamadı veya API kısıtı olabilir)");
-        return false;
+      // TRANSIT
+      if (!getCachedTime(base, "TRANSIT")?.durationText) {
+        setStatus("🚌 Toplu taşıma süresi hesaplanıyor: " + school.name);
+        const t2 = await getTravelTimeTo(base.lat, base.lng, "TRANSIT");
+        if (t2) base.times.TRANSIT = t2;
       }
 
-      geoCache[school.id] = {
-        ...rec,
-        times: {
-          ...(rec.times || {}),
-          [mode]: tt
-        }
-      };
       saveCache(geoCache);
       return true;
     }
@@ -431,35 +450,33 @@
         return;
       }
 
-      const mode = currentMode();
-
       for (const s of visible) {
+        const rec = geoCache[s.id];
+
         const card = document.createElement("div");
         card.className = "card";
-
-        const rec = geoCache[s.id];
 
         const d = distanceKmForSchool(s);
         const distLabel = (typeof d === "number") ? `${d.toFixed(2)} km` : "—";
 
-        const timeText = getBestTimeText(rec, mode); // yoksa null
+        const driveText = bestTimeText(rec, "DRIVING");
+        const transitText = bestTimeText(rec, "TRANSIT");
+
+        const timeBadges = `
+          ${driveText ? `<span class="badge">🚗 Araç: <span class="km">⏱️ ${escapeHtml(driveText)}</span></span>` : ""}
+          ${transitText ? `<span class="badge">🚌 Toplu: <span class="km">⏱️ ${escapeHtml(transitText)}</span></span>` : ""}
+        `;
 
         const top = document.createElement("div");
         top.className = "row";
 
         const left = document.createElement("div");
-
-        // Süre badge’i sadece süre varsa göster
-        const timeBadgeHtml = timeText
-          ? `<span class="badge">${escapeHtml(modeLabel(mode))}: <span class="km">⏱️ ${escapeHtml(timeText)}</span></span>`
-          : ``;
-
         left.innerHTML = `
           <div class="title">${escapeHtml(s.name)}</div>
           <div class="meta">
             <span class="badge">${escapeHtml(s.district)}</span>
             <span class="badge">Mesafe: <span class="km">${escapeHtml(distLabel)}</span></span>
-            ${timeBadgeHtml}
+            ${timeBadges}
           </div>
         `;
 
@@ -476,7 +493,6 @@
         const addrInput = document.createElement("input");
         addrInput.className = "input";
         addrInput.value = `${s.name}, ${s.district}, İstanbul, Türkiye`;
-        addrInput.setAttribute("data-school-id", s.id);
 
         const controls = document.createElement("div");
         controls.className = "controls";
@@ -485,23 +501,19 @@
         btnFind.className = "primary";
         btnFind.textContent = "Konum Bul";
 
+        const btnRouteDrive = document.createElement("button");
+        btnRouteDrive.textContent = "Rota (Araç)";
+
+        const btnRouteTransit = document.createElement("button");
+        btnRouteTransit.textContent = "Rota (Toplu)";
+
         const btnForget = document.createElement("button");
         btnForget.textContent = "Bu Okulu Unut";
 
-        // Konum var ama seçili mod için süre yoksa: "Süre Hesapla"
-        const btnTime = document.createElement("button");
-        btnTime.textContent = "Süre Hesapla";
-
+        // Konum varsa rota butonlarını aktif, yoksa disable
         const hasCoords = !!(rec?.lat && rec?.lng);
-        const hasTimeForMode = !!getBestTimeText(rec, mode);
-        const showTimeBtn = hasCoords && !hasTimeForMode;
-
-        const meta2 = document.createElement("div");
-        meta2.className = "meta";
-        meta2.style.marginTop = "10px";
-        meta2.innerHTML = rec
-          ? `<span class="badge">Bulundu</span> <span class="badge">${escapeHtml(rec.lat.toFixed(6))}, ${escapeHtml(rec.lng.toFixed(6))}</span>`
-          : `<span class="badge">Bulunmadı</span>`;
+        btnRouteDrive.disabled = !hasCoords;
+        btnRouteTransit.disabled = !hasCoords;
 
         btnFind.onclick = async () => {
           btnFind.disabled = true;
@@ -521,24 +533,27 @@
             const lat = r.geometry.location.lat();
             const lng = r.geometry.location.lng();
 
-            // Konumu cache'e yaz
-            const found = {
+            const prev = geoCache[s.id] || {};
+            geoCache[s.id] = {
+              ...prev,
               lat,
               lng,
               formattedAddress: r.formatted_address || "",
               query,
-              ts: Date.now()
+              ts: Date.now(),
+              times: prev.times || {}
             };
-
-            const prev = geoCache[s.id] || {};
-            geoCache[s.id] = { ...prev, ...found, times: (prev.times || {}) };
             saveCache(geoCache);
 
-            // Seçili mod için süre hesapla (tek sefer)
-            await ensureTimeForSchool(s);
+            // süreleri hesapla (iki tane)
+            await ensureTimesForSchool(s);
 
-            // Haritada göster
-            showHomeAndSchoolOnMap(s, geoCache[s.id]);
+            // marker göster
+            showHomeAndSchoolMarker(s, geoCache[s.id]);
+
+            // default: Araç rotasını çiz
+            setStatus("Rota çiziliyor (🚗 Araç): " + s.name);
+            await drawRoute(lat, lng, "DRIVING");
 
             render();
             setStatus("Gösterildi: " + s.name);
@@ -551,19 +566,18 @@
           }
         };
 
-        btnTime.onclick = async () => {
-          btnTime.disabled = true;
-          btnTime.textContent = "Hesaplanıyor...";
-          try {
-            const ok = await ensureTimeForSchool(s);
-            if (ok) {
-              render();
-              setStatus(`Süre güncellendi (${modeLabel(currentMode())}): ${s.name}`);
-            }
-          } finally {
-            btnTime.disabled = false;
-            btnTime.textContent = "Süre Hesapla";
-          }
+        btnRouteDrive.onclick = async () => {
+          const r = geoCache[s.id];
+          if (!r?.lat || !r?.lng) return;
+          setStatus("Rota çiziliyor (🚗 Araç): " + s.name);
+          await drawRoute(r.lat, r.lng, "DRIVING");
+        };
+
+        btnRouteTransit.onclick = async () => {
+          const r = geoCache[s.id];
+          if (!r?.lat || !r?.lng) return;
+          setStatus("Rota çiziliyor (🚌 Toplu): " + s.name);
+          await drawRoute(r.lat, r.lng, "TRANSIT");
         };
 
         btnForget.onclick = () => {
@@ -574,8 +588,16 @@
         };
 
         controls.appendChild(btnFind);
-        if (showTimeBtn) controls.appendChild(btnTime);
+        controls.appendChild(btnRouteDrive);
+        controls.appendChild(btnRouteTransit);
         controls.appendChild(btnForget);
+
+        const meta2 = document.createElement("div");
+        meta2.className = "meta";
+        meta2.style.marginTop = "10px";
+        meta2.innerHTML = rec
+          ? `<span class="badge">Bulundu</span> <span class="badge">${escapeHtml(rec.lat.toFixed(6))}, ${escapeHtml(rec.lng.toFixed(6))}</span>`
+          : `<span class="badge">Bulunmadı</span>`;
 
         card.appendChild(top);
         card.appendChild(addrLabel);
@@ -591,10 +613,6 @@
      ***********************/
     filterEl.addEventListener("input", render);
     districtSelectEl.addEventListener("change", render);
-    modeSelectEl.addEventListener("change", () => {
-      setStatus(`Ulaşım modu: ${modeLabel(currentMode())}`);
-      render();
-    });
 
     document.getElementById("btnClearMarkers").onclick = () => {
       clearMapMarkers(true);
