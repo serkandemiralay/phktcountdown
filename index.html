@@ -86,7 +86,7 @@
     /***********************
      * 0) AYARLAR
      ***********************/
-    const HOME_QUERY_DEFAULT = "Feyzullah Mahallesi, Sevinç Sokak, Maltepe, İstanbul";
+    const HOME_QUERY_DEFAULT = "40.9329, 29.1418";
     const CACHE_KEY = "school_geo_cache_v1";
     const HOME_CACHE_KEY = "home_geo_cache_v1";
 
@@ -215,9 +215,15 @@
     const homeInputDefault = HOME_QUERY_DEFAULT;
 
     async function ensureHomeGeocoded() {
-      if (homeCache && typeof homeCache.lat === "number" && typeof homeCache.lon === "number") {
-        placeHomeMarker(homeCache.lat, homeCache.lon, homeCache.display || homeInputDefault);
-        return true;
+      i// Eğer query koordinatsa direkt kullan
+if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(HOME_QUERY_DEFAULT)) {
+  const [lat, lon] = HOME_QUERY_DEFAULT.split(",").map(Number);
+  homeCache = { lat, lon, display: "Ev Konumu (manuel)", query: HOME_QUERY_DEFAULT, ts: Date.now() };
+  saveCache(HOME_CACHE_KEY, homeCache);
+  placeHomeMarker(lat, lon, "Ev Konumu (manuel)");
+  return true;
+}
+
       }
 
       setStatus("Ev konumu aranıyor (ilk kurulum): " + homeInputDefault);
