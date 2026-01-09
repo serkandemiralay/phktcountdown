@@ -50,15 +50,63 @@
       padding:10px 12px;
       color: var(--text);
       font-size:12px;
+      line-height: 1.45;
     }
     #directionsPanel:empty::before {
       content: "Yol tarifi burada görünecek (bir okul için Konum Bul veya Rota butonları).";
       color: var(--muted);
     }
 
+    .routeHeader {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+      padding-bottom:8px;
+      border-bottom:1px solid var(--border);
+    }
+    .routeHeader .title2 { font-weight:700; font-size:12px; color: var(--text); }
+    .routeHeader .hint { font-size:11px; color: var(--muted); }
+
     .addrlabel { margin-top:10px; color:var(--muted); font-size:11px; }
     .controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+    /* === Directions Panel okunabilirlik fix (Google adp*) === */
+    #directionsPanel { background: #0f1730; color: #e9efff; }
+    #directionsPanel .adp,
+    #directionsPanel .adp table,
+    #directionsPanel .adp-list,
+    #directionsPanel .adp-summary,
+    #directionsPanel .adp-substep,
+    #directionsPanel .adp-text,
+    #directionsPanel .adp-directions,
+    #directionsPanel .adp-legal {
+      color: #e9efff !important;
+    }
+    #directionsPanel table,
+    #directionsPanel .adp table {
+      background: transparent !important;
+      border-color: #23304d !important;
+    }
+    #directionsPanel td,
+    #directionsPanel th,
+    #directionsPanel .adp td,
+    #directionsPanel .adp th {
+      color: #e9efff !important;
+      border-color: #23304d !important;
+    }
+    #directionsPanel a,
+    #directionsPanel a:visited { color: #7aa2ff !important; }
+    #directionsPanel .adp-legal,
+    #directionsPanel .adp-summary,
+    #directionsPanel .adp-text { opacity: 0.95; }
+    #directionsPanel .adp,
+    #directionsPanel .adp-warnbox,
+    #directionsPanel .adp-directions { background: transparent !important; }
+    #directionsPanel img { filter: brightness(1.3) contrast(1.1); }
+    #directionsPanel .adp-step, #directionsPanel .adp-substep { padding: 6px 0; }
   </style>
 </head>
 
@@ -89,7 +137,9 @@
 
     <div class="mapcol">
       <div id="map"></div>
-      <div id="directionsPanel"></div>
+      <div id="directionsPanel">
+        <!-- başlık JS ile eklenecek -->
+      </div>
     </div>
   </div>
 
@@ -99,7 +149,7 @@
      ***********************/
     const GOOGLE_KEY = "AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA"; // <-- buraya key
     const HOME = { lat: 40.932218, lng: 29.126709, label: "Ev" };
-    const CACHE_KEY = "school_google_places_cache_btn_v5"; // v5: DRIVING + TRANSIT süreleri
+    const CACHE_KEY = "school_google_places_cache_btn_v6";
     const BIAS_RADIUS_M = 25000;
 
     /***********************
@@ -164,10 +214,7 @@
       try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch { return {}; }
     }
     function saveCache(obj) { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
-
-    // geoCache[id] örnek:
-    // { lat,lng,formattedAddress,query,ts, times: { DRIVING:{...}, TRANSIT:{...} } }
-    let geoCache = loadCache();
+    let geoCache = loadCache(); // { id: {lat,lng,formattedAddress,query,ts,times:{DRIVING,TRANSIT}} }
 
     /***********************
      * 4) HELPERS
@@ -177,6 +224,9 @@
     const statusEl = document.getElementById("status");
     const districtSelectEl = document.getElementById("districtSelect");
     const directionsPanelEl = document.getElementById("directionsPanel");
+
+    let currentRouteSchoolId = null;
+    let currentRouteMode = null;
 
     function setStatus(t){ statusEl.textContent = t; }
 
@@ -208,16 +258,23 @@
         districts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
     }
 
-    function getCachedTime(rec, mode){
-      return rec?.times?.[mode] || null;
-    }
-
+    function getCachedTime(rec, mode){ return rec?.times?.[mode] || null; }
     function bestTimeText(rec, mode){
       const t = getCachedTime(rec, mode);
       if (!t) return null;
-      if (mode === "DRIVING" && t.trafficText) return t.trafficText; // varsa trafik
+      if (mode === "DRIVING" && t.trafficText) return t.trafficText;
       if (t.durationText) return t.durationText;
       return null;
+    }
+
+    function modeLabel(mode){
+      return mode === "TRANSIT" ? "🚌 Toplu taşıma" : "🚗 Araç";
+    }
+
+    function ensureRouteHeader() {
+      // Panel içeriği google tarafından doldurulmadan önce başlık eklemek istiyoruz.
+      // DirectionsRenderer paneli tamamen overwrite edebiliyor; bu yüzden header’ı “panelin üstünde” ayrı bir div olarak tutuyoruz.
+      // En garantisi: panelin hemen üstüne sabit header koymak.
     }
 
     /***********************
@@ -275,7 +332,6 @@
       });
     }
 
-    // süre hesapla (DRIVING / TRANSIT)
     function getTravelTimeTo(lat, lng, mode) {
       return new Promise((resolve) => {
         const req = {
@@ -310,7 +366,6 @@
       });
     }
 
-    // rota çiz + paneli doldur (mode seçerek)
     function drawRoute(lat, lng, mode) {
       return new Promise((resolve) => {
         const req = {
@@ -335,6 +390,7 @@
           bounds.extend({ lat, lng });
           gmap.fitBounds(bounds);
 
+          currentRouteMode = mode;
           resolve(true);
         });
       });
@@ -351,6 +407,8 @@
       }
       if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
       directionsPanelEl.innerHTML = "";
+      currentRouteSchoolId = null;
+      currentRouteMode = null;
       setStatus("Harita + rota temizlendi.");
     }
 
@@ -420,14 +478,11 @@
       geoCache[school.id] = { ...rec, times: rec.times || {} };
       const base = geoCache[school.id];
 
-      // DRIVING
       if (!getCachedTime(base, "DRIVING")?.durationText) {
         setStatus("🚗 Araç süresi hesaplanıyor: " + school.name);
         const t1 = await getTravelTimeTo(base.lat, base.lng, "DRIVING");
         if (t1) base.times.DRIVING = t1;
       }
-
-      // TRANSIT
       if (!getCachedTime(base, "TRANSIT")?.durationText) {
         setStatus("🚌 Toplu taşıma süresi hesaplanıyor: " + school.name);
         const t2 = await getTravelTimeTo(base.lat, base.lng, "TRANSIT");
@@ -510,7 +565,6 @@
         const btnForget = document.createElement("button");
         btnForget.textContent = "Bu Okulu Unut";
 
-        // Konum varsa rota butonlarını aktif, yoksa disable
         const hasCoords = !!(rec?.lat && rec?.lng);
         btnRouteDrive.disabled = !hasCoords;
         btnRouteTransit.disabled = !hasCoords;
@@ -545,14 +599,13 @@
             };
             saveCache(geoCache);
 
-            // süreleri hesapla (iki tane)
             await ensureTimesForSchool(s);
 
-            // marker göster
             showHomeAndSchoolMarker(s, geoCache[s.id]);
 
-            // default: Araç rotasını çiz
-            setStatus("Rota çiziliyor (🚗 Araç): " + s.name);
+            currentRouteSchoolId = s.id;
+            currentRouteMode = "DRIVING";
+            setStatus(`Rota çiziliyor (${modeLabel("DRIVING")}): ${s.name}`);
             await drawRoute(lat, lng, "DRIVING");
 
             render();
@@ -569,20 +622,30 @@
         btnRouteDrive.onclick = async () => {
           const r = geoCache[s.id];
           if (!r?.lat || !r?.lng) return;
-          setStatus("Rota çiziliyor (🚗 Araç): " + s.name);
+          currentRouteSchoolId = s.id;
+          currentRouteMode = "DRIVING";
+          setStatus(`Rota çiziliyor (${modeLabel("DRIVING")}): ${s.name}`);
           await drawRoute(r.lat, r.lng, "DRIVING");
         };
 
         btnRouteTransit.onclick = async () => {
           const r = geoCache[s.id];
           if (!r?.lat || !r?.lng) return;
-          setStatus("Rota çiziliyor (🚌 Toplu): " + s.name);
+          currentRouteSchoolId = s.id;
+          currentRouteMode = "TRANSIT";
+          setStatus(`Rota çiziliyor (${modeLabel("TRANSIT")}): ${s.name}`);
           await drawRoute(r.lat, r.lng, "TRANSIT");
         };
 
         btnForget.onclick = () => {
           delete geoCache[s.id];
           saveCache(geoCache);
+          if (currentRouteSchoolId === s.id) {
+            if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
+            directionsPanelEl.innerHTML = "";
+            currentRouteSchoolId = null;
+            currentRouteMode = null;
+          }
           setStatus("Unutuldu: " + s.name);
           render();
         };
