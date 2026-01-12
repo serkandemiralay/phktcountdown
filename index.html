@@ -2,748 +2,721 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Okullar • Konum Bul & Haritada Göster</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seyahat Planı • Phuket</title>
   <style>
-    :root { --bg:#0b1220; --card:#121a2b; --muted:#a8b3cf; --text:#e9efff; --accent:#7aa2ff; --border:#23304d; }
-    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
-    header { padding:18px 18px 12px; border-bottom:1px solid var(--border); }
-    h1 { margin:0; font-size:18px; }
-    .sub { margin-top:6px; color:var(--muted); font-size:13px; line-height:1.35; }
-
-    .topbar { display:flex; gap:10px; align-items:center; margin:12px; flex-wrap:wrap; }
-    .input { width:100%; box-sizing:border-box; background:#0f1730; border:1px solid var(--border); color:var(--text); padding:9px 10px; border-radius:10px; font-size:12px; }
-    .search { flex:1; min-width:240px; }
-    .select { width:auto; min-width:180px; }
-
-    button { background:transparent; border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; font-size:12px; }
-    button:hover { border-color: var(--accent); }
-    button.primary { background: rgba(122,162,255,.12); border-color: rgba(122,162,255,.35); }
-    button.danger { border-color: rgba(255,120,120,.35); background: rgba(255,120,120,.10); }
-    button:disabled { opacity:.55; cursor:not-allowed; }
-
-    .status { margin:0 12px 12px; color:var(--muted); font-size:12px; line-height:1.35; }
-
-    .layout { display:grid; grid-template-columns: 520px 1fr; gap:12px; height: calc(100vh - 132px); }
-    @media (max-width: 980px) {
-      .layout { grid-template-columns: 1fr; height:auto; }
-      #map { height: 45vh; }
-      #directionsPanel { max-height: 35vh; }
+    :root{
+      --bg1:#0b1020;
+      --bg2:#111a33;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --accent:#7c5cff;
+      --accent2:#26d3ff;
+      --good:#2ef2a2;
+      --warn:#ffcf5a;
+      --bad:#ff5c7a;
+      --shadow: 0 20px 70px rgba(0,0,0,.55);
+      --radius: 18px;
     }
 
-    .panel { padding:12px; overflow:auto; }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; }
-    .row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-    .title { font-weight:700; font-size:14px; }
-    .meta { color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35; }
-    .badge { font-size:11px; color: var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px; white-space:nowrap; display:inline-block; margin-right:6px; margin-top:6px; }
-    .km { font-weight:700; color:var(--text); }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(124,92,255,.35), transparent 55%),
+        radial-gradient(900px 550px at 85% 30%, rgba(38,211,255,.22), transparent 60%),
+        radial-gradient(800px 600px at 40% 95%, rgba(46,242,162,.14), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
 
-    .mapcol { display:flex; flex-direction:column; height:100%; border-left:1px solid var(--border); }
-    #map { flex: 1 1 auto; width:100%; background:#0f1730; }
-    #directionsPanel {
-      flex: 0 0 auto;
-      max-height: 42%;
-      overflow:auto;
-      background: #0f1730;
-      border-top:1px solid var(--border);
+    /* Subtle grid */
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 20% 15%, rgba(0,0,0,1), rgba(0,0,0,.35) 40%, rgba(0,0,0,.1) 70%, transparent 85%);
+      opacity:.65;
+    }
+
+    .wrap{
+      max-width: 1180px;
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom: 16px;
+    }
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(38,211,255,1));
+      box-shadow: 0 18px 45px rgba(124,92,255,.25);
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .logo svg{filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));}
+    .title h1{
+      font-size: 18px;
+      letter-spacing:.2px;
+      margin:0;
+      line-height:1.2;
+    }
+    .title p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size: 13px;
+    }
+
+    .pill{
+      display:flex;
+      gap:10px;
+      align-items:center;
       padding:10px 12px;
-      color: var(--text);
-      font-size:12px;
-      line-height: 1.45;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      white-space:nowrap;
     }
-    #directionsPanel:empty::before {
-      content: "Yol tarifi burada görünecek (bir okul için Konum Bul veya Rota butonları).";
+    .pill strong{font-size:13px}
+    .pill span{color:var(--muted); font-size:12px}
+
+    /* layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
+      align-items:start;
+    }
+
+    .panel{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel .hd{
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .panel .hd h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .panel .hd .meta{
+      color:var(--muted);
+      font-size:12px;
+    }
+    .panel .bd{ padding: 16px; }
+
+    /* Countdown */
+    .countdownCard{
+      display:grid;
+      gap:14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(124,92,255,.25), rgba(38,211,255,.10));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 24px 70px rgba(0,0,0,.40);
+      position:relative;
+      overflow:hidden;
+    }
+    .countdownCard:after{
+      content:"";
+      position:absolute;
+      width:280px;height:280px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(38,211,255,.25), transparent 65%);
+      top:-160px; right:-120px;
+      filter: blur(2px);
+    }
+    .countTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+    .nextLabel{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .nextLabel .kicker{
+      font-size:12px;
+      color: rgba(255,255,255,.8);
+      letter-spacing:.2px;
+    }
+    .nextLabel .route{
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .badge{
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.85);
+      white-space:nowrap;
+    }
+
+    .timeBoxes{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+    .tbox{
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align:center;
+    }
+    .tbox .num{
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing:.4px;
+    }
+    .tbox .lab{
+      font-size: 11px;
+      color: rgba(255,255,255,.74);
+      margin-top: 4px;
+    }
+
+    .subrow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      color: rgba(255,255,255,.85);
+      font-size:12px;
+      position:relative;
+      z-index:1;
+    }
+    .subrow .muted{color: rgba(255,255,255,.70)}
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background: var(--good);
+      box-shadow: 0 0 0 6px rgba(46,242,162,.15);
+      margin-right:8px;
+      display:inline-block;
+    }
+    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 6px rgba(255,207,90,.12); }
+    .dot.bad{ background: var(--bad); box-shadow: 0 0 0 6px rgba(255,92,122,.12); }
+
+    /* Flight cards */
+    .cards{
+      display:grid;
+      gap:12px;
+      margin-top: 14px;
+    }
+    .flight{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 14px;
+      display:grid;
+      gap:10px;
+    }
+    .flightTop{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .flightTop .left{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .plane{
+      width:36px;height:36px;border-radius:12px;
+      background: rgba(124,92,255,.18);
+      border:1px solid rgba(255,255,255,.14);
+      display:grid;place-items:center;
+    }
+    .flightTop .title{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .flightTop .title strong{font-size:13px}
+    .flightTop .title span{font-size:12px;color:var(--muted)}
+    .flightTop .tag{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.85);
+      white-space:nowrap;
+    }
+    .rows{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    .kv{
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding:10px;
+    }
+    .kv .k{font-size:11px;color:var(--muted)}
+    .kv .v{font-size:13px;margin-top:4px}
+
+    .hint{
+      font-size:12px;color:var(--muted);
+      line-height:1.45;
+      margin-top: 8px;
+    }
+
+    /* Timeline right */
+    .timeline{
+      display:grid;
+      gap:12px;
+    }
+    .day{
+      display:grid;
+      grid-template-columns: 72px 1fr;
+      gap:12px;
+      align-items:stretch;
+    }
+    .datebox{
+      background: rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px 10px;
+      text-align:center;
+    }
+    .datebox .d{
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:.3px;
+    }
+    .datebox .m{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:2px;
+      text-transform:uppercase;
+      letter-spacing:.8px;
+    }
+    .item{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .item:before{
+      content:"";
+      position:absolute;
+      left:-40px; top:-40px;
+      width:140px; height:140px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(124,92,255,.18), transparent 65%);
+      filter: blur(2px);
+    }
+    .item .top{
+      position:relative;
+      z-index:1;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .item .top strong{font-size:13px}
+    .item .top span{
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .chips{
+      position:relative;
+      z-index:1;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .chip{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+    }
+    .chip.acc{ border-color: rgba(38,211,255,.35); }
+    .chip.purp{ border-color: rgba(124,92,255,.35); }
+    .chip.good{ border-color: rgba(46,242,162,.35); }
+
+    .footerNote{
+      margin-top: 12px;
+      font-size:12px;
       color: var(--muted);
     }
 
-    .addrlabel { margin-top:10px; color:var(--muted); font-size:11px; }
-    .controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-
-    /* === Directions Panel okunabilirlik fix (Google adp*) === */
-    #directionsPanel { background: #0f1730; color: #e9efff; }
-    #directionsPanel .adp,
-    #directionsPanel .adp table,
-    #directionsPanel .adp-list,
-    #directionsPanel .adp-summary,
-    #directionsPanel .adp-substep,
-    #directionsPanel .adp-text,
-    #directionsPanel .adp-directions,
-    #directionsPanel .adp-legal {
-      color: #e9efff !important;
+    /* Responsive */
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      header{flex-direction:column; align-items:stretch;}
+      .pill{justify-content:space-between;}
     }
-    #directionsPanel table,
-    #directionsPanel .adp table {
-      background: transparent !important;
-      border-color: #23304d !important;
-    }
-    #directionsPanel td,
-    #directionsPanel th,
-    #directionsPanel .adp td,
-    #directionsPanel .adp th {
-      color: #e9efff !important;
-      border-color: #23304d !important;
-    }
-    #directionsPanel a,
-    #directionsPanel a:visited { color: #7aa2ff !important; }
-    #directionsPanel .adp-legal,
-    #directionsPanel .adp-summary,
-    #directionsPanel .adp-text { opacity: 0.95; }
-    #directionsPanel .adp,
-    #directionsPanel .adp-warnbox,
-    #directionsPanel .adp-directions { background: transparent !important; }
-    #directionsPanel img { filter: brightness(1.3) contrast(1.1); }
-    #directionsPanel .adp-step, #directionsPanel .adp-substep { padding: 6px 0; }
-
-    /* === InfoWindow (okul balonu) okunabilirlik === */
-    .gm-style .gm-style-iw-c{
-      padding:0 !important;
-      border-radius:14px !important;
-      background:transparent !important;
-      box-shadow:0 10px 26px rgba(0,0,0,.45) !important;
-    }
-    .gm-style .gm-style-iw-d{ overflow:hidden !important; }
-    .iwCard{
-      background: rgba(11,18,32,.96);
-      color:#e9efff;
-      border:1px solid rgba(35,48,77,.9);
-      border-radius:14px;
-      padding:12px 12px;
-      min-width:240px;
-      max-width:320px;
-      line-height:1.45;
-    }
-    .iwTitle{ font-weight:800; font-size:14px; margin-bottom:6px; }
-    .iwMeta{ color:#a8b3cf; font-size:12px; }
-    .iwRow{ margin-top:8px; font-size:12px; }
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Okullar • Konum Bul & Haritada Göster</h1>
-    <div class="sub">
-      Ev koordinatı: <span class="mono">40.932218, 29.126709</span><br>
-      <b>Konum Bul</b> → okul bulunur, <b>🚗 Araç + 🚌 Toplu taşıma süreleri</b> hesaplanır.
-      <br>Rota çizimi ve <b>adım adım yol tarifi</b> sağ altta gösterilir.
-    </div>
-  </header>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M2.5 13.2l8.3-2.1 4.6-7.2c.4-.6 1.2-.8 1.8-.3.2.1.3.3.4.5l2.3 5.5 2.9.7c.7.2 1.2.9 1 1.7-.1.6-.6 1-1.2 1.1l-4.2.3-4.2 6.8c-.4.6-1.2.8-1.8.4-.2-.1-.4-.3-.5-.5l-1.8-4.5-5.1 1.3c-.8.2-1.6-.3-1.8-1.1-.2-.8.3-1.6 1.1-1.8z" fill="rgba(255,255,255,.92)"/>
+          </svg>
+        </div>
+        <div class="title">
+          <h1>Phuket Seyahat Planı</h1>
+          <p>Uçuşlar + günlük rota (tek ekranda hızlı takip)</p>
+        </div>
+      </div>
 
-  <div class="topbar">
-    <select id="districtSelect" class="input select">
-      <option value="">Tümü</option>
-    </select>
+      <div class="pill" id="nowPill" title="Tarayıcı saatine göre">
+        <strong>Şu an:</strong>
+        <span id="nowText">—</span>
+      </div>
+    </header>
 
-    <input id="filter" class="input search" placeholder="Ara: okul adı / ilçe (örn: Maltepe, Kadıköy...)">
-    <button id="btnClearMarkers" class="primary">Haritayı Temizle</button>
-    <button id="clearCache" class="danger">Cache Sıfırla</button>
-  </div>
+    <div class="grid">
+      <!-- LEFT -->
+      <section class="panel">
+        <div class="hd">
+          <h2>Kontrol Paneli</h2>
+          <div class="meta" id="timezoneMeta">—</div>
+        </div>
 
-  <div class="status" id="status">Google yükleniyor...</div>
+        <div class="bd">
+          <!-- Countdown -->
+          <div class="countdownCard">
+            <div class="countTop">
+              <div class="nextLabel">
+                <div class="kicker">Bir sonraki uçuş</div>
+                <div class="route" id="nextRoute">—</div>
+              </div>
+              <div class="badge" id="statusBadge">
+                <span class="dot" id="statusDot"></span>
+                <span id="statusText">Hesaplanıyor…</span>
+              </div>
+            </div>
 
-  <div class="layout">
-    <div class="panel" id="list"></div>
+            <div class="timeBoxes" aria-label="Uçuşa kalan süre">
+              <div class="tbox"><div class="num" id="dd">00</div><div class="lab">Gün</div></div>
+              <div class="tbox"><div class="num" id="hh">00</div><div class="lab">Saat</div></div>
+              <div class="tbox"><div class="num" id="mm">00</div><div class="lab">Dakika</div></div>
+              <div class="tbox"><div class="num" id="ss">00</div><div class="lab">Saniye</div></div>
+            </div>
 
-    <div class="mapcol">
-      <div id="map"></div>
-      <div id="directionsPanel"></div>
+            <div class="subrow">
+              <div><span class="muted">Kalkış:</span> <span id="nextDepart">—</span></div>
+              <div><span class="muted">Check-in kapanış:</span> <span id="nextCheckin">—</span></div>
+            </div>
+          </div>
+
+          <div class="cards" id="flightCards"></div>
+
+          <div class="hint">
+            İpucu: Sayaç, tarayıcı saatine göre otomatik olarak <b>gelecekteki en yakın uçuşu</b> seçer.
+            Saat dilimi bilgisi “Istanbul/Mumbai/Phuket” gibi şehirlerde değişebilir; burada tarihleri
+            biletteki yerel saatlere göre tanımladım.
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT -->
+      <section class="panel">
+        <div class="hd">
+          <h2>Plan Listesi</h2>
+          <div class="meta">Ocak 2026</div>
+        </div>
+        <div class="bd">
+          <div class="timeline" id="timeline"></div>
+          <div class="footerNote">Not: “Nai Plajı / Old Phuket / One Chun restoran” gibi notlar plan itemlarında etiket olarak duruyor.</div>
+        </div>
+      </section>
     </div>
   </div>
 
   <script>
-    /***********************
-     * 1) AYARLAR
-     ***********************/
-    const GOOGLE_KEY = "AIzaSyDjrjb-aYP3CAFffI31Uorm2i1ICB8naUA"; // <-- buraya key
-    const HOME = { lat: 40.932218, lng: 29.126709, label: "Ev" };
-    const CACHE_KEY = "school_google_places_cache_btn_v6";
-    const BIAS_RADIUS_M = 25000;
-
-    /***********************
-     * 2) OKULLAR
-     ***********************/
-    const schools = [
-      // MALTEPE
-      { id:"maltepe_adnan_kahveci", district:"Maltepe", name:"Adnan Kahveci Ortaokulu" },
-      { id:"maltepe_celal_avsar", district:"Maltepe", name:"Celal Avşar Ortaokulu" },
-      { id:"maltepe_kucukyali_mtal", district:"Maltepe", name:"Küçükyalı Mesleki ve Teknik Anadolu Lisesi" },
-      { id:"maltepe_muhsine_zeynep", district:"Maltepe", name:"Muhsine Zeynep Ortaokulu" },
-      { id:"maltepe_mutluhan_uzunal_colakoglu", district:"Maltepe", name:"Mutluhan-Uzunal-Çolakoğlu Ortaokulu" },
-      { id:"maltepe_suzan_ahmet_yalkin", district:"Maltepe", name:"Suzan Ahmet Yalkın Ortaokulu" },
-      { id:"maltepe_toki_anadolu", district:"Maltepe", name:"TOKİ Maltepe Anadolu Lisesi" },
-      { id:"maltepe_zumrutevler_anadolu", district:"Maltepe", name:"Zümrütevler Anadolu Lisesi" },
-
-      // KADIKÖY
-      { id:"kadikoy_bahariye", district:"Kadıköy", name:"Bahariye Ortaokulu" },
-      { id:"kadikoy_bostanci_ataturk", district:"Kadıköy", name:"Bostancı Atatürk Ortaokulu" },
-      { id:"kadikoy_cenap_sahabettin", district:"Kadıköy", name:"Cenap Şahabettin İlkokulu" },
-      { id:"kadikoy_faik_resit_unat", district:"Kadıköy", name:"Faik Reşit Unat Ortaokulu" },
-      { id:"kadikoy_halil_turkan", district:"Kadıköy", name:"Halil Türkan Ortaokulu" },
-      { id:"kadikoy_ikbaliye", district:"Kadıköy", name:"İkbaliye Ortaokulu" },
-      { id:"kadikoy_ilhami_ertem", district:"Kadıköy", name:"İlhami Ertem Ortaokulu" },
-      { id:"kadikoy_avni_akyol_gsl", district:"Kadıköy", name:"İstanbul Avni Akyol Güzel Sanatlar Lisesi" },
-      { id:"kadikoy_spor_lisesi", district:"Kadıköy", name:"Kadıköy Spor Lisesi" },
-      { id:"kadikoy_resat_nuri", district:"Kadıköy", name:"Reşat Nuri Güntekin Ortaokulu" },
-
-      // KARTAL
-      { id:"kartal_100yil_ali_riza", district:"Kartal", name:"100 Yıl Ali Rıza Efendi Ortaokulu" },
-      { id:"kartal_cevizli", district:"Kartal", name:"Cevizli Ortaokulu" },
-      { id:"kartal_cavusoglu", district:"Kartal", name:"Çavuşoğlu Ortaokulu" },
-      { id:"kartal_ibrahim_saime_zipkin", district:"Kartal", name:"İbrahim Saime Zıpkın İlkokulu" },
-      { id:"kartal_ihsan_zakiroglu", district:"Kartal", name:"İhsan Zakiroğlu Ortaokulu" },
-      { id:"kartal_borsa_istanbul_mtal", district:"Kartal", name:"Kartal Borsa İstanbul Mesleki ve Teknik Anadolu Lisesi" },
-      { id:"kartal_mev_ortaokulu", district:"Kartal", name:"Kartal Milli Eğitim Vakfı Ortaokulu" },
-      { id:"kartal_sehit_er_serhat_sanli", district:"Kartal", name:"Şehit Er Serhat Şanlı Ortaokulu" },
-      { id:"kartal_sehit_timur_aktemur", district:"Kartal", name:"Şehit Timur Aktemur Ortaokulu" },
-      { id:"kartal_toki_sehit_mustafa", district:"Kartal", name:"TOKİ Şehit Mustafa Kartal Ortaokulu" },
-      { id:"kartal_ulku_bora", district:"Kartal", name:"Ülkü Bora Ortaokulu" },
-
-      // PENDİK
-      { id:"pendik_700_yil", district:"Pendik", name:"700. Yıl Ortaokulu" },
-      { id:"pendik_abdullah_acar", district:"Pendik", name:"Abdullah Acar Ortaokulu" },
-      { id:"pendik_alparslan_al", district:"Pendik", name:"Alparslan Anadolu Lisesi" },
-      { id:"pendik_cahit_zarifoglu", district:"Pendik", name:"Cahit Zarifoğlu Ortaokulu" },
-      { id:"pendik_faruk_demirbag", district:"Pendik", name:"Faruk Demirbağ Ortaokulu" },
-      { id:"pendik_kazim_karabekir", district:"Pendik", name:"Kazım Karabekir Ortaokulu" },
-      { id:"pendik_mehmet_akif_ersoy", district:"Pendik", name:"Mehmet Akif Ersoy Ortaokulu" },
-      { id:"pendik_nuri_demirag_mtal", district:"Pendik", name:"Nuri Demirağ Mesleki ve Teknik Anadolu Lisesi" },
-      { id:"pendik_orhangazi", district:"Pendik", name:"Orhangazi Ortaokulu" },
-      { id:"pendik_ogretmenevleri", district:"Pendik", name:"Öğretmenevleri Ortaokulu" },
-      { id:"pendik_sehit_selcuk_beki", district:"Pendik", name:"Şehit Selçuk Beki Ortaokulu" },
-      { id:"pendik_seyhli", district:"Pendik", name:"Şeyhli Ortaokulu" },
-      { id:"pendik_velibaba", district:"Pendik", name:"Velibaba Ortaokulu" },
+    // =========================
+    // DATA
+    // =========================
+    const flights = [
+      {
+        id: "6E18",
+        date: "2026-01-19",
+        departLocalISO: "2026-01-19T20:00:00+03:00", // Istanbul (UTC+3)
+        from: "İstanbul",
+        fromTerminal: "—",
+        to: "Mumbai",
+        toTerminal: "T2",
+        arrivesText: "04:45 (+1)",
+        checkinClosesText: "18:45",
+        aircraft: "77W",
+        airline: "IndiGo"
+      },
+      {
+        id: "6E1089",
+        date: "2026-01-20",
+        departLocalISO: "2026-01-20T15:50:00+05:30", // Mumbai (UTC+5:30)
+        from: "Mumbai",
+        fromTerminal: "T2",
+        to: "Phuket",
+        toTerminal: "—",
+        arrivesText: "21:45",
+        checkinClosesText: "14:35",
+        aircraft: "A321",
+        airline: "IndiGo"
+      },
+      {
+        id: "6E1090",
+        date: "2026-01-28",
+        departLocalISO: "2026-01-28T22:50:00+07:00", // Phuket/Thailand (UTC+7)
+        from: "Phuket",
+        fromTerminal: "—",
+        to: "Mumbai",
+        toTerminal: "T2",
+        arrivesText: "01:50 (+1)",
+        checkinClosesText: "21:35",
+        aircraft: "A321",
+        airline: "IndiGo"
+      },
+      {
+        id: "6E17",
+        date: "2026-01-29",
+        departLocalISO: "2026-01-29T06:55:00+05:30", // Mumbai
+        from: "Mumbai",
+        fromTerminal: "T2",
+        to: "İstanbul",
+        toTerminal: "—",
+        arrivesText: "11:35",
+        checkinClosesText: "05:40",
+        aircraft: "77W",
+        airline: "IndiGo"
+      }
     ];
 
-    /***********************
-     * 3) CACHE
-     ***********************/
-    function loadCache() {
-      try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch { return {}; }
-    }
-    function saveCache(obj) { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); }
-    let geoCache = loadCache(); // { id: {lat,lng,formattedAddress,query,ts,times:{DRIVING,TRANSIT}} }
+    const planDays = [
+      { day: 19, title: "Uçuş", time: "20:00", chips: ["İstanbul → Mumbai", "6E18", "Check-in: 18:45"] },
+      { day: 20, title: "Varış + Aktarma Uçuşu", time: "21:45", chips: ["Mumbai → Phuket", "6E1089", "Kalkış: 15:50"] },
+      { day: 21, title: "Patong", time: "Serbest", chips: ["Gezi", "Yeme-içme", "Akşam yürüyüşü"] },
+      { day: 22, title: "Phi Phi Adası", time: "Tüm gün", chips: ["Tekne turu", "Şnorkel", "Fotoğraf"] },
+      { day: 23, title: "Fil Safarisi + Plaj", time: "Günlük", chips: ["Safari", "Plaj", "Dinlenme"] },
+      { day: 24, title: "Krabi + Plaj Günü", time: "Günlük", chips: ["Krabi", "Plaj", "Gün batımı"] },
+      { day: 25, title: "Old Phuket + Plaj", time: "Öğlen/akşam", chips: ["Nai Plajı?", "Old Phuket", "One Chun (restoran)"] },
+      { day: 26, title: "Pazar Günü", time: "Akşam", chips: ["Sunday Market", "Sokak lezzetleri", "Alışveriş"] },
+      { day: 27, title: "Wat Chalong Tapınağı", time: "Günlük", chips: ["Tapınak", "Kültür", "Kısa tur"] },
+      { day: 28, title: "Boş Takılmaca + Alışveriş", time: "Günlük", chips: ["Son hazırlık", "Hediyelik", "Uçuş: 22:50 (6E1090)"] },
+    ];
 
-    /***********************
-     * 4) HELPERS
-     ***********************/
-    const listEl = document.getElementById("list");
-    const filterEl = document.getElementById("filter");
-    const statusEl = document.getElementById("status");
-    const districtSelectEl = document.getElementById("districtSelect");
-    const directionsPanelEl = document.getElementById("directionsPanel");
+    // =========================
+    // UI HELPERS
+    // =========================
+    const $ = (s) => document.querySelector(s);
 
-    let currentRouteSchoolId = null;
-    let currentRouteMode = null;
+    function pad2(n){ return String(n).padStart(2,"0"); }
 
-    function setStatus(t){ statusEl.textContent = t; }
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, (m) => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-
-    function toRad(x){ return x * Math.PI / 180; }
-    function haversineKm(lat1,lng1,lat2,lng2){
-      const R=6371, dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
-      const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
-      return 2*R*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-    function distanceKmForSchool(s){
-      const rec = geoCache[s.id];
-      if (!rec) return null;
-      return haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng);
+    function fmtDateTime(d){
+      // Local display (user's device locale/timezone)
+      return new Intl.DateTimeFormat("tr-TR", {
+        weekday:"short", year:"numeric", month:"short", day:"2-digit",
+        hour:"2-digit", minute:"2-digit"
+      }).format(d);
     }
 
-    function initDistrictDropdown() {
-      const districts = Array.from(new Set(schools.map(s => (s.district || "").trim())))
-        .filter(Boolean)
-        .sort((a,b) => a.localeCompare(b, "tr"));
-
-      districtSelectEl.innerHTML =
-        `<option value="">Tümü</option>` +
-        districts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+    function getNextFlight(now = new Date()){
+      const upcoming = flights
+        .map(f => ({...f, depart: new Date(f.departLocalISO)}))
+        .filter(f => f.depart.getTime() > now.getTime())
+        .sort((a,b)=>a.depart-b.depart);
+      return upcoming[0] || null;
     }
 
-    function getCachedTime(rec, mode){ return rec?.times?.[mode] || null; }
-    function bestTimeText(rec, mode){
-      const t = getCachedTime(rec, mode);
-      if (!t) return null;
-      if (mode === "DRIVING" && t.trafficText) return t.trafficText;
-      if (t.durationText) return t.durationText;
-      return null;
+    function statusFromMs(ms){
+      // thresholds: > 24h good, > 4h warn, else bad
+      if (ms > 24*3600*1000) return {label:"Rahat", cls:"", dot:""};
+      if (ms > 4*3600*1000) return {label:"Yaklaşıyor", cls:"warn", dot:"warn"};
+      if (ms > 0) return {label:"Acil", cls:"", dot:"bad"};
+      return {label:"Geçti", cls:"", dot:"bad"};
     }
 
-    function modeLabel(mode){
-      return mode === "TRANSIT" ? "🚌 Toplu taşıma" : "🚗 Araç";
-    }
+    function renderFlights(){
+      const wrap = $("#flightCards");
+      wrap.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:2px">
+          <div style="font-weight:700;font-size:13px;letter-spacing:.2px">Uçuş Kartları</div>
+          <div style="color:var(--muted);font-size:12px">${flights.length} kayıt</div>
+        </div>
+      `;
 
-    /***********************
-     * 5) GOOGLE MAPS / PLACES / DIRECTIONS
-     ***********************/
-    let gmap, placesService, directionsService, directionsRenderer;
-    let homeMarker;
-    let schoolMarkers = {}; // id -> marker
-    let infoWin;
+      flights
+        .map(f => ({...f, depart: new Date(f.departLocalISO)}))
+        .sort((a,b)=>a.depart-b.depart)
+        .forEach(f=>{
+          const el = document.createElement("div");
+          el.className = "flight";
+          el.innerHTML = `
+            <div class="flightTop">
+              <div class="left">
+                <div class="plane" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M2.5 13.2l8.3-2.1 4.6-7.2c.4-.6 1.2-.8 1.8-.3.2.1.3.3.4.5l2.3 5.5 2.9.7c.7.2 1.2.9 1 1.7-.1.6-.6 1-1.2 1.1l-4.2.3-4.2 6.8c-.4.6-1.2.8-1.8.4-.2-.1-.4-.3-.5-.5l-1.8-4.5-5.1 1.3c-.8.2-1.6-.3-1.8-1.1-.2-.8.3-1.6 1.1-1.8z" fill="rgba(255,255,255,.92)"/>
+                  </svg>
+                </div>
+                <div class="title">
+                  <strong>${f.from}${f.fromTerminal && f.fromTerminal!=="—" ? ` (${f.fromTerminal})` : ""} → ${f.to}${f.toTerminal && f.toTerminal!=="—" ? ` (${f.toTerminal})` : ""}</strong>
+                  <span>${fmtDateTime(f.depart)} • ${f.airline} • ${f.id} (${f.aircraft})</span>
+                </div>
+              </div>
+              <div class="tag">Kalkış: ${new Intl.DateTimeFormat("tr-TR",{hour:"2-digit",minute:"2-digit"}).format(f.depart)}</div>
+            </div>
 
-    window.__initMap = function() {
-      gmap = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: HOME.lat, lng: HOME.lng },
-        zoom: 12,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: true,
-        /* Haritadaki arka plan yazı/POI etiketlerini azalt */
-        styles: [
-          { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
-          { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
-          { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
-        ]
-      });
-
-      placesService = new google.maps.places.PlacesService(gmap);
-      directionsService = new google.maps.DirectionsService();
-
-      directionsRenderer = new google.maps.DirectionsRenderer({
-        map: gmap,
-        panel: directionsPanelEl,
-        suppressMarkers: true
-      });
-
-      infoWin = new google.maps.InfoWindow();
-
-      homeMarker = new google.maps.Marker({
-        map: gmap,
-        position: { lat: HOME.lat, lng: HOME.lng },
-        title: HOME.label
-      });
-
-      setStatus("Hazır. Semt seç + ara, sonra karttan Konum Bul.");
-      render();
-    };
-
-    function placesTextSearch(query) {
-      return new Promise((resolve) => {
-        const req = {
-          query,
-          location: new google.maps.LatLng(HOME.lat, HOME.lng),
-          radius: BIAS_RADIUS_M
-        };
-        placesService.textSearch(req, (results, status) => {
-          if (status !== google.maps.places.PlacesServiceStatus.OK || !results || results.length === 0) {
-            resolve(null);
-            return;
-          }
-          resolve(results[0]);
+            <div class="rows">
+              <div class="kv"><div class="k">Tarih</div><div class="v">${f.date}</div></div>
+              <div class="kv"><div class="k">Varış</div><div class="v">${f.arrivesText}</div></div>
+              <div class="kv"><div class="k">Check-in kapanış</div><div class="v">${f.checkinClosesText}</div></div>
+            </div>
+          `;
+          wrap.appendChild(el);
         });
-      });
     }
 
-    function getTravelTimeTo(lat, lng, mode) {
-      return new Promise((resolve) => {
-        const req = {
-          origin: new google.maps.LatLng(HOME.lat, HOME.lng),
-          destination: new google.maps.LatLng(lat, lng),
-          travelMode: google.maps.TravelMode[mode] || google.maps.TravelMode.DRIVING
-        };
-        if (mode === "DRIVING") req.drivingOptions = { departureTime: new Date() };
-        if (mode === "TRANSIT") req.transitOptions = { departureTime: new Date() };
-
-        directionsService.route(req, (result, status) => {
-          try {
-            if (status !== google.maps.DirectionsStatus.OK || !result?.routes?.[0]?.legs?.[0]) {
-              resolve(null);
-              return;
-            }
-            const leg = result.routes[0].legs[0];
-            const normal = leg.duration ? { text: leg.duration.text, value: leg.duration.value } : null;
-            const traffic = leg.duration_in_traffic ? { text: leg.duration_in_traffic.text, value: leg.duration_in_traffic.value } : null;
-
-            resolve({
-              durationText: normal?.text || "",
-              durationSec: normal?.value ?? null,
-              trafficText: (mode === "DRIVING" ? (traffic?.text || "") : ""),
-              trafficSec: (mode === "DRIVING" ? (traffic?.value ?? null) : null),
-              ts: Date.now()
-            });
-          } catch {
-            resolve(null);
-          }
-        });
-      });
-    }
-
-    function drawRoute(lat, lng, mode) {
-      return new Promise((resolve) => {
-        const req = {
-          origin: new google.maps.LatLng(HOME.lat, HOME.lng),
-          destination: new google.maps.LatLng(lat, lng),
-          travelMode: google.maps.TravelMode[mode] || google.maps.TravelMode.DRIVING
-        };
-        if (mode === "DRIVING") req.drivingOptions = { departureTime: new Date() };
-        if (mode === "TRANSIT") req.transitOptions = { departureTime: new Date() };
-
-        directionsService.route(req, (result, status) => {
-          if (status !== google.maps.DirectionsStatus.OK || !result) {
-            directionsRenderer.setDirections({ routes: [] });
-            directionsPanelEl.innerHTML = "";
-            resolve(false);
-            return;
-          }
-          directionsRenderer.setDirections(result);
-
-          const bounds = new google.maps.LatLngBounds();
-          bounds.extend({ lat: HOME.lat, lng: HOME.lng });
-          bounds.extend({ lat, lng });
-          gmap.fitBounds(bounds);
-
-          currentRouteMode = mode;
-          resolve(true);
-        });
-      });
-    }
-
-    function clearMapMarkers(keepHome = true) {
-      for (const id of Object.keys(schoolMarkers)) {
-        schoolMarkers[id].setMap(null);
-        delete schoolMarkers[id];
-      }
-      if (!keepHome && homeMarker) {
-        homeMarker.setMap(null);
-        homeMarker = null;
-      }
-      if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
-      directionsPanelEl.innerHTML = "";
-      currentRouteSchoolId = null;
-      currentRouteMode = null;
-      setStatus("Harita + rota temizlendi.");
-    }
-
-    function showHomeAndSchoolMarker(school, rec) {
-      if (schoolMarkers[school.id]) {
-        schoolMarkers[school.id].setPosition({ lat: rec.lat, lng: rec.lng });
-      } else {
-        schoolMarkers[school.id] = new google.maps.Marker({
-          map: gmap,
-          position: { lat: rec.lat, lng: rec.lng },
-          title: school.name
-        });
-      }
-
-      const km = haversineKm(HOME.lat, HOME.lng, rec.lat, rec.lng).toFixed(2);
-      const tDrive = bestTimeText(rec, "DRIVING");
-      const tTransit = bestTimeText(rec, "TRANSIT");
-
-      /* InfoWindow içeriğini koyu opak kart yap */
-      const html =
-        `<div class="iwCard">` +
-          `<div class="iwTitle">${escapeHtml(school.name)}</div>` +
-          `<div class="iwMeta">${escapeHtml(rec.formattedAddress || "")}</div>` +
-          `<div class="iwRow"><b>Mesafe:</b> ${escapeHtml(km)} km</div>` +
-          ((tDrive || tTransit)
-            ? `<div class="iwRow">` +
-                `${tDrive ? `<b>🚗 Araç:</b> ⏱️ ${escapeHtml(tDrive)} ` : ""}` +
-                `${tTransit ? `&nbsp;&nbsp;<b>🚌 Toplu:</b> ⏱️ ${escapeHtml(tTransit)}` : ""}` +
-              `</div>`
-            : ``) +
-        `</div>`;
-
-      // aynı marker'a tekrar tekrar listener eklememek için önce temiz bir flag koy
-      if (!schoolMarkers[school.id].__iwBound) {
-        schoolMarkers[school.id].addListener("click", () => {
-          const r = geoCache[school.id];
-          if (!r) return;
-          const km2 = haversineKm(HOME.lat, HOME.lng, r.lat, r.lng).toFixed(2);
-          const td = bestTimeText(r, "DRIVING");
-          const tt = bestTimeText(r, "TRANSIT");
-
-          const html2 =
-            `<div class="iwCard">` +
-              `<div class="iwTitle">${escapeHtml(school.name)}</div>` +
-              `<div class="iwMeta">${escapeHtml(r.formattedAddress || "")}</div>` +
-              `<div class="iwRow"><b>Mesafe:</b> ${escapeHtml(km2)} km</div>` +
-              ((td || tt)
-                ? `<div class="iwRow">` +
-                    `${td ? `<b>🚗 Araç:</b> ⏱️ ${escapeHtml(td)} ` : ""}` +
-                    `${tt ? `&nbsp;&nbsp;<b>🚌 Toplu:</b> ⏱️ ${escapeHtml(tt)}` : ""}` +
-                  `</div>`
-                : ``) +
-            `</div>`;
-
-          infoWin.setContent(html2);
-          infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
-        });
-        schoolMarkers[school.id].__iwBound = true;
-      }
-
-      infoWin.setContent(html);
-      infoWin.open({ map: gmap, anchor: schoolMarkers[school.id] });
-    }
-
-    /***********************
-     * 6) LISTE / RENDER
-     ***********************/
-    function getFilteredSchoolsSorted() {
-      const q = (filterEl.value || "").toLowerCase().trim();
-      const district = (districtSelectEl.value || "").trim();
-
-      const filtered = schools.filter(s => {
-        if (district && s.district !== district) return false;
-        const hay = (s.name + " " + s.district).toLowerCase();
-        return !q || hay.includes(q);
-      });
-
-      return filtered
-        .map(s => ({ s, d: distanceKmForSchool(s) }))
-        .sort((a,b) => {
-          const ad = (typeof a.d === "number") ? a.d : Infinity;
-          const bd = (typeof b.d === "number") ? b.d : Infinity;
-          if (ad !== bd) return ad - bd;
-          return a.s.name.localeCompare(b.s.name, "tr");
-        })
-        .map(x => x.s);
-    }
-
-    async function ensureTimesForSchool(school) {
-      const rec = geoCache[school.id];
-      if (!rec?.lat || !rec?.lng) return false;
-
-      geoCache[school.id] = { ...rec, times: rec.times || {} };
-      const base = geoCache[school.id];
-
-      if (!getCachedTime(base, "DRIVING")?.durationText) {
-        setStatus("🚗 Araç süresi hesaplanıyor: " + school.name);
-        const t1 = await getTravelTimeTo(base.lat, base.lng, "DRIVING");
-        if (t1) base.times.DRIVING = t1;
-      }
-      if (!getCachedTime(base, "TRANSIT")?.durationText) {
-        setStatus("🚌 Toplu taşıma süresi hesaplanıyor: " + school.name);
-        const t2 = await getTravelTimeTo(base.lat, base.lng, "TRANSIT");
-        if (t2) base.times.TRANSIT = t2;
-      }
-
-      saveCache(geoCache);
-      return true;
-    }
-
-    function render() {
-      const visible = getFilteredSchoolsSorted();
-      listEl.innerHTML = "";
-
-      if (!placesService) {
-        const c = document.createElement("div");
-        c.className = "card";
-        c.textContent = "Google Maps yüklenmedi. Key / referrer / API enable kontrol et.";
-        listEl.appendChild(c);
-        return;
-      }
-
-      for (const s of visible) {
-        const rec = geoCache[s.id];
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        const d = distanceKmForSchool(s);
-        const distLabel = (typeof d === "number") ? `${d.toFixed(2)} km` : "—";
-
-        const driveText = bestTimeText(rec, "DRIVING");
-        const transitText = bestTimeText(rec, "TRANSIT");
-
-        const timeBadges = `
-          ${driveText ? `<span class="badge">🚗 Araç: <span class="km">⏱️ ${escapeHtml(driveText)}</span></span>` : ""}
-          ${transitText ? `<span class="badge">🚌 Toplu: <span class="km">⏱️ ${escapeHtml(transitText)}</span></span>` : ""}
-        `;
-
-        const top = document.createElement("div");
-        top.className = "row";
-
-        const left = document.createElement("div");
-        left.innerHTML = `
-          <div class="title">${escapeHtml(s.name)}</div>
-          <div class="meta">
-            <span class="badge">${escapeHtml(s.district)}</span>
-            <span class="badge">Mesafe: <span class="km">${escapeHtml(distLabel)}</span></span>
-            ${timeBadges}
+    function renderTimeline(){
+      const tl = $("#timeline");
+      tl.innerHTML = "";
+      planDays.forEach(d=>{
+        const row = document.createElement("div");
+        row.className = "day";
+        row.innerHTML = `
+          <div class="datebox">
+            <div class="d">${d.day}</div>
+            <div class="m">OCAK</div>
+          </div>
+          <div class="item">
+            <div class="top">
+              <strong>${d.title}</strong>
+              <span>${d.time}</span>
+            </div>
+            <div class="chips">
+              ${d.chips.map((c,i)=>`<span class="chip ${i===0?"acc":(i===1?"purp":"")}">${c}</span>`).join("")}
+            </div>
           </div>
         `;
-
-        const right = document.createElement("div");
-        right.innerHTML = `<span class="badge">Google</span>`;
-
-        top.appendChild(left);
-        top.appendChild(right);
-
-        const addrLabel = document.createElement("div");
-        addrLabel.className = "addrlabel";
-        addrLabel.textContent = "Arama metni (bulamazsa burayı daha detaylı yaz):";
-
-        const addrInput = document.createElement("input");
-        addrInput.className = "input";
-        addrInput.value = `${s.name}, ${s.district}, İstanbul, Türkiye`;
-
-        const controls = document.createElement("div");
-        controls.className = "controls";
-
-        const btnFind = document.createElement("button");
-        btnFind.className = "primary";
-        btnFind.textContent = "Konum Bul";
-
-        const btnRouteDrive = document.createElement("button");
-        btnRouteDrive.textContent = "Rota (Araç)";
-
-        const btnRouteTransit = document.createElement("button");
-        btnRouteTransit.textContent = "Rota (Toplu)";
-
-        const btnForget = document.createElement("button");
-        btnForget.textContent = "Bu Okulu Unut";
-
-        const hasCoords = !!(rec?.lat && rec?.lng);
-        btnRouteDrive.disabled = !hasCoords;
-        btnRouteTransit.disabled = !hasCoords;
-
-        btnFind.onclick = async () => {
-          btnFind.disabled = true;
-          btnFind.textContent = "Aranıyor...";
-          try {
-            const query = addrInput.value.trim();
-            if (!query) return;
-
-            setStatus("Aranıyor: " + s.name);
-
-            const r = await placesTextSearch(query);
-            if (!r || !r.geometry || !r.geometry.location) {
-              setStatus("Bulunamadı. Arama metnini daha detaylı yazıp tekrar dene.");
-              return;
-            }
-
-            const lat = r.geometry.location.lat();
-            const lng = r.geometry.location.lng();
-
-            const prev = geoCache[s.id] || {};
-            geoCache[s.id] = {
-              ...prev,
-              lat,
-              lng,
-              formattedAddress: r.formatted_address || "",
-              query,
-              ts: Date.now(),
-              times: prev.times || {}
-            };
-            saveCache(geoCache);
-
-            await ensureTimesForSchool(s);
-
-            showHomeAndSchoolMarker(s, geoCache[s.id]);
-
-            currentRouteSchoolId = s.id;
-            currentRouteMode = "DRIVING";
-            setStatus(`Rota çiziliyor (${modeLabel("DRIVING")}): ${s.name}`);
-            await drawRoute(lat, lng, "DRIVING");
-
-            render();
-            setStatus("Gösterildi: " + s.name);
-          } catch (e) {
-            console.error(e);
-            setStatus("Hata oldu. Console'a (F12) bak.");
-          } finally {
-            btnFind.disabled = false;
-            btnFind.textContent = "Konum Bul";
-          }
-        };
-
-        btnRouteDrive.onclick = async () => {
-          const r = geoCache[s.id];
-          if (!r?.lat || !r?.lng) return;
-          currentRouteSchoolId = s.id;
-          currentRouteMode = "DRIVING";
-          setStatus(`Rota çiziliyor (${modeLabel("DRIVING")}): ${s.name}`);
-          await drawRoute(r.lat, r.lng, "DRIVING");
-        };
-
-        btnRouteTransit.onclick = async () => {
-          const r = geoCache[s.id];
-          if (!r?.lat || !r?.lng) return;
-          currentRouteSchoolId = s.id;
-          currentRouteMode = "TRANSIT";
-          setStatus(`Rota çiziliyor (${modeLabel("TRANSIT")}): ${s.name}`);
-          await drawRoute(r.lat, r.lng, "TRANSIT");
-        };
-
-        btnForget.onclick = () => {
-          delete geoCache[s.id];
-          saveCache(geoCache);
-          if (currentRouteSchoolId === s.id) {
-            if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
-            directionsPanelEl.innerHTML = "";
-            currentRouteSchoolId = null;
-            currentRouteMode = null;
-          }
-          setStatus("Unutuldu: " + s.name);
-          render();
-        };
-
-        controls.appendChild(btnFind);
-        controls.appendChild(btnRouteDrive);
-        controls.appendChild(btnRouteTransit);
-        controls.appendChild(btnForget);
-
-        const meta2 = document.createElement("div");
-        meta2.className = "meta";
-        meta2.style.marginTop = "10px";
-        meta2.innerHTML = rec
-          ? `<span class="badge">Bulundu</span> <span class="badge">${escapeHtml(rec.lat.toFixed(6))}, ${escapeHtml(rec.lng.toFixed(6))}</span>`
-          : `<span class="badge">Bulunmadı</span>`;
-
-        card.appendChild(top);
-        card.appendChild(addrLabel);
-        card.appendChild(addrInput);
-        card.appendChild(controls);
-        card.appendChild(meta2);
-        listEl.appendChild(card);
-      }
+        tl.appendChild(row);
+      });
     }
 
-    /***********************
-     * 7) TOP BAR
-     ***********************/
-    filterEl.addEventListener("input", render);
-    districtSelectEl.addEventListener("change", render);
+    // =========================
+    // COUNTDOWN
+    // =========================
+    let currentTarget = null;
 
-    document.getElementById("btnClearMarkers").onclick = () => {
-      clearMapMarkers(true);
-      if (gmap) gmap.setCenter({ lat: HOME.lat, lng: HOME.lng });
-      if (gmap) gmap.setZoom(12);
-    };
+    function updateNow(){
+      const now = new Date();
+      $("#nowText").textContent = fmtDateTime(now);
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Yerel saat";
+      $("#timezoneMeta").textContent = `Saat dilimi: ${tz}`;
+    }
 
-    document.getElementById("clearCache").onclick = () => {
-      localStorage.removeItem(CACHE_KEY);
-      geoCache = {};
-      clearMapMarkers(true);
-      setStatus("Cache sıfırlandı.");
-      render();
-    };
+    function setCountdownTarget(f){
+      currentTarget = f;
+      $("#nextRoute").textContent = `${f.from} → ${f.to}`;
+      $("#nextDepart").textContent = fmtDateTime(new Date(f.departLocalISO));
+      $("#nextCheckin").textContent = f.checkinClosesText;
+    }
 
-    /***********************
-     * 8) GOOGLE SCRIPT LOADER
-     ***********************/
-    function loadGoogleScript() {
-      if (!GOOGLE_KEY || GOOGLE_KEY === "PUT_YOUR_KEY_HERE") {
-        setStatus("API key yok. GOOGLE_KEY satırına key’ini yapıştır.");
+    function tick(){
+      const now = new Date();
+      updateNow();
+
+      const next = getNextFlight(now);
+      if (!next){
+        $("#nextRoute").textContent = "Planlı uçuş kalmadı";
+        $("#nextDepart").textContent = "—";
+        $("#nextCheckin").textContent = "—";
+        $("#dd").textContent = "00"; $("#hh").textContent = "00"; $("#mm").textContent = "00"; $("#ss").textContent = "00";
+        $("#statusText").textContent = "Tamamlandı";
+        $("#statusDot").className = "dot";
         return;
       }
-      const s = document.createElement("script");
-      s.async = true;
-      s.defer = true;
-      s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GOOGLE_KEY)}&libraries=places&callback=__initMap`;
-      s.onerror = () => setStatus("Google Maps yüklenemedi. Key / referrer / API enable kontrol et.");
-      document.head.appendChild(s);
+
+      if (!currentTarget || currentTarget.id !== next.id){
+        setCountdownTarget(next);
+      }
+
+      const target = new Date(next.departLocalISO);
+      const diff = target.getTime() - now.getTime();
+
+      const s = Math.max(0, Math.floor(diff/1000));
+      const days = Math.floor(s / 86400);
+      const hours = Math.floor((s % 86400) / 3600);
+      const mins = Math.floor((s % 3600) / 60);
+      const secs = s % 60;
+
+      $("#dd").textContent = pad2(days);
+      $("#hh").textContent = pad2(hours);
+      $("#mm").textContent = pad2(mins);
+      $("#ss").textContent = pad2(secs);
+
+      const st = statusFromMs(diff);
+      $("#statusText").textContent = st.label;
+      $("#statusDot").className = `dot ${st.dot || ""}`;
     }
 
-    // Başlat
-    initDistrictDropdown();
-    loadGoogleScript();
+    // boot
+    renderFlights();
+    renderTimeline();
+    tick();
+    setInterval(tick, 1000);
   </script>
 </body>
 </html>
