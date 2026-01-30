@@ -2,457 +2,314 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seyahat Planı • Phuket</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zar Kutusu Oyunu</title>
   <style>
-    :root{
-      /* Daha açık tema */
-      --bg1:#f7f8ff;
-      --bg2:#eef3ff;
-
-      --card: rgba(255,255,255,.78);
-      --card2: rgba(255,255,255,.92);
-      --stroke: rgba(20,30,60,.12);
-
-      --text: rgba(10,14,24,.92);
-      --muted: rgba(10,14,24,.62);
-
-      --accent:#6b5cff;
-      --accent2:#18b6ff;
-      --good:#17c97b;
-      --warn:#f2b400;
-      --bad:#ff3b6b;
-
-      --shadow: 0 18px 55px rgba(26,34,70,.12);
-      --radius: 18px;
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    body { margin: 0; background:#0b1020; color:#e9eefc; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 12px; font-size: 22px; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .box {
+      background: #141b33;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+      min-height: 190px;
     }
-
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(1100px 700px at 10% 10%, rgba(107,92,255,.18), transparent 55%),
-        radial-gradient(900px 600px at 90% 25%, rgba(24,182,255,.16), transparent 60%),
-        radial-gradient(900px 700px at 45% 100%, rgba(23,201,123,.10), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-      overflow-x:hidden;
+    .box[aria-disabled="true"] { opacity:.55; cursor:not-allowed; }
+    .label { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .who { font-weight: 700; }
+    .count { font-size: 13px; opacity: .9; }
+    .hint { margin-top: 8px; font-size: 13px; opacity:.85; }
+    .diceRow { display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px; }
+    .die {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background:#0f1530;
+      border:1px solid rgba(255,255,255,.15);
+      display:grid; place-items:center;
+      font-weight:800; font-size: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
     }
-
-    body:before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(to right, rgba(20,30,60,.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(20,30,60,.04) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: radial-gradient(circle at 20% 15%, rgba(0,0,0,1), rgba(0,0,0,.45) 40%, rgba(0,0,0,.15) 70%, transparent 85%);
-      opacity:.55;
-    }
-
-    .wrap{ max-width:1180px; margin:28px auto; padding:18px; }
-
-    header{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
-    .brand{ display:flex; gap:12px; align-items:center; }
-    .logo{
-      width:44px;height:44px;border-radius:14px;
-      background: linear-gradient(135deg, rgba(107,92,255,1), rgba(24,182,255,1));
-      box-shadow: 0 16px 38px rgba(107,92,255,.18);
-      display:grid;place-items:center;
-      border:1px solid rgba(255,255,255,.8);
-    }
-    .title h1{ font-size:18px; margin:0; line-height:1.2; }
-    .title p{ margin:4px 0 0; color:var(--muted); font-size:13px; }
-
-    .pill{
-      display:flex; gap:10px; align-items:center;
-      padding:10px 12px; border-radius:999px;
-      background: rgba(255,255,255,.75);
-      border: 1px solid var(--stroke);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(26,34,70,.10);
-      white-space:nowrap;
-    }
-    .pill strong{font-size:13px}
-    .pill span{color:var(--muted); font-size:12px}
-
-    .grid{ display:grid; grid-template-columns: 1.05fr .95fr; gap:16px; align-items:start; }
-
-    .panel{
-      background: var(--card);
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      overflow:hidden;
-    }
-    .panel .hd{
-      padding:16px 16px 12px;
-      border-bottom: 1px solid rgba(20,30,60,.10);
+    .mid {
+      margin-top: 16px;
+      background:#101735;
+      border:1px dashed rgba(255,255,255,.2);
+      border-radius: 16px;
+      padding: 14px 16px;
       display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
-    .panel .hd h2{ margin:0; font-size:14px; }
-    .panel .hd .meta{ color:var(--muted); font-size:12px; }
-    .panel .bd{ padding:16px; }
-
-    /* Countdown */
-    .countdownCard{
-      display:grid; gap:14px; padding:16px;
-      border-radius:16px;
-      background: linear-gradient(135deg, rgba(107,92,255,.14), rgba(24,182,255,.09));
-      border: 1px solid rgba(20,30,60,.10);
-      box-shadow: 0 18px 44px rgba(26,34,70,.10);
-      position:relative;
-      overflow:hidden;
-    }
-    .countdownCard:after{
-      content:"";
-      position:absolute;
-      width:280px;height:280px;border-radius:50%;
-      background: radial-gradient(circle, rgba(24,182,255,.18), transparent 65%);
-      top:-160px; right:-120px;
-      filter: blur(2px);
-    }
-    .countTop{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; position:relative; z-index:1; }
-    .nextLabel{ display:flex; flex-direction:column; gap:4px; }
-    .nextLabel .kicker{ font-size:12px; color: rgba(10,14,24,.70); }
-    .nextLabel .route{ font-size:16px; font-weight:800; }
-
-    .timeBoxes{ display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; position:relative; z-index:1; }
-    .tbox{
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(20,30,60,.10);
-      border-radius:14px;
-      padding:12px 10px;
-      text-align:center;
-    }
-    .tbox .num{ font-size:22px; font-weight:900; letter-spacing:.4px; }
-    .tbox .lab{ font-size:11px; color: rgba(10,14,24,.62); margin-top:4px; }
-
-    .subrow{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      font-size:12px; position:relative; z-index:1;
-      color: rgba(10,14,24,.75);
-    }
-    .subrow .muted{ color: rgba(10,14,24,.55); }
-
-    /* Flight cards */
-    .cards{ display:grid; gap:12px; margin-top:14px; }
-    .flight{
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(20,30,60,.10);
-      border-radius:16px;
-      padding:14px;
-      display:grid; gap:10px;
-      box-shadow: 0 10px 22px rgba(26,34,70,.06);
-    }
-    .flightTop{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
-    .flightTop .left{ display:flex; gap:10px; align-items:flex-start; }
-    .plane{
-      width:36px;height:36px;border-radius:12px;
-      background: rgba(107,92,255,.10);
-      border:1px solid rgba(20,30,60,.10);
-      display:grid;place-items:center;
-    }
-    .flightTop .title{ display:flex; flex-direction:column; gap:2px; }
-    .flightTop .title strong{ font-size:13px; }
-    .flightTop .title span{ font-size:12px; color:var(--muted); }
-    .flightTop .tag{
-      font-size:12px; padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(20,30,60,.10);
-      background: rgba(255,255,255,.7);
-      color: rgba(10,14,24,.75);
+    .pill {
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
       white-space:nowrap;
     }
-    .rows{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
-    .kv{
-      background: rgba(255,255,255,.75);
-      border:1px solid rgba(20,30,60,.10);
-      border-radius:14px;
-      padding:10px;
+    .controls { display:flex; gap:10px; margin-top: 16px; }
+    button {
+      background:#2c5cff; color:white; border:0;
+      padding: 10px 12px; border-radius: 12px;
+      font-weight: 700; cursor:pointer;
     }
-    .kv .k{ font-size:11px; color:var(--muted); }
-    .kv .v{ font-size:13px; margin-top:4px; }
-
-    .hint{ font-size:12px; color:var(--muted); line-height:1.45; margin-top:8px; }
-
-    /* Timeline */
-    .timeline{ display:grid; gap:12px; }
-    .day{ display:grid; grid-template-columns: 72px 1fr; gap:12px; align-items:stretch; }
-    .datebox{
-      background: rgba(255,255,255,.75);
-      border:1px solid rgba(20,30,60,.10);
-      border-radius:16px;
-      padding:12px 10px;
-      text-align:center;
-      box-shadow: 0 10px 22px rgba(26,34,70,.06);
+    button.secondary { background: rgba(255,255,255,.10); }
+    .log {
+      margin-top: 16px;
+      background:#0f1530;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 13px;
+      max-height: 220px;
+      overflow:auto;
     }
-    .datebox .d{ font-size:18px; font-weight:900; }
-    .datebox .m{ font-size:11px; color:var(--muted); margin-top:2px; letter-spacing:.8px; }
-
-    .item{
-      background: rgba(255,255,255,.78);
-      border:1px solid rgba(20,30,60,.10);
-      border-radius:16px;
-      padding:12px;
-      position:relative;
-      overflow:hidden;
-      box-shadow: 0 10px 22px rgba(26,34,70,.06);
+    .turn {
+      margin-top: 10px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px;
     }
-    .item:before{
-      content:"";
-      position:absolute;
-      left:-40px; top:-40px;
-      width:140px; height:140px; border-radius:50%;
-      background: radial-gradient(circle, rgba(107,92,255,.12), transparent 65%);
-      filter: blur(2px);
+    .turn strong { color:#b9c7ff; }
+    .winner {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(0, 220, 120, .14);
+      border:1px solid rgba(0, 220, 120, .35);
+      display:none;
     }
-    .item .top{ position:relative; z-index:1; display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
-    .item .top strong{ font-size:13px; }
-    .item .top span{ font-size:12px; color:var(--muted); white-space:nowrap; }
-
-    /* Editable chips */
-    .chips{ position:relative; z-index:1; display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .chip{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.75);
-      border: 1px solid rgba(20,30,60,.12);
-      color: rgba(10,14,24,.78);
+    .shake { animation: shake .55s ease-in-out; }
+    @keyframes shake {
+      0%{ transform:translate(0,0) rotate(0deg);}
+      20%{ transform:translate(-3px,2px) rotate(-2deg);}
+      40%{ transform:translate(4px,-2px) rotate(2deg);}
+      60%{ transform:translate(-4px,-1px) rotate(-2deg);}
+      80%{ transform:translate(3px,2px) rotate(2deg);}
+      100%{ transform:translate(0,0) rotate(0deg);}
     }
-
-    .footerNote{ margin-top:12px; font-size:12px; color: var(--muted); }
-
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      header{flex-direction:column; align-items:stretch;}
-      .pill{justify-content:space-between;}
-    }
+    .tiny { font-size: 12px; opacity:.8; }
   </style>
 </head>
-
 <body>
   <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M2.5 13.2l8.3-2.1 4.6-7.2c.4-.6 1.2-.8 1.8-.3.2.1.3.3.4.5l2.3 5.5 2.9.7c.7.2 1.2.9 1 1.7-.1.6-.6 1-1.2 1.1l-4.2.3-4.2 6.8c-.4.6-1.2.8-1.8.4-.2-.1-.4-.3-.5-.5l-1.8-4.5-5.1 1.3c-.8.2-1.6-.3-1.8-1.1-.2-.8.3-1.6 1.1-1.8z" fill="rgba(255,255,255,.92)"/>
-          </svg>
-        </div>
-        <div class="title">
-          <h1>Phuket Seyahat Planı</h1>
-          <p>Uçuşlar + günlük rota (tek ekranda hızlı takip)</p>
-        </div>
-      </div>
-
-      <div class="pill" id="nowPill" title="Tarayıcı saatine göre">
-        <strong>Şu an:</strong>
-        <span id="nowText">—</span>
-      </div>
-    </header>
-
-    <div class="grid">
-      <!-- LEFT -->
-      <section class="panel">
-        <div class="hd">
-          <h2>Kontrol Paneli</h2>
-          <div class="meta" id="timezoneMeta">—</div>
-        </div>
-
-        <div class="bd">
-          <div class="countdownCard">
-            <div class="countTop">
-              <div class="nextLabel">
-                <div class="kicker">Bir sonraki uçuş</div>
-                <div class="route" id="nextRoute">—</div>
-              </div>
-              <!-- Rozet kaldırıldı -->
-            </div>
-
-            <div class="timeBoxes" aria-label="Uçuşa kalan süre">
-              <div class="tbox"><div class="num" id="dd">00</div><div class="lab">Gün</div></div>
-              <div class="tbox"><div class="num" id="hh">00</div><div class="lab">Saat</div></div>
-              <div class="tbox"><div class="num" id="mm">00</div><div class="lab">Dakika</div></div>
-              <div class="tbox"><div class="num" id="ss">00</div><div class="lab">Saniye</div></div>
-            </div>
-
-            <div class="subrow">
-              <div><span class="muted">Kalkış:</span> <span id="nextDepart">—</span></div>
-              <div><span class="muted">Check-in kapanış:</span> <span id="nextCheckin">—</span></div>
-            </div>
-          </div>
-
-          <div class="cards" id="flightCards"></div>
-          <div class="hint">Sayaç tarayıcı saatine göre otomatik olarak gelecekteki en yakın uçuşu seçer.</div>
-        </div>
-      </section>
-
-      <!-- RIGHT -->
-      <section class="panel">
-        <div class="hd">
-          <h2>Plan Listesi</h2>
-          <div class="meta">Ocak 2026</div>
-        </div>
-        <div class="bd">
-          <div class="timeline" id="timeline"></div>
-          <div class="footerNote">Bir sonraki adım: bunu ortak (realtime) düzenlemeye çevirebiliriz.</div>
-        </div>
-      </section>
+    <h1>🎲 Zar Kutusu Oyunu</h1>
+    <div class="turn">
+      <div class="pill">Sıra: <strong id="turnText">Oyuncu 1</strong></div>
+      <div class="pill">Turda atılacak zar: <strong id="rollCountText">5</strong></div>
     </div>
+
+    <div class="row" style="margin-top:14px;">
+      <div class="box" id="box1" role="button" tabindex="0" aria-disabled="false">
+        <div class="label">
+          <div class="who">Oyuncu 1 Kutusu</div>
+          <div class="count">Zar: <strong id="p1count">20</strong></div>
+        </div>
+        <div class="hint">Tıkla / Enter: kutuyu salla (zar at)</div>
+        <div class="diceRow" id="p1dice"></div>
+      </div>
+
+      <div class="box" id="box2" role="button" tabindex="0" aria-disabled="true">
+        <div class="label">
+          <div class="who">Oyuncu 2 Kutusu</div>
+          <div class="count">Zar: <strong id="p2count">20</strong></div>
+        </div>
+        <div class="hint">Sıra sende olunca sallayabilirsin</div>
+        <div class="diceRow" id="p2dice"></div>
+      </div>
+    </div>
+
+    <div class="mid">
+      <div>
+        <div><strong>Orta Havuz</strong> (1 gelenler buraya)</div>
+        <div class="tiny">Bu örnekte orta havuz sadece görsel/istatistik amaçlı.</div>
+      </div>
+      <div class="pill">Ortadaki zar: <strong id="midCount">0</strong></div>
+    </div>
+
+    <div class="controls">
+      <button id="resetBtn" class="secondary">Yeni Oyun</button>
+      <button id="fastBtn" class="secondary">Hızlı Mod: Başlangıç 10 zar</button>
+    </div>
+
+    <div class="winner" id="winnerBox"></div>
+
+    <div class="log" id="log"></div>
   </div>
 
-  <script>
-    const flights = [
-      { id:"6E18",    date:"2026-01-19", departLocalISO:"2026-01-19T20:00:00+03:00", from:"İstanbul", fromTerminal:"—", to:"Mumbai", toTerminal:"T2", arrivesText:"04:45 (+1)", checkinClosesText:"18:45", aircraft:"77W", airline:"IndiGo" },
-      { id:"6E1089",  date:"2026-01-20", departLocalISO:"2026-01-20T15:50:00+05:30", from:"Mumbai",   fromTerminal:"T2", to:"Phuket", toTerminal:"—", arrivesText:"21:45", checkinClosesText:"14:35", aircraft:"A321", airline:"IndiGo" },
-      { id:"6E1090",  date:"2026-01-28", departLocalISO:"2026-01-28T22:50:00+07:00", from:"Phuket",   fromTerminal:"—", to:"Mumbai", toTerminal:"T2", arrivesText:"01:50 (+1)", checkinClosesText:"21:35", aircraft:"A321", airline:"IndiGo" },
-      { id:"6E17",    date:"2026-01-29", departLocalISO:"2026-01-29T06:55:00+05:30", from:"Mumbai",   fromTerminal:"T2", to:"İstanbul", toTerminal:"—", arrivesText:"11:35", checkinClosesText:"05:40", aircraft:"77W", airline:"IndiGo" }
-    ];
+<script>
+(() => {
+  const state = {
+    p: [null, { dice: 20 }, { dice: 20 }],
+    middle: 0,
+    turn: 1, // 1 veya 2
+    perTurnRoll: 5,
+    gameOver: false
+  };
 
-    const planDays = [
-      { day:19, title:"Uçuş", time:"20:00", chips:["İstanbul → Mumbai","6E18","Check-in: 18:45"] },
-      { day:20, title:"Varış + Aktarma Uçuşu", time:"21:45", chips:["Mumbai → Phuket","6E1089","Kalkış: 15:50"] },
-      { day:21, title:"Patong", time:"Serbest", chips:["Gezi","Yeme-içme","Akşam yürüyüşü"] },
-      { day:22, title:"Phi Phi Adası", time:"Tüm gün", chips:["Tekne turu","Şnorkel","Fotoğraf"] },
-      { day:23, title:"Fil Safarisi + Plaj", time:"Günlük", chips:["Safari","Plaj","Dinlenme"] },
-      { day:24, title:"Krabi + Plaj Günü", time:"Günlük", chips:["Krabi","Plaj","Gün batımı"] },
-      { day:25, title:"Old Phuket + Plaj", time:"Öğlen/akşam", chips:["Nai Plajı?","Old Phuket","One Chun"] },
-      { day:26, title:"Pazar Günü", time:"Akşam", chips:["Sunday Market","Sokak lezzetleri","Alışveriş"] },
-      { day:27, title:"Wat Chalong Tapınağı", time:"Günlük", chips:["Tapınak","Kültür","Kısa tur"] },
-      { day:28, title:"Boş Takılmaca + Alışveriş", time:"Günlük", chips:["Son hazırlık","Hediyelik","Uçuş: 22:50 (6E1090)"] },
-    ];
+  const el = {
+    box1: document.getElementById('box1'),
+    box2: document.getElementById('box2'),
+    p1dice: document.getElementById('p1dice'),
+    p2dice: document.getElementById('p2dice'),
+    p1count: document.getElementById('p1count'),
+    p2count: document.getElementById('p2count'),
+    midCount: document.getElementById('midCount'),
+    turnText: document.getElementById('turnText'),
+    rollCountText: document.getElementById('rollCountText'),
+    log: document.getElementById('log'),
+    winnerBox: document.getElementById('winnerBox'),
+    resetBtn: document.getElementById('resetBtn'),
+    fastBtn: document.getElementById('fastBtn'),
+  };
 
-    const $ = (s)=>document.querySelector(s);
-    const pad2 = (n)=>String(n).padStart(2,"0");
+  function setInteractability() {
+    const t = state.turn;
+    el.box1.setAttribute('aria-disabled', String(!(t === 1) || state.gameOver));
+    el.box2.setAttribute('aria-disabled', String(!(t === 2) || state.gameOver));
+  }
 
-    function fmtDateTime(d){
-      return new Intl.DateTimeFormat("tr-TR",{weekday:"short",year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}).format(d);
+  function renderCounts() {
+    el.p1count.textContent = state.p[1].dice;
+    el.p2count.textContent = state.p[2].dice;
+    el.midCount.textContent = state.middle;
+    el.turnText.textContent = state.turn === 1 ? 'Oyuncu 1' : 'Oyuncu 2';
+    el.rollCountText.textContent = state.perTurnRoll;
+  }
+
+  function logLine(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    el.log.prepend(div);
+  }
+
+  function clearDiceRows() {
+    el.p1dice.innerHTML = "";
+    el.p2dice.innerHTML = "";
+  }
+
+  function showDice(player, diceArr, moved) {
+    // moved: {toMiddle, toOpponent, kept}
+    const row = player === 1 ? el.p1dice : el.p2dice;
+    row.innerHTML = "";
+    diceArr.forEach(v => {
+      const d = document.createElement('div');
+      d.className = 'die';
+      d.textContent = v;
+      row.appendChild(d);
+    });
+
+    logLine(
+      `Oyuncu ${player} attı: [${diceArr.join(", ")}] | ` +
+      `1→orta: ${moved.toMiddle}, 6→rakip: ${moved.toOpponent}, elde kalan: ${moved.kept}`
+    );
+  }
+
+  function rand1to6() {
+    return Math.floor(Math.random() * 6) + 1;
+  }
+
+  function checkWin() {
+    if (state.p[1].dice <= 0) return 1;
+    if (state.p[2].dice <= 0) return 2;
+    return 0;
+  }
+
+  function endGame(winner) {
+    state.gameOver = true;
+    setInteractability();
+    el.winnerBox.style.display = 'block';
+    el.winnerBox.innerHTML = `<strong>✅ Oyuncu ${winner} kazandı!</strong> (Zarlarını bitirdi)`;
+    logLine(`🏁 Oyun bitti. Kazanan: Oyuncu ${winner}`);
+  }
+
+  function rollForPlayer(player) {
+    if (state.gameOver) return;
+    if (state.turn !== player) return;
+
+    const boxEl = player === 1 ? el.box1 : el.box2;
+    boxEl.classList.remove('shake');
+    // reflow trick
+    void boxEl.offsetWidth;
+    boxEl.classList.add('shake');
+
+    const available = state.p[player].dice;
+    const rollN = Math.min(state.perTurnRoll, available); // elde kaç zar varsa o kadar at
+    if (rollN <= 0) {
+      // zaten bitmiş
+      endGame(player);
+      return;
     }
 
-    function getNextFlight(now=new Date()){
-      const upcoming = flights
-        .map(f=>({...f, depart:new Date(f.departLocalISO)}))
-        .filter(f=>f.depart.getTime()>now.getTime())
-        .sort((a,b)=>a.depart-b.depart);
-      return upcoming[0] || null;
+    const opponent = player === 1 ? 2 : 1;
+
+    let toMiddle = 0, toOpponent = 0, kept = 0;
+    const dice = [];
+
+    for (let i = 0; i < rollN; i++) {
+      const v = rand1to6();
+      dice.push(v);
+      if (v === 1) toMiddle++;
+      else if (v === 6) toOpponent++;
+      else kept++;
     }
 
-    function renderFlights(){
-      const wrap = $("#flightCards");
-      wrap.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:2px">
-          <div style="font-weight:800;font-size:13px">Uçuş Kartları</div>
-          <div style="color:var(--muted);font-size:12px">${flights.length} kayıt</div>
-        </div>
-      `;
-      flights
-        .map(f=>({...f, depart:new Date(f.departLocalISO)}))
-        .sort((a,b)=>a.depart-b.depart)
-        .forEach(f=>{
-          const el = document.createElement("div");
-          el.className="flight";
-          el.innerHTML=`
-            <div class="flightTop">
-              <div class="left">
-                <div class="plane" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M2.5 13.2l8.3-2.1 4.6-7.2c.4-.6 1.2-.8 1.8-.3.2.1.3.3.4.5l2.3 5.5 2.9.7c.7.2 1.2.9 1 1.7-.1.6-.6 1-1.2 1.1l-4.2.3-4.2 6.8c-.4.6-1.2.8-1.8.4-.2-.1-.4-.3-.5-.5l-1.8-4.5-5.1 1.3c-.8.2-1.6-.3-1.8-1.1-.2-.8.3-1.6 1.1-1.8z" fill="rgba(10,14,24,.92)"/>
-                  </svg>
-                </div>
-                <div class="title">
-                  <strong>${f.from}${f.fromTerminal!=="—"?` (${f.fromTerminal})`:""} → ${f.to}${f.toTerminal!=="—"?` (${f.toTerminal})`:""}</strong>
-                  <span>${fmtDateTime(f.depart)} • ${f.airline} • ${f.id} (${f.aircraft})</span>
-                </div>
-              </div>
-              <div class="tag">Kalkış: ${new Intl.DateTimeFormat("tr-TR",{hour:"2-digit",minute:"2-digit"}).format(f.depart)}</div>
-            </div>
-            <div class="rows">
-              <div class="kv"><div class="k">Tarih</div><div class="v">${f.date}</div></div>
-              <div class="kv"><div class="k">Varış</div><div class="v">${f.arrivesText}</div></div>
-              <div class="kv"><div class="k">Check-in kapanış</div><div class="v">${f.checkinClosesText}</div></div>
-            </div>
-          `;
-          wrap.appendChild(el);
-        });
+    // oyuncu, attığı zarları önce elinden çıkarır:
+    state.p[player].dice -= rollN;
+
+    // 1'ler ortaya
+    state.middle += toMiddle;
+
+    // 6'lar rakibe
+    state.p[opponent].dice += toOpponent;
+
+    // 2-5 atan oyuncuya geri döner
+    state.p[player].dice += kept;
+
+    showDice(player, dice, {toMiddle, toOpponent, kept});
+    renderCounts();
+
+    const winner = checkWin();
+    if (winner) {
+      endGame(winner);
+      return;
     }
 
-    function renderTimeline(){
-      const tl = $("#timeline");
-      tl.innerHTML="";
-      planDays.forEach(d=>{
-        const row = document.createElement("div");
-        row.className="day";
-        row.innerHTML=`
-          <div class="datebox">
-            <div class="d">${d.day}</div>
-            <div class="m">OCAK</div>
-          </div>
-          <div class="item">
-            <div class="top">
-              <strong>${d.title}</strong>
-              <span>${d.time}</span>
-            </div>
-            <div class="chips">
-              ${d.chips.map(c=>`<span class="chip">${c}</span>`).join("")}
-            </div>
-          </div>
-        `;
-        tl.appendChild(row);
-      });
-    }
+    // sıra değiştir
+    state.turn = opponent;
+    setInteractability();
+    renderCounts();
+  }
 
-    function updateNow(){
-      const now = new Date();
-      $("#nowText").textContent = fmtDateTime(now);
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Yerel saat";
-      $("#timezoneMeta").textContent = `Saat dilimi: ${tz}`;
-    }
+  function resetGame(startDice=20) {
+    state.p[1].dice = startDice;
+    state.p[2].dice = startDice;
+    state.middle = 0;
+    state.turn = 1;
+    state.gameOver = false;
+    el.winnerBox.style.display = 'none';
+    el.log.innerHTML = "";
+    clearDiceRows();
+    renderCounts();
+    setInteractability();
+    logLine(`Yeni oyun başladı. Her oyuncu ${startDice} zar ile başlıyor. Oyuncu 1 başlar.`);
+  }
 
-    let currentTarget=null;
-    function setCountdownTarget(f){
-      currentTarget=f;
-      $("#nextRoute").textContent = `${f.from} → ${f.to}`;
-      $("#nextDepart").textContent = fmtDateTime(new Date(f.departLocalISO));
-      $("#nextCheckin").textContent = f.checkinClosesText;
-    }
+  // Click + keyboard
+  el.box1.addEventListener('click', () => rollForPlayer(1));
+  el.box2.addEventListener('click', () => rollForPlayer(2));
+  el.box1.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') rollForPlayer(1); });
+  el.box2.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') rollForPlayer(2); });
 
-    function tick(){
-      const now = new Date();
-      updateNow();
-      const next = getNextFlight(now);
-      if(!next){
-        $("#nextRoute").textContent="Planlı uçuş kalmadı";
-        $("#nextDepart").textContent="—";
-        $("#nextCheckin").textContent="—";
-        $("#dd").textContent="00"; $("#hh").textContent="00"; $("#mm").textContent="00"; $("#ss").textContent="00";
-        return;
-      }
-      if(!currentTarget || currentTarget.id!==next.id) setCountdownTarget(next);
+  el.resetBtn.addEventListener('click', () => resetGame(20));
+  el.fastBtn.addEventListener('click', () => resetGame(10));
 
-      const target = new Date(next.departLocalISO);
-      const diff = target.getTime()-now.getTime();
-      const s = Math.max(0, Math.floor(diff/1000));
-      const days = Math.floor(s/86400);
-      const hours = Math.floor((s%86400)/3600);
-      const mins = Math.floor((s%3600)/60);
-      const secs = s%60;
-
-      $("#dd").textContent=pad2(days);
-      $("#hh").textContent=pad2(hours);
-      $("#mm").textContent=pad2(mins);
-      $("#ss").textContent=pad2(secs);
-    }
-
-    renderFlights();
-    renderTimeline();
-    tick();
-    setInterval(tick, 1000);
-  </script>
+  resetGame(20);
+})();
+</script>
 </body>
 </html>
