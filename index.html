@@ -3,312 +3,642 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Zar Kutusu Oyunu</title>
+  <title>Silindir Kutu Zar Oyunu</title>
   <style>
-    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    body { margin: 0; background:#0b1020; color:#e9eefc; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 24px; }
-    h1 { margin: 0 0 12px; font-size: 22px; }
-    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .box {
-      background: #141b33;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      padding: 16px;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      user-select: none;
-      min-height: 190px;
+    :root{
+      --bg:#0b1020;
+      --text:#e9eefc;
+      --muted:rgba(233,238,252,.72);
+      --line:rgba(255,255,255,.12);
+      --shadow: rgba(0,0,0,.38);
+
+      --cup1:#4b8cff;
+      --cup2:#ff6d6d;
+
+      --leather:#d8c8b7;
+      --leather2:#c9b59f;
+      --inner:#a07a55;
+      --inner2:#8a6646;
     }
-    .box[aria-disabled="true"] { opacity:.55; cursor:not-allowed; }
-    .label { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .who { font-weight: 700; }
-    .count { font-size: 13px; opacity: .9; }
-    .hint { margin-top: 8px; font-size: 13px; opacity:.85; }
-    .diceRow { display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px; }
-    .die {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      background:#0f1530;
-      border:1px solid rgba(255,255,255,.15);
-      display:grid; place-items:center;
-      font-weight:800; font-size: 18px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    *{ box-sizing:border-box; }
+    body{ margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    .wrap{ max-width:1050px; margin:0 auto; padding:22px; }
+
+    h1{ margin:0 0 10px; font-size:22px; }
+    .topbar{
+      display:flex; flex-wrap:wrap; gap:10px;
+      align-items:center; justify-content:space-between;
+      margin-bottom:14px;
     }
-    .mid {
-      margin-top: 16px;
-      background:#101735;
-      border:1px dashed rgba(255,255,255,.2);
-      border-radius: 16px;
-      padding: 14px 16px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-    }
-    .pill {
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 13px;
+    .pill{
+      background: rgba(255,255,255,.07);
+      border:1px solid var(--line);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      display:flex; gap:8px; align-items:center;
       white-space:nowrap;
     }
-    .controls { display:flex; gap:10px; margin-top: 16px; }
-    button {
-      background:#2c5cff; color:white; border:0;
-      padding: 10px 12px; border-radius: 12px;
-      font-weight: 700; cursor:pointer;
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: 0 18px 45px var(--shadow);
+      position:relative;
+      overflow:hidden;
+      min-height: 340px;
     }
-    button.secondary { background: rgba(255,255,255,.10); }
-    .log {
-      margin-top: 16px;
-      background:#0f1530;
-      border:1px solid rgba(255,255,255,.12);
+    .panelHeader{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      margin-bottom:10px;
+    }
+    .who{ font-weight:900; font-size:16px; }
+    .meta{ font-size:13px; color:var(--muted); line-height:1.2; }
+
+    .hint{ font-size:13px; color:var(--muted); margin: 2px 0 10px; }
+
+    .scene{
+      position:relative;
+      height: 210px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      cursor:pointer;
+    }
+    .panel.disabled{
+      opacity:.55;
+      filter:saturate(.9);
+    }
+    .scene:focus{ outline: 2px solid rgba(255,255,255,.18); outline-offset: 2px; }
+
+    /* --- Cup & Lid --- */
+    .cupWrap{
+      position:relative;
+      width: 260px;
+      height: 170px;
+      transform: translateY(6px);
+    }
+
+    /* Cup body: cylindrical */
+    .cup{
+      position:absolute;
+      left: 20px;
+      top: 18px;
+      width: 175px;
+      height: 120px;
+      border-radius: 70px;
+      background: linear-gradient(135deg, var(--leather), var(--leather2));
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: 0 18px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+      transform-origin: 60% 60%;
+      transform: rotate(-18deg);
+    }
+    /* stitching line */
+    .cup::before{
+      content:"";
+      position:absolute;
+      inset: 8px;
+      border-radius: 64px;
+      border: 2px dashed rgba(0,0,0,.16);
+      opacity:.55;
+    }
+    /* inner mouth */
+    .cup::after{
+      content:"";
+      position:absolute;
+      left: 16px;
+      top: 18px;
+      width: 100px;
+      height: 84px;
+      border-radius: 48px;
+      background: radial-gradient(120px 110px at 35% 40%, var(--inner), var(--inner2));
+      box-shadow: inset 0 10px 18px rgba(0,0,0,.20);
+      opacity:.96;
+    }
+
+    /* Color accent stripe for each player */
+    .panel.p1 .cupStripe{ background: linear-gradient(180deg, rgba(75,140,255,.95), rgba(75,140,255,.15)); }
+    .panel.p2 .cupStripe{ background: linear-gradient(180deg, rgba(255,109,109,.95), rgba(255,109,109,.15)); }
+    .cupStripe{
+      position:absolute;
+      right:-10px;
+      top:-20px;
+      width: 70px;
+      height: 170px;
+      transform: rotate(18deg);
+      opacity:.45;
+      filter: blur(.1px);
+    }
+
+    /* Lid: disk */
+    .lid{
+      position:absolute;
+      right: 6px;
+      bottom: 12px;
+      width: 95px;
+      height: 95px;
+      border-radius: 999px;
+      background: radial-gradient(120px 120px at 35% 30%, #b79270, #8f6c49);
+      border:1px solid rgba(0,0,0,.18);
+      box-shadow: 0 18px 28px rgba(0,0,0,.30);
+      transform: rotate(8deg);
+      transform-origin: 50% 50%;
+    }
+    .lid::before{
+      content:"";
+      position:absolute;
+      inset: 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(0,0,0,.10);
+      opacity:.6;
+    }
+
+    /* Dice inside + spilling area */
+    .spillArea{
+      position:absolute;
+      left: 44px;
+      top: 64px;
+      width: 170px;
+      height: 110px;
+      pointer-events:none;
+      overflow:visible;
+    }
+
+    /* tiny stock text */
+    .stockBadge{
+      position:absolute;
+      left: 14px;
+      top: 12px;
+      font-size:12px;
+      color: rgba(255,255,255,.75);
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 6px 10px;
+      border-radius: 999px;
+      pointer-events:none;
+    }
+
+    /* Results strip */
+    .results{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      min-height: 58px;
+      align-items:center;
+    }
+
+    /* Dice face */
+    .die{
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(0,0,0,.14);
+      box-shadow: 0 12px 26px rgba(0,0,0,.30);
+      position:absolute;
+      opacity:0;
+      transform: translate(0,0) rotate(0deg) scale(.98);
+      animation: none;
+    }
+    .pip{ position:absolute; width:9px; height:9px; border-radius:50%; background: rgba(0,0,0,.72); }
+    .c { left:50%; top:50%; transform: translate(-50%,-50%); }
+    .tl{ left:12px; top:12px; }
+    .tr{ right:12px; top:12px; }
+    .bl{ left:12px; bottom:12px; }
+    .br{ right:12px; bottom:12px; }
+    .ml{ left:12px; top:50%; transform: translateY(-50%); }
+    .mr{ right:12px; top:50%; transform: translateY(-50%); }
+
+    /* Result dice shown under panel (static) */
+    .resultDie{
+      width:46px; height:46px;
+      border-radius:12px;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(0,0,0,.14);
+      box-shadow: 0 12px 26px rgba(0,0,0,.30);
+      position:relative;
+      opacity:0;
+      transform: translateY(10px) scale(.98);
+      animation: pop 420ms ease forwards;
+    }
+    .resultDie.badge1{ outline: 3px solid rgba(0,220,120,.30); }
+    .resultDie.badge6{ outline: 3px solid rgba(255,200,0,.35); }
+    @keyframes pop{ to{ opacity:1; transform: translateY(0) scale(1); } }
+
+    /* Shake sequence */
+    .anim .cup{ animation: cupShake 620ms ease-in-out; }
+    @keyframes cupShake{
+      0%{ transform: rotate(-18deg) translate(0,0); }
+      15%{ transform: rotate(-23deg) translate(-2px,2px); }
+      30%{ transform: rotate(-10deg) translate(3px,-2px); }
+      45%{ transform: rotate(-26deg) translate(-3px,-1px); }
+      60%{ transform: rotate(-12deg) translate(2px,2px); }
+      80%{ transform: rotate(-20deg) translate(-1px,-2px); }
+      100%{ transform: rotate(-18deg) translate(0,0); }
+    }
+
+    /* Lid movement: "close" then "open" */
+    .anim .lid{ animation: lidCloseOpen 620ms ease-in-out; }
+    @keyframes lidCloseOpen{
+      0%   { transform: translate(0,0) rotate(8deg) scale(1); }
+      20%  { transform: translate(-70px,-60px) rotate(-18deg) scale(.98); } /* lid goes to cover */
+      55%  { transform: translate(-70px,-60px) rotate(-10deg) scale(.98); } /* stays closed during shake */
+      100% { transform: translate(0,0) rotate(8deg) scale(1); } /* returns open */
+    }
+
+    /* Dice spill animation (from mouth outward) */
+    @keyframes spill{
+      0% { opacity:0; transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(.9); }
+      20%{ opacity:1; }
+      100%{ opacity:1; transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1); }
+    }
+
+    /* Middle + controls + log */
+    .mid{
+      margin-top:16px;
+      background: rgba(255,255,255,.05);
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:16px;
+      padding:12px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .controls{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+    button{
+      border:0; cursor:pointer;
+      background:#2c5cff; color:#fff;
+      padding:10px 12px; border-radius:12px;
+      font-weight:800;
+    }
+    button.secondary{ background: rgba(255,255,255,.10); border:1px solid var(--line); }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+
+    .winner{
+      margin-top:14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,220,120,.35);
+      background: rgba(0,220,120,.12);
+      display:none;
+      font-weight:900;
+    }
+    .log{
+      margin-top:14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
       border-radius: 16px;
       padding: 12px;
       font-size: 13px;
-      max-height: 220px;
+      max-height: 240px;
       overflow:auto;
     }
-    .turn {
-      margin-top: 10px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 12px;
-    }
-    .turn strong { color:#b9c7ff; }
-    .winner {
-      margin-top: 16px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(0, 220, 120, .14);
-      border:1px solid rgba(0, 220, 120, .35);
-      display:none;
-    }
-    .shake { animation: shake .55s ease-in-out; }
-    @keyframes shake {
-      0%{ transform:translate(0,0) rotate(0deg);}
-      20%{ transform:translate(-3px,2px) rotate(-2deg);}
-      40%{ transform:translate(4px,-2px) rotate(2deg);}
-      60%{ transform:translate(-4px,-1px) rotate(-2deg);}
-      80%{ transform:translate(3px,2px) rotate(2deg);}
-      100%{ transform:translate(0,0) rotate(0deg);}
-    }
-    .tiny { font-size: 12px; opacity:.8; }
+    .log div + div{ margin-top:6px; opacity:.92; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>🎲 Zar Kutusu Oyunu</h1>
-    <div class="turn">
+    <h1>🎲 Silindir Kutu Zar</h1>
+
+    <div class="topbar">
       <div class="pill">Sıra: <strong id="turnText">Oyuncu 1</strong></div>
-      <div class="pill">Turda atılacak zar: <strong id="rollCountText">5</strong></div>
+      <div class="pill">Tur başına: <strong>5</strong> zar</div>
+      <div class="pill">Orta (1’ler): <strong id="midText">0</strong></div>
     </div>
 
-    <div class="row" style="margin-top:14px;">
-      <div class="box" id="box1" role="button" tabindex="0" aria-disabled="false">
-        <div class="label">
-          <div class="who">Oyuncu 1 Kutusu</div>
-          <div class="count">Zar: <strong id="p1count">20</strong></div>
+    <div class="grid">
+      <!-- Player 1 -->
+      <section class="panel p1" id="panel1">
+        <div class="panelHeader">
+          <div>
+            <div class="who">Oyuncu 1</div>
+            <div class="meta">Zar: <strong id="p1Count">20</strong></div>
+          </div>
+          <div class="meta">1→orta, 6→rakip</div>
         </div>
-        <div class="hint">Tıkla / Enter: kutuyu salla (zar at)</div>
-        <div class="diceRow" id="p1dice"></div>
-      </div>
 
-      <div class="box" id="box2" role="button" tabindex="0" aria-disabled="true">
-        <div class="label">
-          <div class="who">Oyuncu 2 Kutusu</div>
-          <div class="count">Zar: <strong id="p2count">20</strong></div>
+        <div class="hint">Kutuyu tıkla / Enter: sallayıp zar at (sadece sırandaysa)</div>
+
+        <div class="scene" id="scene1" role="button" tabindex="0" aria-label="Oyuncu 1 kutusu">
+          <div class="stockBadge" id="p1StockBadge">Kutuda: 20</div>
+
+          <div class="cupWrap">
+            <div class="cupStripe"></div>
+            <div class="cup"></div>
+            <div class="lid"></div>
+            <div class="spillArea" id="spill1"></div>
+          </div>
         </div>
-        <div class="hint">Sıra sende olunca sallayabilirsin</div>
-        <div class="diceRow" id="p2dice"></div>
-      </div>
+
+        <div class="results" id="results1"></div>
+      </section>
+
+      <!-- Player 2 -->
+      <section class="panel p2" id="panel2">
+        <div class="panelHeader">
+          <div>
+            <div class="who">Oyuncu 2</div>
+            <div class="meta">Zar: <strong id="p2Count">20</strong></div>
+          </div>
+          <div class="meta">1→orta, 6→rakip</div>
+        </div>
+
+        <div class="hint">Kutuyu tıkla / Enter: sallayıp zar at (sadece sırandaysa)</div>
+
+        <div class="scene" id="scene2" role="button" tabindex="0" aria-label="Oyuncu 2 kutusu">
+          <div class="stockBadge" id="p2StockBadge">Kutuda: 20</div>
+
+          <div class="cupWrap">
+            <div class="cupStripe"></div>
+            <div class="cup"></div>
+            <div class="lid"></div>
+            <div class="spillArea" id="spill2"></div>
+          </div>
+        </div>
+
+        <div class="results" id="results2"></div>
+      </section>
     </div>
 
     <div class="mid">
       <div>
-        <div><strong>Orta Havuz</strong> (1 gelenler buraya)</div>
-        <div class="tiny">Bu örnekte orta havuz sadece görsel/istatistik amaçlı.</div>
+        <div><strong>Orta Havuz</strong> (1 gelenler burada birikir)</div>
+        <div style="font-size:12px;color:var(--muted); margin-top:2px;">Not: Ortadaki zarlar geri oyuna dönmüyor (senin dediğin gibi sadece ortaya atılıyor).</div>
       </div>
-      <div class="pill">Ortadaki zar: <strong id="midCount">0</strong></div>
+      <div class="pill">Orta: <strong id="midText2">0</strong></div>
     </div>
 
     <div class="controls">
-      <button id="resetBtn" class="secondary">Yeni Oyun</button>
-      <button id="fastBtn" class="secondary">Hızlı Mod: Başlangıç 10 zar</button>
+      <button class="secondary" id="newBtn">Yeni Oyun (20)</button>
+      <button class="secondary" id="fastBtn">Hızlı Başla (10)</button>
+      <button class="secondary" id="clearLog">Log Temizle</button>
     </div>
 
     <div class="winner" id="winnerBox"></div>
-
     <div class="log" id="log"></div>
   </div>
 
 <script>
 (() => {
+  const PER_TURN = 5;
+
   const state = {
-    p: [null, { dice: 20 }, { dice: 20 }],
+    p: { 1: { dice: 20 }, 2: { dice: 20 } },
     middle: 0,
-    turn: 1, // 1 veya 2
-    perTurnRoll: 5,
-    gameOver: false
+    turn: 1,
+    busy: false,
+    over: false
   };
 
   const el = {
-    box1: document.getElementById('box1'),
-    box2: document.getElementById('box2'),
-    p1dice: document.getElementById('p1dice'),
-    p2dice: document.getElementById('p2dice'),
-    p1count: document.getElementById('p1count'),
-    p2count: document.getElementById('p2count'),
-    midCount: document.getElementById('midCount'),
     turnText: document.getElementById('turnText'),
-    rollCountText: document.getElementById('rollCountText'),
-    log: document.getElementById('log'),
+    midText: document.getElementById('midText'),
+    midText2: document.getElementById('midText2'),
+    p1Count: document.getElementById('p1Count'),
+    p2Count: document.getElementById('p2Count'),
+    p1StockBadge: document.getElementById('p1StockBadge'),
+    p2StockBadge: document.getElementById('p2StockBadge'),
+    panel1: document.getElementById('panel1'),
+    panel2: document.getElementById('panel2'),
+    scene1: document.getElementById('scene1'),
+    scene2: document.getElementById('scene2'),
+    spill1: document.getElementById('spill1'),
+    spill2: document.getElementById('spill2'),
+    results1: document.getElementById('results1'),
+    results2: document.getElementById('results2'),
     winnerBox: document.getElementById('winnerBox'),
-    resetBtn: document.getElementById('resetBtn'),
+    log: document.getElementById('log'),
+    newBtn: document.getElementById('newBtn'),
     fastBtn: document.getElementById('fastBtn'),
+    clearLog: document.getElementById('clearLog'),
   };
 
-  function setInteractability() {
-    const t = state.turn;
-    el.box1.setAttribute('aria-disabled', String(!(t === 1) || state.gameOver));
-    el.box2.setAttribute('aria-disabled', String(!(t === 2) || state.gameOver));
+  function logLine(t){
+    const d = document.createElement('div');
+    d.textContent = t;
+    el.log.prepend(d);
   }
 
-  function renderCounts() {
-    el.p1count.textContent = state.p[1].dice;
-    el.p2count.textContent = state.p[2].dice;
-    el.midCount.textContent = state.middle;
-    el.turnText.textContent = state.turn === 1 ? 'Oyuncu 1' : 'Oyuncu 2';
-    el.rollCountText.textContent = state.perTurnRoll;
+  function rand1to6(){ return Math.floor(Math.random()*6)+1; }
+
+  function diePips(value){
+    switch(value){
+      case 1: return ["c"];
+      case 2: return ["tl","br"];
+      case 3: return ["tl","c","br"];
+      case 4: return ["tl","tr","bl","br"];
+      case 5: return ["tl","tr","c","bl","br"];
+      case 6: return ["tl","ml","bl","tr","mr","br"];
+      default: return ["c"];
+    }
   }
 
-  function logLine(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    el.log.prepend(div);
+  function render(){
+    el.turnText.textContent = state.turn === 1 ? "Oyuncu 1" : "Oyuncu 2";
+    el.midText.textContent = state.middle;
+    el.midText2.textContent = state.middle;
+
+    el.p1Count.textContent = state.p[1].dice;
+    el.p2Count.textContent = state.p[2].dice;
+
+    el.p1StockBadge.textContent = `Kutuda: ${state.p[1].dice}`;
+    el.p2StockBadge.textContent = `Kutuda: ${state.p[2].dice}`;
+
+    const d1 = (state.turn !== 1) || state.busy || state.over;
+    const d2 = (state.turn !== 2) || state.busy || state.over;
+    el.panel1.classList.toggle('disabled', d1);
+    el.panel2.classList.toggle('disabled', d2);
+
+    el.scene1.setAttribute("aria-disabled", String(d1));
+    el.scene2.setAttribute("aria-disabled", String(d2));
   }
 
-  function clearDiceRows() {
-    el.p1dice.innerHTML = "";
-    el.p2dice.innerHTML = "";
+  function clearVisuals(){
+    el.spill1.innerHTML = "";
+    el.spill2.innerHTML = "";
+    el.results1.innerHTML = "";
+    el.results2.innerHTML = "";
   }
 
-  function showDice(player, diceArr, moved) {
-    // moved: {toMiddle, toOpponent, kept}
-    const row = player === 1 ? el.p1dice : el.p2dice;
-    row.innerHTML = "";
-    diceArr.forEach(v => {
-      const d = document.createElement('div');
-      d.className = 'die';
-      d.textContent = v;
-      row.appendChild(d);
+  function makeSpillDie(value, delay, i){
+    const die = document.createElement('div');
+    die.className = 'die';
+
+    // Start near cup mouth (relative to spillArea)
+    const sx = 18 + (i%2)*8;
+    const sy = 10 + (i%3)*6;
+    const sr = (-12 + (i*7)) + "deg";
+
+    // Target spread outward
+    const tx = 18 + (i*28) + (Math.random()*8 - 4);
+    const ty = 34 + ((i%2)*18) + (Math.random()*10 - 5);
+    const tr = (-22 + (i*13)) + "deg";
+
+    die.style.setProperty("--sx", sx + "px");
+    die.style.setProperty("--sy", sy + "px");
+    die.style.setProperty("--sr", sr);
+    die.style.setProperty("--tx", tx + "px");
+    die.style.setProperty("--ty", ty + "px");
+    die.style.setProperty("--tr", tr);
+
+    die.style.animation = `spill 520ms ease forwards`;
+    die.style.animationDelay = `${delay}ms`;
+
+    diePips(value).forEach(pos=>{
+      const p=document.createElement('div');
+      p.className = `pip ${pos}`;
+      die.appendChild(p);
     });
 
-    logLine(
-      `Oyuncu ${player} attı: [${diceArr.join(", ")}] | ` +
-      `1→orta: ${moved.toMiddle}, 6→rakip: ${moved.toOpponent}, elde kalan: ${moved.kept}`
-    );
+    return die;
   }
 
-  function rand1to6() {
-    return Math.floor(Math.random() * 6) + 1;
+  function addResultDie(container, value, delay){
+    const d = document.createElement('div');
+    d.className = 'resultDie';
+    d.style.animationDelay = `${delay}ms`;
+
+    if(value === 1) d.classList.add('badge1');
+    if(value === 6) d.classList.add('badge6');
+
+    diePips(value).forEach(pos=>{
+      const p=document.createElement('div');
+      p.className = `pip ${pos}`;
+      d.appendChild(p);
+    });
+
+    container.appendChild(d);
   }
 
-  function checkWin() {
-    if (state.p[1].dice <= 0) return 1;
-    if (state.p[2].dice <= 0) return 2;
+  function checkWin(){
+    if(state.p[1].dice <= 0) return 1;
+    if(state.p[2].dice <= 0) return 2;
     return 0;
   }
 
-  function endGame(winner) {
-    state.gameOver = true;
-    setInteractability();
-    el.winnerBox.style.display = 'block';
-    el.winnerBox.innerHTML = `<strong>✅ Oyuncu ${winner} kazandı!</strong> (Zarlarını bitirdi)`;
+  function endGame(winner){
+    state.over = true;
+    el.winnerBox.style.display = "block";
+    el.winnerBox.textContent = `✅ Oyuncu ${winner} kazandı! (zarları bitti)`;
     logLine(`🏁 Oyun bitti. Kazanan: Oyuncu ${winner}`);
+    render();
   }
 
-  function rollForPlayer(player) {
-    if (state.gameOver) return;
-    if (state.turn !== player) return;
+  async function animatePanel(panelEl){
+    panelEl.classList.add('anim');
+    await new Promise(r => setTimeout(r, 640));
+    panelEl.classList.remove('anim');
+  }
 
-    const boxEl = player === 1 ? el.box1 : el.box2;
-    boxEl.classList.remove('shake');
-    // reflow trick
-    void boxEl.offsetWidth;
-    boxEl.classList.add('shake');
+  async function playTurn(player){
+    if(state.over || state.busy) return;
+    if(state.turn !== player) return;
 
     const available = state.p[player].dice;
-    const rollN = Math.min(state.perTurnRoll, available); // elde kaç zar varsa o kadar at
-    if (rollN <= 0) {
-      // zaten bitmiş
+    if(available <= 0){
       endGame(player);
       return;
     }
 
     const opponent = player === 1 ? 2 : 1;
+    const rollN = Math.min(PER_TURN, available);
 
-    let toMiddle = 0, toOpponent = 0, kept = 0;
-    const dice = [];
+    state.busy = true;
+    clearVisuals();
+    render();
 
-    for (let i = 0; i < rollN; i++) {
+    const panelEl = player === 1 ? el.panel1 : el.panel2;
+    const spillEl  = player === 1 ? el.spill1  : el.spill2;
+    const resEl    = player === 1 ? el.results1: el.results2;
+
+    // lid close + shake
+    await animatePanel(panelEl);
+
+    let ones=0, sixes=0;
+    const rolls = [];
+
+    // Roll & apply rules immediately (so counts change this turn)
+    for(let i=0;i<rollN;i++){
       const v = rand1to6();
-      dice.push(v);
-      if (v === 1) toMiddle++;
-      else if (v === 6) toOpponent++;
-      else kept++;
+      rolls.push(v);
+
+      if(v === 1){
+        ones++;
+        state.p[player].dice -= 1;   // oyuncudan eksilir
+        state.middle += 1;           // ortaya gider
+      } else if(v === 6){
+        sixes++;
+        state.p[player].dice -= 1;   // oyuncudan eksilir
+        state.p[opponent].dice += 1; // rakibe gider
+      } else {
+        // 2-5: oyuncuda kalır -> değişiklik yok
+      }
     }
 
-    // oyuncu, attığı zarları önce elinden çıkarır:
-    state.p[player].dice -= rollN;
+    // Spill dice animation in the scene
+    rolls.forEach((v,i)=>{
+      const die = makeSpillDie(v, 40 + i*70, i);
+      spillEl.appendChild(die);
+    });
 
-    // 1'ler ortaya
-    state.middle += toMiddle;
+    // Result dice under the panel
+    rolls.forEach((v,i)=> addResultDie(resEl, v, 80 + i*70));
 
-    // 6'lar rakibe
-    state.p[opponent].dice += toOpponent;
+    render();
 
-    // 2-5 atan oyuncuya geri döner
-    state.p[player].dice += kept;
-
-    showDice(player, dice, {toMiddle, toOpponent, kept});
-    renderCounts();
+    logLine(
+      `Oyuncu ${player} (${rollN} zar) attı: [${rolls.join(", ")}] | 1→orta: ${ones}, 6→rakip: ${sixes} | ` +
+      `O1:${state.p[1].dice} O2:${state.p[2].dice} Orta:${state.middle}`
+    );
 
     const winner = checkWin();
-    if (winner) {
+    if(winner){
       endGame(winner);
+      state.busy = false;
       return;
     }
 
-    // sıra değiştir
+    // switch turn
     state.turn = opponent;
-    setInteractability();
-    renderCounts();
+    state.busy = false;
+    render();
   }
 
-  function resetGame(startDice=20) {
+  function reset(startDice){
     state.p[1].dice = startDice;
     state.p[2].dice = startDice;
     state.middle = 0;
     state.turn = 1;
-    state.gameOver = false;
-    el.winnerBox.style.display = 'none';
+    state.busy = false;
+    state.over = false;
+
+    el.winnerBox.style.display = "none";
     el.log.innerHTML = "";
-    clearDiceRows();
-    renderCounts();
-    setInteractability();
-    logLine(`Yeni oyun başladı. Her oyuncu ${startDice} zar ile başlıyor. Oyuncu 1 başlar.`);
+    clearVisuals();
+    render();
+
+    logLine(`Yeni oyun başladı. Her oyuncu ${startDice} zarla başlıyor. Oyuncu 1 başlar.`);
   }
 
-  // Click + keyboard
-  el.box1.addEventListener('click', () => rollForPlayer(1));
-  el.box2.addEventListener('click', () => rollForPlayer(2));
-  el.box1.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') rollForPlayer(1); });
-  el.box2.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') rollForPlayer(2); });
+  // Events
+  el.scene1.addEventListener('click', () => playTurn(1));
+  el.scene2.addEventListener('click', () => playTurn(2));
 
-  el.resetBtn.addEventListener('click', () => resetGame(20));
-  el.fastBtn.addEventListener('click', () => resetGame(10));
+  el.scene1.addEventListener('keydown', (e)=>{ if(e.key==="Enter" || e.key===" ") playTurn(1); });
+  el.scene2.addEventListener('keydown', (e)=>{ if(e.key==="Enter" || e.key===" ") playTurn(2); });
 
-  resetGame(20);
+  el.newBtn.addEventListener('click', ()=> reset(20));
+  el.fastBtn.addEventListener('click', ()=> reset(10));
+  el.clearLog.addEventListener('click', ()=> el.log.innerHTML = "");
+
+  reset(20);
 })();
 </script>
 </body>
