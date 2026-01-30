@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Silindir Kutu Zar Oyunu</title>
+  <title>10 Zar - Kutu Oyunu</title>
   <style>
     :root{
       --bg:#0b1020;
@@ -12,8 +12,8 @@
       --line:rgba(255,255,255,.12);
       --shadow: rgba(0,0,0,.38);
 
-      --cup1:#4b8cff;
-      --cup2:#ff6d6d;
+      --p1:#4b8cff;
+      --p2:#ff6d6d;
 
       --leather:#d8c8b7;
       --leather2:#c9b59f;
@@ -22,9 +22,9 @@
     }
     *{ box-sizing:border-box; }
     body{ margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    .wrap{ max-width:1050px; margin:0 auto; padding:22px; }
-
+    .wrap{ max-width:1100px; margin:0 auto; padding:22px; }
     h1{ margin:0 0 10px; font-size:22px; }
+
     .topbar{
       display:flex; flex-wrap:wrap; gap:10px;
       align-items:center; justify-content:space-between;
@@ -39,6 +39,7 @@
       display:flex; gap:8px; align-items:center;
       white-space:nowrap;
     }
+
     .grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
     .panel{
@@ -49,20 +50,21 @@
       box-shadow: 0 18px 45px var(--shadow);
       position:relative;
       overflow:hidden;
-      min-height: 340px;
+      min-height: 345px;
     }
+    .panel.disabled{ opacity:.55; filter:saturate(.9); }
+
     .panelHeader{
       display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
       margin-bottom:10px;
     }
     .who{ font-weight:900; font-size:16px; }
     .meta{ font-size:13px; color:var(--muted); line-height:1.2; }
-
     .hint{ font-size:13px; color:var(--muted); margin: 2px 0 10px; }
 
     .scene{
       position:relative;
-      height: 210px;
+      height: 215px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.18);
@@ -73,28 +75,17 @@
       user-select:none;
       cursor:pointer;
     }
-    .panel.disabled{
-      opacity:.55;
-      filter:saturate(.9);
-    }
     .scene:focus{ outline: 2px solid rgba(255,255,255,.18); outline-offset: 2px; }
 
-    /* --- Cup & Lid --- */
-    .cupWrap{
-      position:relative;
-      width: 260px;
-      height: 170px;
-      transform: translateY(6px);
-    }
-
-    /* Cup body: cylindrical */
+    /* Cup */
+    .cupWrap{ position:relative; width: 280px; height: 180px; transform: translateY(6px); }
     .cup{
       position:absolute;
-      left: 20px;
-      top: 18px;
-      width: 175px;
-      height: 120px;
-      border-radius: 70px;
+      left: 28px;
+      top: 22px;
+      width: 190px;
+      height: 125px;
+      border-radius: 74px;
       background: linear-gradient(135deg, var(--leather), var(--leather2));
       border: 1px solid rgba(0,0,0,.12);
       box-shadow: 0 18px 30px rgba(0,0,0,.25);
@@ -102,50 +93,45 @@
       transform-origin: 60% 60%;
       transform: rotate(-18deg);
     }
-    /* stitching line */
     .cup::before{
       content:"";
       position:absolute;
       inset: 8px;
-      border-radius: 64px;
+      border-radius: 68px;
       border: 2px dashed rgba(0,0,0,.16);
       opacity:.55;
     }
-    /* inner mouth */
     .cup::after{
       content:"";
       position:absolute;
-      left: 16px;
-      top: 18px;
-      width: 100px;
-      height: 84px;
-      border-radius: 48px;
+      left: 18px;
+      top: 20px;
+      width: 110px;
+      height: 88px;
+      border-radius: 52px;
       background: radial-gradient(120px 110px at 35% 40%, var(--inner), var(--inner2));
       box-shadow: inset 0 10px 18px rgba(0,0,0,.20);
       opacity:.96;
     }
 
-    /* Color accent stripe for each player */
-    .panel.p1 .cupStripe{ background: linear-gradient(180deg, rgba(75,140,255,.95), rgba(75,140,255,.15)); }
-    .panel.p2 .cupStripe{ background: linear-gradient(180deg, rgba(255,109,109,.95), rgba(255,109,109,.15)); }
     .cupStripe{
       position:absolute;
-      right:-10px;
-      top:-20px;
-      width: 70px;
-      height: 170px;
+      right:-12px;
+      top:-18px;
+      width: 76px;
+      height: 186px;
       transform: rotate(18deg);
       opacity:.45;
-      filter: blur(.1px);
     }
+    .panel.p1 .cupStripe{ background: linear-gradient(180deg, rgba(75,140,255,.95), rgba(75,140,255,.15)); }
+    .panel.p2 .cupStripe{ background: linear-gradient(180deg, rgba(255,109,109,.95), rgba(255,109,109,.15)); }
 
-    /* Lid: disk */
     .lid{
       position:absolute;
-      right: 6px;
-      bottom: 12px;
-      width: 95px;
-      height: 95px;
+      right: 4px;
+      bottom: 14px;
+      width: 98px;
+      height: 98px;
       border-radius: 999px;
       background: radial-gradient(120px 120px at 35% 30%, #b79270, #8f6c49);
       border:1px solid rgba(0,0,0,.18);
@@ -162,42 +148,39 @@
       opacity:.6;
     }
 
-    /* Dice inside + spilling area */
     .spillArea{
       position:absolute;
-      left: 44px;
-      top: 64px;
-      width: 170px;
-      height: 110px;
+      left: 60px;
+      top: 78px;
+      width: 195px;
+      height: 125px;
       pointer-events:none;
       overflow:visible;
     }
 
-    /* tiny stock text */
     .stockBadge{
       position:absolute;
       left: 14px;
       top: 12px;
       font-size:12px;
-      color: rgba(255,255,255,.75);
+      color: rgba(255,255,255,.80);
       background: rgba(0,0,0,.18);
       border: 1px solid rgba(255,255,255,.10);
       padding: 6px 10px;
       border-radius: 999px;
       pointer-events:none;
+      display:flex; align-items:center; gap:8px;
+    }
+    .dots{ display:flex; gap:4px; }
+    .dot{
+      width:10px; height:10px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(0,0,0,.12);
+      opacity:.9;
     }
 
-    /* Results strip */
-    .results{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      min-height: 58px;
-      align-items:center;
-    }
-
-    /* Dice face */
+    /* Dice faces */
     .die{
       width: 46px; height: 46px;
       border-radius: 12px;
@@ -208,6 +191,7 @@
       opacity:0;
       transform: translate(0,0) rotate(0deg) scale(.98);
       animation: none;
+      will-change: transform, opacity;
     }
     .pip{ position:absolute; width:9px; height:9px; border-radius:50%; background: rgba(0,0,0,.72); }
     .c { left:50%; top:50%; transform: translate(-50%,-50%); }
@@ -218,7 +202,14 @@
     .ml{ left:12px; top:50%; transform: translateY(-50%); }
     .mr{ right:12px; top:50%; transform: translateY(-50%); }
 
-    /* Result dice shown under panel (static) */
+    .results{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      min-height: 58px;
+      align-items:center;
+    }
     .resultDie{
       width:46px; height:46px;
       border-radius:12px;
@@ -234,7 +225,7 @@
     .resultDie.badge6{ outline: 3px solid rgba(255,200,0,.35); }
     @keyframes pop{ to{ opacity:1; transform: translateY(0) scale(1); } }
 
-    /* Shake sequence */
+    /* Animations */
     .anim .cup{ animation: cupShake 620ms ease-in-out; }
     @keyframes cupShake{
       0%{ transform: rotate(-18deg) translate(0,0); }
@@ -245,32 +236,58 @@
       80%{ transform: rotate(-20deg) translate(-1px,-2px); }
       100%{ transform: rotate(-18deg) translate(0,0); }
     }
-
-    /* Lid movement: "close" then "open" */
     .anim .lid{ animation: lidCloseOpen 620ms ease-in-out; }
     @keyframes lidCloseOpen{
       0%   { transform: translate(0,0) rotate(8deg) scale(1); }
-      20%  { transform: translate(-70px,-60px) rotate(-18deg) scale(.98); } /* lid goes to cover */
-      55%  { transform: translate(-70px,-60px) rotate(-10deg) scale(.98); } /* stays closed during shake */
-      100% { transform: translate(0,0) rotate(8deg) scale(1); } /* returns open */
+      20%  { transform: translate(-84px,-70px) rotate(-18deg) scale(.98); }
+      55%  { transform: translate(-84px,-70px) rotate(-10deg) scale(.98); }
+      100% { transform: translate(0,0) rotate(8deg) scale(1); }
     }
 
-    /* Dice spill animation (from mouth outward) */
     @keyframes spill{
       0% { opacity:0; transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(.9); }
       20%{ opacity:1; }
       100%{ opacity:1; transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1); }
     }
+    @keyframes fly{
+      0% { opacity:1; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(1); }
+      100%{ opacity:1; transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(.95); }
+    }
+    @keyframes fadeOut{ to{ opacity:0; } }
 
-    /* Middle + controls + log */
-    .mid{
+    /* Middle area (visible pile) */
+    .middlePanel{
       margin-top:16px;
       background: rgba(255,255,255,.05);
       border:1px dashed rgba(255,255,255,.18);
       border-radius:16px;
       padding:12px 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
     }
+    .middleLeft{ min-width: 220px; }
+    .middleTitle{ font-weight:900; margin-bottom:4px; }
+    .middleDesc{ font-size:12px; color:var(--muted); }
+    .pile{
+      position:relative;
+      flex:1;
+      min-height: 90px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.15);
+      overflow:hidden;
+      padding:10px;
+    }
+    .miniDie{
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: 0 10px 16px rgba(0,0,0,.22);
+      position:absolute;
+    }
+    .miniPip{ width:4px; height:4px; border-radius:50%; background: rgba(0,0,0,.65); position:absolute; }
+    .miniPip.c { left:50%; top:50%; transform: translate(-50%,-50%); }
+
     .controls{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
     button{
       border:0; cursor:pointer;
@@ -305,12 +322,12 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>🎲 Silindir Kutu Zar</h1>
+    <h1>🎲 10 Zar (5-5) Kutu Oyunu</h1>
 
     <div class="topbar">
       <div class="pill">Sıra: <strong id="turnText">Oyuncu 1</strong></div>
-      <div class="pill">Tur başına: <strong>5</strong> zar</div>
-      <div class="pill">Orta (1’ler): <strong id="midText">0</strong></div>
+      <div class="pill">Kural: <strong>1→orta</strong>, <strong>6→rakip</strong> (2-5 kalır)</div>
+      <div class="pill">Orta: <strong id="midText">0</strong></div>
     </div>
 
     <div class="grid">
@@ -319,15 +336,18 @@
         <div class="panelHeader">
           <div>
             <div class="who">Oyuncu 1</div>
-            <div class="meta">Zar: <strong id="p1Count">20</strong></div>
+            <div class="meta">Zar: <strong id="p1Count">5</strong></div>
           </div>
-          <div class="meta">1→orta, 6→rakip</div>
+          <div class="meta">Toplam zar: 10</div>
         </div>
 
         <div class="hint">Kutuyu tıkla / Enter: sallayıp zar at (sadece sırandaysa)</div>
 
         <div class="scene" id="scene1" role="button" tabindex="0" aria-label="Oyuncu 1 kutusu">
-          <div class="stockBadge" id="p1StockBadge">Kutuda: 20</div>
+          <div class="stockBadge" id="p1Stock">
+            Kutuda: <strong id="p1StockNum">5</strong>
+            <span class="dots" id="p1Dots"></span>
+          </div>
 
           <div class="cupWrap">
             <div class="cupStripe"></div>
@@ -345,15 +365,18 @@
         <div class="panelHeader">
           <div>
             <div class="who">Oyuncu 2</div>
-            <div class="meta">Zar: <strong id="p2Count">20</strong></div>
+            <div class="meta">Zar: <strong id="p2Count">5</strong></div>
           </div>
-          <div class="meta">1→orta, 6→rakip</div>
+          <div class="meta">Toplam zar: 10</div>
         </div>
 
         <div class="hint">Kutuyu tıkla / Enter: sallayıp zar at (sadece sırandaysa)</div>
 
         <div class="scene" id="scene2" role="button" tabindex="0" aria-label="Oyuncu 2 kutusu">
-          <div class="stockBadge" id="p2StockBadge">Kutuda: 20</div>
+          <div class="stockBadge" id="p2Stock">
+            Kutuda: <strong id="p2StockNum">5</strong>
+            <span class="dots" id="p2Dots"></span>
+          </div>
 
           <div class="cupWrap">
             <div class="cupStripe"></div>
@@ -367,18 +390,19 @@
       </section>
     </div>
 
-    <div class="mid">
-      <div>
-        <div><strong>Orta Havuz</strong> (1 gelenler burada birikir)</div>
-        <div style="font-size:12px;color:var(--muted); margin-top:2px;">Not: Ortadaki zarlar geri oyuna dönmüyor (senin dediğin gibi sadece ortaya atılıyor).</div>
+    <!-- Middle pile -->
+    <div class="middlePanel">
+      <div class="middleLeft">
+        <div class="middleTitle">Orta Havuz</div>
+        <div class="middleDesc">1 gelen zarlar burada birikir (toplam zardan düşer).</div>
+        <div class="pill" style="margin-top:10px;">Orta: <strong id="midText2">0</strong></div>
       </div>
-      <div class="pill">Orta: <strong id="midText2">0</strong></div>
+      <div class="pile" id="pile"></div>
     </div>
 
     <div class="controls">
-      <button class="secondary" id="newBtn">Yeni Oyun (20)</button>
-      <button class="secondary" id="fastBtn">Hızlı Başla (10)</button>
-      <button class="secondary" id="clearLog">Log Temizle</button>
+      <button class="secondary" id="resetBtn">Yeni Oyun (5-5)</button>
+      <button class="secondary" id="clearLogBtn">Log Temizle</button>
     </div>
 
     <div class="winner" id="winnerBox"></div>
@@ -387,10 +411,9 @@
 
 <script>
 (() => {
-  const PER_TURN = 5;
-
+  // Total dice = 10, start: 5 vs 5
   const state = {
-    p: { 1: { dice: 20 }, 2: { dice: 20 } },
+    p: { 1: { dice: 5 }, 2: { dice: 5 } },
     middle: 0,
     turn: 1,
     busy: false,
@@ -403,21 +426,27 @@
     midText2: document.getElementById('midText2'),
     p1Count: document.getElementById('p1Count'),
     p2Count: document.getElementById('p2Count'),
-    p1StockBadge: document.getElementById('p1StockBadge'),
-    p2StockBadge: document.getElementById('p2StockBadge'),
+    p1StockNum: document.getElementById('p1StockNum'),
+    p2StockNum: document.getElementById('p2StockNum'),
+    p1Dots: document.getElementById('p1Dots'),
+    p2Dots: document.getElementById('p2Dots'),
+
     panel1: document.getElementById('panel1'),
     panel2: document.getElementById('panel2'),
     scene1: document.getElementById('scene1'),
     scene2: document.getElementById('scene2'),
+
     spill1: document.getElementById('spill1'),
     spill2: document.getElementById('spill2'),
     results1: document.getElementById('results1'),
     results2: document.getElementById('results2'),
+
+    pile: document.getElementById('pile'),
     winnerBox: document.getElementById('winnerBox'),
     log: document.getElementById('log'),
-    newBtn: document.getElementById('newBtn'),
-    fastBtn: document.getElementById('fastBtn'),
-    clearLog: document.getElementById('clearLog'),
+
+    resetBtn: document.getElementById('resetBtn'),
+    clearLogBtn: document.getElementById('clearLogBtn'),
   };
 
   function logLine(t){
@@ -440,45 +469,78 @@
     }
   }
 
-  function render(){
-    el.turnText.textContent = state.turn === 1 ? "Oyuncu 1" : "Oyuncu 2";
-    el.midText.textContent = state.middle;
-    el.midText2.textContent = state.middle;
-
-    el.p1Count.textContent = state.p[1].dice;
-    el.p2Count.textContent = state.p[2].dice;
-
-    el.p1StockBadge.textContent = `Kutuda: ${state.p[1].dice}`;
-    el.p2StockBadge.textContent = `Kutuda: ${state.p[2].dice}`;
-
-    const d1 = (state.turn !== 1) || state.busy || state.over;
-    const d2 = (state.turn !== 2) || state.busy || state.over;
-    el.panel1.classList.toggle('disabled', d1);
-    el.panel2.classList.toggle('disabled', d2);
-
-    el.scene1.setAttribute("aria-disabled", String(d1));
-    el.scene2.setAttribute("aria-disabled", String(d2));
-  }
-
-  function clearVisuals(){
+  function clearTurnVisuals(){
     el.spill1.innerHTML = "";
     el.spill2.innerHTML = "";
     el.results1.innerHTML = "";
     el.results2.innerHTML = "";
   }
 
-  function makeSpillDie(value, delay, i){
+  function setDisabled(){
+    const d1 = (state.turn !== 1) || state.busy || state.over;
+    const d2 = (state.turn !== 2) || state.busy || state.over;
+    el.panel1.classList.toggle('disabled', d1);
+    el.panel2.classList.toggle('disabled', d2);
+    el.scene1.setAttribute("aria-disabled", String(d1));
+    el.scene2.setAttribute("aria-disabled", String(d2));
+  }
+
+  function renderDots(node, count){
+    node.innerHTML = "";
+    for(let i=0;i<count;i++){
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      node.appendChild(dot);
+    }
+  }
+
+  function render(){
+    el.turnText.textContent = state.turn === 1 ? "Oyuncu 1" : "Oyuncu 2";
+
+    el.p1Count.textContent = state.p[1].dice;
+    el.p2Count.textContent = state.p[2].dice;
+    el.p1StockNum.textContent = state.p[1].dice;
+    el.p2StockNum.textContent = state.p[2].dice;
+
+    el.midText.textContent = state.middle;
+    el.midText2.textContent = state.middle;
+
+    renderDots(el.p1Dots, state.p[1].dice);
+    renderDots(el.p2Dots, state.p[2].dice);
+
+    setDisabled();
+  }
+
+  function checkTotalInvariant(){
+    // total should always be 10 (p1+p2+middle)
+    const total = state.p[1].dice + state.p[2].dice + state.middle;
+    return total;
+  }
+
+  function endGame(winner){
+    state.over = true;
+    el.winnerBox.style.display = "block";
+    el.winnerBox.textContent = `✅ Oyuncu ${winner} kazandı! (zarları bitti)`;
+    logLine(`🏁 Oyun bitti. Kazanan: Oyuncu ${winner}`);
+    render();
+  }
+
+  async function animatePanel(panelEl){
+    panelEl.classList.add('anim');
+    await new Promise(r => setTimeout(r, 640));
+    panelEl.classList.remove('anim');
+  }
+
+  function makeSceneDie(value, delay, i){
     const die = document.createElement('div');
     die.className = 'die';
 
-    // Start near cup mouth (relative to spillArea)
     const sx = 18 + (i%2)*8;
     const sy = 10 + (i%3)*6;
     const sr = (-12 + (i*7)) + "deg";
 
-    // Target spread outward
-    const tx = 18 + (i*28) + (Math.random()*8 - 4);
-    const ty = 34 + ((i%2)*18) + (Math.random()*10 - 5);
+    const tx = 20 + (i*30) + (Math.random()*10 - 5);
+    const ty = 40 + ((i%2)*18) + (Math.random()*12 - 6);
     const tr = (-22 + (i*13)) + "deg";
 
     die.style.setProperty("--sx", sx + "px");
@@ -504,7 +566,6 @@
     const d = document.createElement('div');
     d.className = 'resultDie';
     d.style.animationDelay = `${delay}ms`;
-
     if(value === 1) d.classList.add('badge1');
     if(value === 6) d.classList.add('badge6');
 
@@ -513,107 +574,181 @@
       p.className = `pip ${pos}`;
       d.appendChild(p);
     });
-
     container.appendChild(d);
   }
 
+  function sceneDieCenterOnScreen(sceneEl){
+    const r = sceneEl.getBoundingClientRect();
+    return { x: r.left + r.width*0.5, y: r.top + r.height*0.55 };
+  }
+
+  function pileCenterOnScreen(){
+    const r = el.pile.getBoundingClientRect();
+    return { x: r.left + r.width*0.5, y: r.top + r.height*0.5 };
+  }
+
+  function addMiniDieToPile(value){
+    const mini = document.createElement('div');
+    mini.className = 'miniDie';
+    // scatter inside pile
+    const pr = el.pile.getBoundingClientRect();
+    const x = 8 + Math.random() * (pr.width - 32);
+    const y = 8 + Math.random() * (pr.height - 32);
+    mini.style.left = `${x}px`;
+    mini.style.top  = `${y}px`;
+    mini.style.transform = `rotate(${Math.random()*50 - 25}deg)`;
+
+    // simplest: show a center pip for 1 (since only 1 goes to pile)
+    const pip = document.createElement('div');
+    pip.className = 'miniPip c';
+    mini.appendChild(pip);
+
+    el.pile.appendChild(mini);
+  }
+
+  function flyDieToTarget(value, fromSceneEl, toPoint, delayMs, onDone){
+    // Create a floating die in body coordinates
+    const die = document.createElement('div');
+    die.className = 'die';
+    die.style.position = 'fixed';
+    die.style.zIndex = 9999;
+    die.style.pointerEvents = 'none';
+    die.style.opacity = 1;
+
+    diePips(value).forEach(pos=>{
+      const p=document.createElement('div');
+      p.className = `pip ${pos}`;
+      die.appendChild(p);
+    });
+
+    const from = sceneDieCenterOnScreen(fromSceneEl);
+    const fx = from.x - 23; // half die
+    const fy = from.y - 23;
+    die.style.left = `${fx}px`;
+    die.style.top  = `${fy}px`;
+
+    const fr = (Math.random()*40 - 20) + "deg";
+    const tr = (Math.random()*60 - 30) + "deg";
+
+    // Movement vector in fixed-position transform
+    const tx = (toPoint.x - 23) - fx;
+    const ty = (toPoint.y - 23) - fy;
+
+    die.style.setProperty("--fx", "0px");
+    die.style.setProperty("--fy", "0px");
+    die.style.setProperty("--fr", fr);
+    die.style.setProperty("--tx", tx + "px");
+    die.style.setProperty("--ty", ty + "px");
+    die.style.setProperty("--tr", tr);
+
+    die.style.animation = `fly 520ms ease forwards, fadeOut 260ms ease forwards`;
+    die.style.animationDelay = `${delayMs}ms, ${delayMs + 520}ms`;
+
+    document.body.appendChild(die);
+
+    setTimeout(() => {
+      die.remove();
+      onDone?.();
+    }, delayMs + 520 + 280);
+  }
+
   function checkWin(){
-    if(state.p[1].dice <= 0) return 1;
-    if(state.p[2].dice <= 0) return 2;
+    if(state.p[1].dice === 0) return 1;
+    if(state.p[2].dice === 0) return 2;
     return 0;
-  }
-
-  function endGame(winner){
-    state.over = true;
-    el.winnerBox.style.display = "block";
-    el.winnerBox.textContent = `✅ Oyuncu ${winner} kazandı! (zarları bitti)`;
-    logLine(`🏁 Oyun bitti. Kazanan: Oyuncu ${winner}`);
-    render();
-  }
-
-  async function animatePanel(panelEl){
-    panelEl.classList.add('anim');
-    await new Promise(r => setTimeout(r, 640));
-    panelEl.classList.remove('anim');
   }
 
   async function playTurn(player){
     if(state.over || state.busy) return;
     if(state.turn !== player) return;
-
-    const available = state.p[player].dice;
-    if(available <= 0){
+    if(state.p[player].dice <= 0){
       endGame(player);
       return;
     }
 
     const opponent = player === 1 ? 2 : 1;
-    const rollN = Math.min(PER_TURN, available);
+    const rollN = state.p[player].dice; // elindeki kadar atar (max 5 zaten)
+    const panelEl = player === 1 ? el.panel1 : el.panel2;
+    const sceneEl = player === 1 ? el.scene1 : el.scene2;
+    const spillEl = player === 1 ? el.spill1 : el.spill2;
+    const resEl   = player === 1 ? el.results1 : el.results2;
 
     state.busy = true;
-    clearVisuals();
+    clearTurnVisuals();
     render();
 
-    const panelEl = player === 1 ? el.panel1 : el.panel2;
-    const spillEl  = player === 1 ? el.spill1  : el.spill2;
-    const resEl    = player === 1 ? el.results1: el.results2;
-
-    // lid close + shake
     await animatePanel(panelEl);
 
     let ones=0, sixes=0;
     const rolls = [];
+    const movedOnes = [];
+    const movedSixes = [];
 
-    // Roll & apply rules immediately (so counts change this turn)
+    // Roll and apply ONLY 1 & 6 movement
     for(let i=0;i<rollN;i++){
       const v = rand1to6();
       rolls.push(v);
 
       if(v === 1){
         ones++;
-        state.p[player].dice -= 1;   // oyuncudan eksilir
-        state.middle += 1;           // ortaya gider
+        state.p[player].dice -= 1;
+        state.middle += 1;
+        movedOnes.push(v);
       } else if(v === 6){
         sixes++;
-        state.p[player].dice -= 1;   // oyuncudan eksilir
-        state.p[opponent].dice += 1; // rakibe gider
+        state.p[player].dice -= 1;
+        state.p[opponent].dice += 1;
+        movedSixes.push(v);
       } else {
-        // 2-5: oyuncuda kalır -> değişiklik yok
+        // 2-5 -> stays, no change
       }
     }
 
-    // Spill dice animation in the scene
+    // Visual spill + results
     rolls.forEach((v,i)=>{
-      const die = makeSpillDie(v, 40 + i*70, i);
+      const die = makeSceneDie(v, 40 + i*70, i);
       spillEl.appendChild(die);
+      addResultDie(resEl, v, 80 + i*70);
     });
-
-    // Result dice under the panel
-    rolls.forEach((v,i)=> addResultDie(resEl, v, 80 + i*70));
 
     render();
 
+    // Fly animations: 1 -> pile, 6 -> opponent scene
+    const pilePoint = pileCenterOnScreen();
+    const oppScene = opponent === 1 ? el.scene1 : el.scene2;
+    const oppPoint = sceneDieCenterOnScreen(oppScene);
+
+    // For each 1: fly to pile, then add mini die
+    movedOnes.forEach((v, idx) => {
+      flyDieToTarget(1, sceneEl, pilePoint, 180 + idx*90, () => addMiniDieToPile(1));
+    });
+
+    // For each 6: fly to opponent scene (just visual)
+    movedSixes.forEach((v, idx) => {
+      flyDieToTarget(6, sceneEl, oppPoint, 210 + idx*90);
+    });
+
+    const total = checkTotalInvariant();
     logLine(
-      `Oyuncu ${player} (${rollN} zar) attı: [${rolls.join(", ")}] | 1→orta: ${ones}, 6→rakip: ${sixes} | ` +
-      `O1:${state.p[1].dice} O2:${state.p[2].dice} Orta:${state.middle}`
+      `Oyuncu ${player} ${rollN} zar attı: [${rolls.join(", ")}] | 1→orta: ${ones}, 6→rakip: ${sixes} | Toplam: ${total}`
     );
 
     const winner = checkWin();
     if(winner){
-      endGame(winner);
+      // küçük bir bekleme, uçuşlar bitsin
+      setTimeout(() => endGame(winner), 400);
       state.busy = false;
       return;
     }
 
-    // switch turn
     state.turn = opponent;
     state.busy = false;
     render();
   }
 
-  function reset(startDice){
-    state.p[1].dice = startDice;
-    state.p[2].dice = startDice;
+  function reset(){
+    state.p[1].dice = 5;
+    state.p[2].dice = 5;
     state.middle = 0;
     state.turn = 1;
     state.busy = false;
@@ -621,24 +756,22 @@
 
     el.winnerBox.style.display = "none";
     el.log.innerHTML = "";
-    clearVisuals();
+    el.pile.innerHTML = "";
+    clearTurnVisuals();
     render();
-
-    logLine(`Yeni oyun başladı. Her oyuncu ${startDice} zarla başlıyor. Oyuncu 1 başlar.`);
+    logLine("Yeni oyun başladı: Toplam 10 zar (5-5). Oyuncu 1 başlar.");
   }
 
   // Events
   el.scene1.addEventListener('click', () => playTurn(1));
   el.scene2.addEventListener('click', () => playTurn(2));
-
   el.scene1.addEventListener('keydown', (e)=>{ if(e.key==="Enter" || e.key===" ") playTurn(1); });
   el.scene2.addEventListener('keydown', (e)=>{ if(e.key==="Enter" || e.key===" ") playTurn(2); });
 
-  el.newBtn.addEventListener('click', ()=> reset(20));
-  el.fastBtn.addEventListener('click', ()=> reset(10));
-  el.clearLog.addEventListener('click', ()=> el.log.innerHTML = "");
+  el.resetBtn.addEventListener('click', reset);
+  el.clearLogBtn.addEventListener('click', ()=> el.log.innerHTML="");
 
-  reset(20);
+  reset();
 })();
 </script>
 </body>
