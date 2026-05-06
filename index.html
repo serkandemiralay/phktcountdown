@@ -1,778 +1,911 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>10 Zar - Kutu Oyunu</title>
-  <style>
-    :root{
-      --bg:#0b1020;
-      --text:#e9eefc;
-      --muted:rgba(233,238,252,.72);
-      --line:rgba(255,255,255,.12);
-      --shadow: rgba(0,0,0,.38);
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kuala Lumpur & Bali Travel OS</title>
 
-      --p1:#4b8cff;
-      --p2:#ff6d6d;
+<style>
+:root{
+  --ink:#10100d;
+  --cream:#f6efe4;
+  --paper:#fffaf3;
+  --muted:#6f665b;
+  --gold:#b9975b;
+  --forest:#17382b;
+  --line:rgba(16,16,13,.12);
+  --shadow:0 26px 80px rgba(0,0,0,.12);
+}
 
-      --leather:#d8c8b7;
-      --leather2:#c9b59f;
-      --inner:#a07a55;
-      --inner2:#8a6646;
-    }
-    *{ box-sizing:border-box; }
-    body{ margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    .wrap{ max-width:1100px; margin:0 auto; padding:22px; }
-    h1{ margin:0 0 10px; font-size:22px; }
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.6;
+}
+img{width:100%;display:block;object-fit:cover}
+a{text-decoration:none;color:inherit}
+.serif{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.045em}
 
-    .topbar{
-      display:flex; flex-wrap:wrap; gap:10px;
-      align-items:center; justify-content:space-between;
-      margin-bottom:14px;
-    }
-    .pill{
-      background: rgba(255,255,255,.07);
-      border:1px solid var(--line);
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:13px;
-      display:flex; gap:8px; align-items:center;
-      white-space:nowrap;
-    }
+.nav{
+  position:fixed;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(1180px,94%);
+  z-index:50;
+  display:flex;
+  gap:10px;
+  padding:10px;
+  border-radius:22px;
+  background:rgba(255,250,243,.88);
+  backdrop-filter:blur(18px);
+  box-shadow:0 16px 45px rgba(0,0,0,.1);
+}
+.logo{
+  background:var(--ink);
+  color:#fff3df;
+  border-radius:16px;
+  padding:12px 16px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.navlinks{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.navlinks::-webkit-scrollbar{display:none}
+.nav a{
+  padding:10px 13px;
+  border-radius:14px;
+  color:#51483e;
+  font-size:13px;
+  white-space:nowrap;
+}
+.nav a:hover{background:#eee3d3}
 
-    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.hero{
+  min-height:100vh;
+  padding:140px 6vw 70px;
+  display:flex;
+  align-items:flex-end;
+  color:white;
+  background:
+    linear-gradient(90deg,rgba(16,16,13,.92),rgba(16,16,13,.58),rgba(16,16,13,.15)),
+    url("https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=2200&q=90");
+  background-size:cover;
+  background-position:center;
+}
+.hero-inner{max-width:1180px}
+.kicker,.eyebrow{
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+h1{font-size:clamp(58px,10vw,146px);line-height:.86;margin-bottom:28px}
+h2{font-size:clamp(40px,6vw,82px);line-height:.93;margin-bottom:18px}
+h3{font-size:clamp(24px,2.4vw,34px);line-height:1.05;margin-bottom:10px}
+p{color:var(--muted);font-size:16.5px}
+.hero p{max-width:780px;font-size:clamp(19px,2vw,27px);color:#f0e5d5}
 
-    .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-      box-shadow: 0 18px 45px var(--shadow);
-      position:relative;
-      overflow:hidden;
-      min-height: 345px;
-    }
-    .panel.disabled{ opacity:.55; filter:saturate(.9); }
+.hero-stats{
+  margin-top:42px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  border-radius:26px;
+  overflow:hidden;
+  background:rgba(255,255,255,.18);
+}
+.hero-stats div{
+  padding:22px;
+  background:rgba(255,255,255,.1);
+  backdrop-filter:blur(10px);
+}
+.hero-stats span{
+  display:block;
+  color:var(--gold);
+  font-size:12px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+.hero-stats strong{font-size:17px}
 
-    .panelHeader{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-      margin-bottom:10px;
-    }
-    .who{ font-weight:900; font-size:16px; }
-    .meta{ font-size:13px; color:var(--muted); line-height:1.2; }
-    .hint{ font-size:13px; color:var(--muted); margin: 2px 0 10px; }
+section{
+  padding:88px 6vw;
+  max-width:1280px;
+  margin:auto;
+}
+.head{
+  display:grid;
+  grid-template-columns:1fr .8fr;
+  gap:38px;
+  align-items:end;
+  margin-bottom:36px;
+}
+.lead{font-size:21px;color:#5f564d}
 
-    .scene{
-      position:relative;
-      height: 215px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      user-select:none;
-      cursor:pointer;
-    }
-    .scene:focus{ outline: 2px solid rgba(255,255,255,.18); outline-offset: 2px; }
+.chapter{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+  align-items:center;
+}
+.panel{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:34px;
+  padding:36px;
+  box-shadow:var(--shadow);
+}
+.photo{
+  border-radius:34px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  background:linear-gradient(135deg,#d9b36d,#31543f);
+}
+.photo img{height:590px}
 
-    /* Cup */
-    .cupWrap{ position:relative; width: 280px; height: 180px; transform: translateY(6px); }
-    .cup{
-      position:absolute;
-      left: 28px;
-      top: 22px;
-      width: 190px;
-      height: 125px;
-      border-radius: 74px;
-      background: linear-gradient(135deg, var(--leather), var(--leather2));
-      border: 1px solid rgba(0,0,0,.12);
-      box-shadow: 0 18px 30px rgba(0,0,0,.25);
-      overflow:hidden;
-      transform-origin: 60% 60%;
-      transform: rotate(-18deg);
-    }
-    .cup::before{
-      content:"";
-      position:absolute;
-      inset: 8px;
-      border-radius: 68px;
-      border: 2px dashed rgba(0,0,0,.16);
-      opacity:.55;
-    }
-    .cup::after{
-      content:"";
-      position:absolute;
-      left: 18px;
-      top: 20px;
-      width: 110px;
-      height: 88px;
-      border-radius: 52px;
-      background: radial-gradient(120px 110px at 35% 40%, var(--inner), var(--inner2));
-      box-shadow: inset 0 10px 18px rgba(0,0,0,.20);
-      opacity:.96;
-    }
+.list{
+  display:grid;
+  gap:12px;
+  margin-top:22px;
+}
+.list div{
+  padding:16px 18px;
+  border-radius:18px;
+  background:#f1eadf;
+  color:#5d544a;
+}
 
-    .cupStripe{
-      position:absolute;
-      right:-12px;
-      top:-18px;
-      width: 76px;
-      height: 186px;
-      transform: rotate(18deg);
-      opacity:.45;
-    }
-    .panel.p1 .cupStripe{ background: linear-gradient(180deg, rgba(75,140,255,.95), rgba(75,140,255,.15)); }
-    .panel.p2 .cupStripe{ background: linear-gradient(180deg, rgba(255,109,109,.95), rgba(255,109,109,.15)); }
+.plan-grid{
+  display:grid;
+  gap:16px;
+}
+details.day{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:28px;
+  box-shadow:0 16px 45px rgba(0,0,0,.07);
+  overflow:hidden;
+}
+summary{
+  cursor:pointer;
+  list-style:none;
+  padding:24px;
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:center;
+}
+summary::-webkit-details-marker{display:none}
+.date{
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.mood{
+  padding:8px 12px;
+  border-radius:999px;
+  background:#efe5d4;
+  color:#58482f;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.day-content{
+  padding:0 24px 24px;
+}
+.schedule{
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+.slot{
+  display:grid;
+  grid-template-columns:90px 1fr;
+  gap:14px;
+  padding:14px;
+  border-radius:18px;
+  background:#f4eadb;
+}
+.time{
+  font-weight:900;
+  color:var(--forest);
+  font-size:13px;
+}
+.checks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:16px;
+}
+.check{
+  font-size:12px;
+  padding:8px 10px;
+  border-radius:999px;
+  background:#e8efe5;
+  color:#314839;
+  font-weight:800;
+}
 
-    .lid{
-      position:absolute;
-      right: 4px;
-      bottom: 14px;
-      width: 98px;
-      height: 98px;
-      border-radius: 999px;
-      background: radial-gradient(120px 120px at 35% 30%, #b79270, #8f6c49);
-      border:1px solid rgba(0,0,0,.18);
-      box-shadow: 0 18px 28px rgba(0,0,0,.30);
-      transform: rotate(8deg);
-      transform-origin: 50% 50%;
-    }
-    .lid::before{
-      content:"";
-      position:absolute;
-      inset: 10px;
-      border-radius: 999px;
-      border: 2px solid rgba(0,0,0,.10);
-      opacity:.6;
-    }
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+.gal{
+  min-height:340px;
+  border-radius:28px;
+  overflow:hidden;
+  position:relative;
+  background:linear-gradient(135deg,#d9b36d,#31543f);
+  box-shadow:0 20px 60px rgba(0,0,0,.12);
+}
+.gal img{height:100%}
+.gal span{
+  position:absolute;
+  left:16px;
+  right:16px;
+  bottom:16px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(16,16,13,.72);
+  color:white;
+  font-size:14px;
+  backdrop-filter:blur(10px);
+}
 
-    .spillArea{
-      position:absolute;
-      left: 60px;
-      top: 78px;
-      width: 195px;
-      height: 125px;
-      pointer-events:none;
-      overflow:visible;
-    }
+.foodgrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:22px;
+}
+.food{
+  display:grid;
+  grid-template-columns:210px 1fr;
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:30px;
+  overflow:hidden;
+  box-shadow:0 18px 55px rgba(0,0,0,.08);
+}
+.food img{height:100%;min-height:230px}
+.food .body{padding:26px}
+.tag{
+  display:inline-block;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
 
-    .stockBadge{
-      position:absolute;
-      left: 14px;
-      top: 12px;
-      font-size:12px;
-      color: rgba(255,255,255,.80);
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
-      padding: 6px 10px;
-      border-radius: 999px;
-      pointer-events:none;
-      display:flex; align-items:center; gap:8px;
-    }
-    .dots{ display:flex; gap:4px; }
-    .dot{
-      width:10px; height:10px;
-      border-radius: 4px;
-      background: rgba(255,255,255,.92);
-      border:1px solid rgba(0,0,0,.12);
-      opacity:.9;
-    }
+.dark{
+  max-width:none;
+  background:var(--ink);
+  color:#fff3df;
+}
+.dark-inner{max-width:1280px;margin:auto}
+.dark p{color:#d7c7b2}
 
-    /* Dice faces */
-    .die{
-      width: 46px; height: 46px;
-      border-radius: 12px;
-      background: rgba(255,255,255,.95);
-      border: 1px solid rgba(0,0,0,.14);
-      box-shadow: 0 12px 26px rgba(0,0,0,.30);
-      position:absolute;
-      opacity:0;
-      transform: translate(0,0) rotate(0deg) scale(.98);
-      animation: none;
-      will-change: transform, opacity;
-    }
-    .pip{ position:absolute; width:9px; height:9px; border-radius:50%; background: rgba(0,0,0,.72); }
-    .c { left:50%; top:50%; transform: translate(-50%,-50%); }
-    .tl{ left:12px; top:12px; }
-    .tr{ right:12px; top:12px; }
-    .bl{ left:12px; bottom:12px; }
-    .br{ right:12px; bottom:12px; }
-    .ml{ left:12px; top:50%; transform: translateY(-50%); }
-    .mr{ right:12px; top:50%; transform: translateY(-50%); }
+.reviewgrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+.review{
+  background:#171713;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:28px;
+  padding:26px;
+}
+.review .quote{
+  font-family:Georgia,serif;
+  color:var(--gold);
+  font-size:58px;
+  line-height:.7;
+}
+.review h3{font-size:23px;color:white}
 
-    .results{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      min-height: 58px;
-      align-items:center;
-    }
-    .resultDie{
-      width:46px; height:46px;
-      border-radius:12px;
-      background: rgba(255,255,255,.95);
-      border: 1px solid rgba(0,0,0,.14);
-      box-shadow: 0 12px 26px rgba(0,0,0,.30);
-      position:relative;
-      opacity:0;
-      transform: translateY(10px) scale(.98);
-      animation: pop 420ms ease forwards;
-    }
-    .resultDie.badge1{ outline: 3px solid rgba(0,220,120,.30); }
-    .resultDie.badge6{ outline: 3px solid rgba(255,200,0,.35); }
-    @keyframes pop{ to{ opacity:1; transform: translateY(0) scale(1); } }
+.checklist{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.todo{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:16px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+.todo input{margin-top:5px;accent-color:var(--gold)}
 
-    /* Animations */
-    .anim .cup{ animation: cupShake 620ms ease-in-out; }
-    @keyframes cupShake{
-      0%{ transform: rotate(-18deg) translate(0,0); }
-      15%{ transform: rotate(-23deg) translate(-2px,2px); }
-      30%{ transform: rotate(-10deg) translate(3px,-2px); }
-      45%{ transform: rotate(-26deg) translate(-3px,-1px); }
-      60%{ transform: rotate(-12deg) translate(2px,2px); }
-      80%{ transform: rotate(-20deg) translate(-1px,-2px); }
-      100%{ transform: rotate(-18deg) translate(0,0); }
-    }
-    .anim .lid{ animation: lidCloseOpen 620ms ease-in-out; }
-    @keyframes lidCloseOpen{
-      0%   { transform: translate(0,0) rotate(8deg) scale(1); }
-      20%  { transform: translate(-84px,-70px) rotate(-18deg) scale(.98); }
-      55%  { transform: translate(-84px,-70px) rotate(-10deg) scale(.98); }
-      100% { transform: translate(0,0) rotate(8deg) scale(1); }
-    }
+footer{
+  padding:78px 6vw;
+  background:var(--forest);
+  color:#fff5e7;
+  text-align:center;
+}
+footer p{color:#d7cbb8}
 
-    @keyframes spill{
-      0% { opacity:0; transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(.9); }
-      20%{ opacity:1; }
-      100%{ opacity:1; transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1); }
-    }
-    @keyframes fly{
-      0% { opacity:1; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(1); }
-      100%{ opacity:1; transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(.95); }
-    }
-    @keyframes fadeOut{ to{ opacity:0; } }
-
-    /* Middle area (visible pile) */
-    .middlePanel{
-      margin-top:16px;
-      background: rgba(255,255,255,.05);
-      border:1px dashed rgba(255,255,255,.18);
-      border-radius:16px;
-      padding:12px 14px;
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-    }
-    .middleLeft{ min-width: 220px; }
-    .middleTitle{ font-weight:900; margin-bottom:4px; }
-    .middleDesc{ font-size:12px; color:var(--muted); }
-    .pile{
-      position:relative;
-      flex:1;
-      min-height: 90px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.15);
-      overflow:hidden;
-      padding:10px;
-    }
-    .miniDie{
-      width: 22px; height: 22px;
-      border-radius: 6px;
-      background: rgba(255,255,255,.92);
-      border: 1px solid rgba(0,0,0,.12);
-      box-shadow: 0 10px 16px rgba(0,0,0,.22);
-      position:absolute;
-    }
-    .miniPip{ width:4px; height:4px; border-radius:50%; background: rgba(0,0,0,.65); position:absolute; }
-    .miniPip.c { left:50%; top:50%; transform: translate(-50%,-50%); }
-
-    .controls{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
-    button{
-      border:0; cursor:pointer;
-      background:#2c5cff; color:#fff;
-      padding:10px 12px; border-radius:12px;
-      font-weight:800;
-    }
-    button.secondary{ background: rgba(255,255,255,.10); border:1px solid var(--line); }
-    button:disabled{ opacity:.5; cursor:not-allowed; }
-
-    .winner{
-      margin-top:14px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(0,220,120,.35);
-      background: rgba(0,220,120,.12);
-      display:none;
-      font-weight:900;
-    }
-    .log{
-      margin-top:14px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px;
-      font-size: 13px;
-      max-height: 240px;
-      overflow:auto;
-    }
-    .log div + div{ margin-top:6px; opacity:.92; }
-  </style>
+@media(max-width:1050px){
+  .hero-stats,.gallery,.reviewgrid,.checklist{grid-template-columns:1fr 1fr}
+  .chapter,.head,.foodgrid{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+  .nav{top:10px;width:94%;flex-direction:column;align-items:stretch}
+  .logo{text-align:center}
+  .hero{padding:155px 5vw 50px}
+  section{padding:66px 5vw}
+  .hero-stats,.gallery,.reviewgrid,.checklist{grid-template-columns:1fr}
+  .photo img{height:430px}
+  summary{display:block}
+  .mood{display:inline-block;margin-top:10px}
+  .slot{grid-template-columns:1fr}
+  .food{grid-template-columns:1fr}
+  .food img{height:235px}
+}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <h1>🎲 10 Zar (5-5) Kutu Oyunu</h1>
 
-    <div class="topbar">
-      <div class="pill">Sıra: <strong id="turnText">Oyuncu 1</strong></div>
-      <div class="pill">Kural: <strong>1→orta</strong>, <strong>6→rakip</strong> (2-5 kalır)</div>
-      <div class="pill">Orta: <strong id="midText">0</strong></div>
+<nav class="nav">
+  <div class="logo">Kuala Lumpur × Bali</div>
+  <div class="navlinks">
+      <a href="#overview">Uçuş Planı</a>
+    <a href="#kuala-lumpur">Kuala Lumpur</a>
+    <a href="#kuala-lumpur-plan">Kuala Lumpur Plan</a>
+    <a href="#bali">Bali</a>
+    <a href="#bali-plan">Bali Plan</a>
+    <a href="#photos">Fotoğraflar</a>
+    <a href="#food">Yemekler</a>
+    <a href="#reviews">Yorumlar</a>
+    <a href="#checklist">Checklist</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="kicker">Personal Luxury Travel OS · 2026</div>
+    <h1 class="serif">Kuala Lumpur<br>& Bali</h1>
+    <p>Şehir ışıkları, jungle sabahları, tropikal kahvaltılar, beach club günleri ve Uluwatu’da sinematik final.</p>
+
+    <div class="hero-stats">
+      <div><span>Tarih</span><strong>20 Temmuz – 14 Ağustos</strong></div>
+      <div><span>Kişi</span><strong>2 kişi · Çift tatili</strong></div>
+      <div><span>Enerji</span><strong>Luxury · Relax · Gastronomi</strong></div>
+      <div><span>Felsefe</span><strong>Az aktivite, doğru deneyim</strong></div>
     </div>
-
-    <div class="grid">
-      <!-- Player 1 -->
-      <section class="panel p1" id="panel1">
-        <div class="panelHeader">
-          <div>
-            <div class="who">Oyuncu 1</div>
-            <div class="meta">Zar: <strong id="p1Count">5</strong></div>
-          </div>
-          <div class="meta">Toplam zar: 10</div>
-        </div>
-
-        <div class="hint">Kutuyu tıkla / Enter: sallayıp zar at (sadece sırandaysa)</div>
-
-        <div class="scene" id="scene1" role="button" tabindex="0" aria-label="Oyuncu 1 kutusu">
-          <div class="stockBadge" id="p1Stock">
-            Kutuda: <strong id="p1StockNum">5</strong>
-            <span class="dots" id="p1Dots"></span>
-          </div>
-
-          <div class="cupWrap">
-            <div class="cupStripe"></div>
-            <div class="cup"></div>
-            <div class="lid"></div>
-            <div class="spillArea" id="spill1"></div>
-          </div>
-        </div>
-
-        <div class="results" id="results1"></div>
-      </section>
-
-      <!-- Player 2 -->
-      <section class="panel p2" id="panel2">
-        <div class="panelHeader">
-          <div>
-            <div class="who">Oyuncu 2</div>
-            <div class="meta">Zar: <strong id="p2Count">5</strong></div>
-          </div>
-          <div class="meta">Toplam zar: 10</div>
-        </div>
-
-        <div class="hint">Kutuyu tıkla / Enter: sallayıp zar at (sadece sırandaysa)</div>
-
-        <div class="scene" id="scene2" role="button" tabindex="0" aria-label="Oyuncu 2 kutusu">
-          <div class="stockBadge" id="p2Stock">
-            Kutuda: <strong id="p2StockNum">5</strong>
-            <span class="dots" id="p2Dots"></span>
-          </div>
-
-          <div class="cupWrap">
-            <div class="cupStripe"></div>
-            <div class="cup"></div>
-            <div class="lid"></div>
-            <div class="spillArea" id="spill2"></div>
-          </div>
-        </div>
-
-        <div class="results" id="results2"></div>
-      </section>
+  </div>
+</header>
+<section id="overview">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Flight Plan</div>
+      <h2 class="serif">Uçuş planı</h2>
     </div>
-
-    <!-- Middle pile -->
-    <div class="middlePanel">
-      <div class="middleLeft">
-        <div class="middleTitle">Orta Havuz</div>
-        <div class="middleDesc">1 gelen zarlar burada birikir (toplam zardan düşer).</div>
-        <div class="pill" style="margin-top:10px;">Orta: <strong id="midText2">0</strong></div>
-      </div>
-      <div class="pile" id="pile"></div>
-    </div>
-
-    <div class="controls">
-      <button class="secondary" id="resetBtn">Yeni Oyun (5-5)</button>
-      <button class="secondary" id="clearLogBtn">Log Temizle</button>
-    </div>
-
-    <div class="winner" id="winnerBox"></div>
-    <div class="log" id="log"></div>
+    <p class="lead">Tüm rota bu uçuş akışının üzerine kuruluyor. Geçiş günlerini hafif tutmak planın en kritik kısmı.</p>
   </div>
 
-<script>
-(() => {
-  // Total dice = 10, start: 5 vs 5
-  const state = {
-    p: { 1: { dice: 5 }, 2: { dice: 5 } },
-    middle: 0,
-    turn: 1,
-    busy: false,
-    over: false
-  };
+  <div class="plan-grid">
 
-  const el = {
-    turnText: document.getElementById('turnText'),
-    midText: document.getElementById('midText'),
-    midText2: document.getElementById('midText2'),
-    p1Count: document.getElementById('p1Count'),
-    p2Count: document.getElementById('p2Count'),
-    p1StockNum: document.getElementById('p1StockNum'),
-    p2StockNum: document.getElementById('p2StockNum'),
-    p1Dots: document.getElementById('p1Dots'),
-    p2Dots: document.getElementById('p2Dots'),
+    <details class="day" open>
+      <summary>
+        <div>
+          <div class="date">20 Temmuz 2026 · Pazartesi</div>
+          <h3 class="serif">İstanbul → Kuala Lumpur</h3>
+        </div>
+        <span class="mood">Uzun uçuş</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">22:15</div>
+            <div>
+              <strong>İstanbul Havalimanı kalkış</strong>
+              <p>Uçuşu tatilin ilk ritüeli gibi düşünün: rahat kıyafet, kulaklık, uyku maskesi, hafif bakım kiti.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
 
-    panel1: document.getElementById('panel1'),
-    panel2: document.getElementById('panel2'),
-    scene1: document.getElementById('scene1'),
-    scene2: document.getElementById('scene2'),
+    <details class="day">
+      <summary>
+        <div>
+          <div class="date">22 Temmuz 2026 · Çarşamba</div>
+          <h3 class="serif">Kuala Lumpur varış</h3>
+        </div>
+        <span class="mood">Soft arrival</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">02:40</div>
+            <div>
+              <strong>Kuala Lumpur varış</strong>
+              <p>Bu gün ağır aktivite yok. Otel, duş, dinlenme, KLCC çevresi ve akşam rooftop yeterli.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
 
-    spill1: document.getElementById('spill1'),
-    spill2: document.getElementById('spill2'),
-    results1: document.getElementById('results1'),
-    results2: document.getElementById('results2'),
+    <details class="day">
+      <summary>
+        <div>
+          <div class="date">25 Temmuz 2026</div>
+          <h3 class="serif">Kuala Lumpur → Bali</h3>
+        </div>
+        <span class="mood">Island transfer</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">17:55</div>
+            <div>
+              <strong>Kuala Lumpur kalkış</strong>
+              <p>Günü hafif tutun. Havalimanına rahat geçiş ve erken check-in iyi olur.</p>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="time">21:05</div>
+            <div>
+              <strong>Bali varış</strong>
+              <p>O gece plan yok. Direkt otele transfer ve uyku.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
 
-    pile: document.getElementById('pile'),
-    winnerBox: document.getElementById('winnerBox'),
-    log: document.getElementById('log'),
+    <details class="day">
+      <summary>
+        <div>
+          <div class="date">12 Ağustos 2026</div>
+          <h3 class="serif">Bali → Kuala Lumpur</h3>
+        </div>
+        <span class="mood">Return transfer</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">07:00</div>
+            <div>
+              <strong>Bali kalkış</strong>
+              <p>Transfer çok erken olmalı. Bir gece önce valiz ve ödeme işleri tamamen bitmiş olsun.</p>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="time">10:05</div>
+            <div>
+              <strong>Kuala Lumpur varış</strong>
+              <p>Son Kuala Lumpur günü: otel, dinlenme, hafif alışveriş ve sakin akşam.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
 
-    resetBtn: document.getElementById('resetBtn'),
-    clearLogBtn: document.getElementById('clearLogBtn'),
-  };
+    <details class="day">
+      <summary>
+        <div>
+          <div class="date">13–14 Ağustos 2026</div>
+          <h3 class="serif">Kuala Lumpur → İstanbul</h3>
+        </div>
+        <span class="mood">Final flight</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">19:15</div>
+            <div>
+              <strong>Kuala Lumpur kalkış</strong>
+              <p>13 Ağustos günü ağır aktivite koymayın. Son alışveriş + kahve + havalimanına rahat geçiş.</p>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="time">06:55</div>
+            <div>
+              <strong>14 Ağustos Cuma · İstanbul varış</strong>
+              <p>Tatilin resmi kapanışı. Eve dönüş için yavaş bir gün planlamak iyi olur.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
 
-  function logLine(t){
-    const d = document.createElement('div');
-    d.textContent = t;
-    el.log.prepend(d);
-  }
+  </div>
+</section>
 
-  function rand1to6(){ return Math.floor(Math.random()*6)+1; }
+<section id="kuala-lumpur">
+  <div class="chapter">
+    <div class="photo">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1300&q=90" alt="Kuala Lumpur skyline">
+    </div>
 
-  function diePips(value){
-    switch(value){
-      case 1: return ["c"];
-      case 2: return ["tl","br"];
-      case 3: return ["tl","c","br"];
-      case 4: return ["tl","tr","bl","br"];
-      case 5: return ["tl","tr","c","bl","br"];
-      case 6: return ["tl","ml","bl","tr","mr","br"];
-      default: return ["c"];
-    }
-  }
+    <div class="panel">
+      <div class="eyebrow">Chapter I · Malaysia</div>
+      <h2 class="serif">Kuala Lumpur şehirli açılış.</h2>
+      <p class="lead">Bali öncesi modern Asya enerjisi: Petronas, rooftop, Batu Caves, Chinatown ve Jalan Alor.</p>
+      <div class="list">
+        <div><strong>Petronas:</strong> Akşam ışıklı hali en etkileyici.</div>
+        <div><strong>Batu Caves:</strong> Sabah erken gidin; maymunlara dikkat.</div>
+        <div><strong>Chinatown:</strong> Central Market + kahve + kısa yürüyüş.</div>
+        <div><strong>Jalan Alor:</strong> Sokak lezzeti ve canlı gece pazarı.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  function clearTurnVisuals(){
-    el.spill1.innerHTML = "";
-    el.spill2.innerHTML = "";
-    el.results1.innerHTML = "";
-    el.results2.innerHTML = "";
-  }
+<section id="kuala-lumpur-plan">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Kuala Lumpur Daily Plan</div>
+      <h2 class="serif">Kuala Lumpur günlük planları</h2>
+    </div>
+    <p class="lead">Bu bölüm şehirdeyken direkt kullanılacak kısa ve net takip alanı.</p>
+  </div>
 
-  function setDisabled(){
-    const d1 = (state.turn !== 1) || state.busy || state.over;
-    const d2 = (state.turn !== 2) || state.busy || state.over;
-    el.panel1.classList.toggle('disabled', d1);
-    el.panel2.classList.toggle('disabled', d2);
-    el.scene1.setAttribute("aria-disabled", String(d1));
-    el.scene2.setAttribute("aria-disabled", String(d2));
-  }
+  <div class="plan-grid">
 
-  function renderDots(node, count){
-    node.innerHTML = "";
-    for(let i=0;i<count;i++){
-      const dot = document.createElement('span');
-      dot.className = 'dot';
-      node.appendChild(dot);
-    }
-  }
+    <details class="day" open>
+      <summary>
+        <div><div class="date">22 Temmuz · Kuala Lumpur</div><h3 class="serif">Arrival & Skyline</h3></div>
+        <span class="mood">Hafif tempo</span>
+      </summary>
+      <div class="day-content">
+        <p>Çok erken varış olduğu için amaç dinlenmek ve şehre yumuşak giriş.</p>
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Otel / dinlenme</strong><p>Erken check-in mümkünse otele geçin. Değilse lounge/kahvaltı.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>KLCC & Petronas çevresi</strong><p>Kısa yürüyüş, kahve, şehir atmosferi.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Rooftop açılışı</strong><p>Petronas manzaralı kokteyl. Erken uyku.</p></div></div>
+        </div>
+        <div class="checks"><span class="check">Rezervasyon: Rooftop</span><span class="check">Enerji: %40</span></div>
+      </div>
+    </details>
 
-  function render(){
-    el.turnText.textContent = state.turn === 1 ? "Oyuncu 1" : "Oyuncu 2";
+    <details class="day">
+      <summary>
+        <div><div class="date">23 Temmuz · Kuala Lumpur</div><h3 class="serif">Batu Caves & Chinatown</h3></div>
+        <span class="mood">Kültür + sokak lezzeti</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">07:30</div><div><strong>Batu Caves</strong><p>Sabah erken gidin. Daha serin, daha az kalabalık. Maymunlara dikkat.</p></div></div>
+          <div class="slot"><div class="time">13:00</div><div><strong>Chinatown & Central Market</strong><p>Kahve, kısa alışveriş, kültür yürüyüşü.</p></div></div>
+          <div class="slot"><div class="time">19:30</div><div><strong>Jalan Alor</strong><p>Satay, noodle, seafood. Kalabalık ama atmosfer güçlü.</p></div></div>
+        </div>
+        <div class="checks"><span class="check">Must eat: Satay</span><span class="check">Yanına: Su + rahat ayakkabı</span></div>
+      </div>
+    </details>
 
-    el.p1Count.textContent = state.p[1].dice;
-    el.p2Count.textContent = state.p[2].dice;
-    el.p1StockNum.textContent = state.p[1].dice;
-    el.p2StockNum.textContent = state.p[2].dice;
+    <details class="day">
+      <summary>
+        <div><div class="date">24 Temmuz · Kuala Lumpur</div><h3 class="serif">Luxury City Day</h3></div>
+        <span class="mood">Şık + rahat</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Geç kahvaltı</strong><p>Otel kahvaltısı veya iyi bir şehir kafesi.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Spa / alışveriş</strong><p>Pavilion Kuala Lumpur veya Suria KLCC.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Fine dining</strong><p>Michelin seçkisi veya modern Malay mutfağı.</p></div></div>
+        </div>
+        <div class="checks"><span class="check">Rezervasyon: Dinner</span><span class="check">Enerji: %55</span></div>
+      </div>
+    </details>
 
-    el.midText.textContent = state.middle;
-    el.midText2.textContent = state.middle;
+    <details class="day">
+      <summary>
+        <div><div class="date">25 Temmuz · Kuala Lumpur → Bali</div><h3 class="serif">Island Transfer</h3></div>
+        <span class="mood">Geçiş günü</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Yavaş kahvaltı</strong><p>Valiz toparlama, checkout.</p></div></div>
+          <div class="slot"><div class="time">17:55</div><div><strong>Bali uçuşu</strong><p>Havalimanına erken geçin.</p></div></div>
+          <div class="slot"><div class="time">21:05</div><div><strong>Bali varış</strong><p>Otele direkt transfer. Aktivite yok.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    renderDots(el.p1Dots, state.p[1].dice);
-    renderDots(el.p2Dots, state.p[2].dice);
+  </div>
+</section>
 
-    setDisabled();
-  }
+<section id="bali">
+  <div class="chapter">
+    <div class="panel">
+      <div class="eyebrow">Chapter II · Indonesia</div>
+      <h2 class="serif">Bali sahne sahne yaşanmalı.</h2>
+      <p class="lead">Ubud doğa ve spa, Canggu sosyal enerji, Seminyak şık akşamlar, Nusa Penida macera, Uluwatu final.</p>
+      <div class="list">
+        <div><strong>Ubud:</strong> Jungle villa, rice terrace, waterfall, couple spa.</div>
+        <div><strong>Canggu:</strong> Brunch, kahve, beach club, sunset.</div>
+        <div><strong>Seminyak:</strong> Potato Head, butik alışveriş, iyi restoran.</div>
+        <div><strong>Nusa Penida:</strong> Kelingking, Diamond Beach, dramatik manzaralar.</div>
+        <div><strong>Uluwatu:</strong> Cliff sunset, Kecak Dance, final dinner.</div>
+      </div>
+    </div>
 
-  function checkTotalInvariant(){
-    // total should always be 10 (p1+p2+middle)
-    const total = state.p[1].dice + state.p[2].dice + state.middle;
-    return total;
-  }
+    <div class="photo">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=1300&q=90" alt="Bali coast">
+    </div>
+  </div>
+</section>
 
-  function endGame(winner){
-    state.over = true;
-    el.winnerBox.style.display = "block";
-    el.winnerBox.textContent = `✅ Oyuncu ${winner} kazandı! (zarları bitti)`;
-    logLine(`🏁 Oyun bitti. Kazanan: Oyuncu ${winner}`);
-    render();
-  }
+<section id="bali-plan">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Bali Daily Plan</div>
+      <h2 class="serif">Bali günlük planları</h2>
+    </div>
+    <p class="lead">Uzun Bali bölümü artık bölge akışına göre okunuyor: Ubud → Canggu/Seminyak → Nusa Penida → Uluwatu.</p>
+  </div>
 
-  async function animatePanel(panelEl){
-    panelEl.classList.add('anim');
-    await new Promise(r => setTimeout(r, 640));
-    panelEl.classList.remove('anim');
-  }
+  <div class="plan-grid">
 
-  function makeSceneDie(value, delay, i){
-    const die = document.createElement('div');
-    die.className = 'die';
+    <details class="day" open>
+      <summary><div><div class="date">26 Temmuz · Ubud</div><h3 class="serif">Jungle Reset</h3></div><span class="mood">Dinlenme</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Villa kahvaltısı</strong><p>Havuz, dinlenme, ada moduna giriş.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Ubud merkez</strong><p>Kısa yürüyüş, kahve, hafif alışveriş.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Romantik Ubud dinner</strong><p>Erken ve sakin akşam yemeği.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    const sx = 18 + (i%2)*8;
-    const sy = 10 + (i%3)*6;
-    const sr = (-12 + (i*7)) + "deg";
+    <details class="day">
+      <summary><div><div class="date">27 Temmuz · Ubud</div><h3 class="serif">Rice Terrace & Temple</h3></div><span class="mood">Doğa + kültür</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">07:00</div><div><strong>Tegallalang Rice Terrace</strong><p>En iyi ışık ve az kalabalık.</p></div></div>
+          <div class="slot"><div class="time">11:30</div><div><strong>Tirta Empul</strong><p>Tapınak ritüeli. Sarong ve saygılı kıyafet.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Otel + spa</strong><p>Günü yavaş kapatın.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    const tx = 20 + (i*30) + (Math.random()*10 - 5);
-    const ty = 40 + ((i%2)*18) + (Math.random()*12 - 6);
-    const tr = (-22 + (i*13)) + "deg";
+    <details class="day">
+      <summary><div><div class="date">28 Temmuz · Ubud</div><h3 class="serif">Waterfall & Couple Spa</h3></div><span class="mood">Romantik</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Kanto Lampo / Tibumana</strong><p>Kaymaz sandalet ve su geçirmez çanta.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Hafif lunch</strong><p>Ubud’da sağlıklı bowl veya lokal warung.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Couple spa & flower bath</strong><p>Bu tatilin imza anlarından biri.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    die.style.setProperty("--sx", sx + "px");
-    die.style.setProperty("--sy", sy + "px");
-    die.style.setProperty("--sr", sr);
-    die.style.setProperty("--tx", tx + "px");
-    die.style.setProperty("--ty", ty + "px");
-    die.style.setProperty("--tr", tr);
+    <details class="day">
+      <summary><div><div class="date">29 Temmuz · Ubud → Canggu</div><h3 class="serif">Social Island’a Geçiş</h3></div><span class="mood">Transfer + brunch</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Checkout</strong><p>Yavaş kahvaltı, valiz.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Canggu check-in</strong><p>Kahve ve kısa çevre yürüyüşü.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Sunset drink</strong><p>Echo Beach / La Brisa çevresi.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    die.style.animation = `spill 520ms ease forwards`;
-    die.style.animationDelay = `${delay}ms`;
+    <details class="day">
+      <summary><div><div class="date">30 Temmuz · Canggu</div><h3 class="serif">Brunch & Beach Club</h3></div><span class="mood">Sosyal</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Canggu brunch</strong><p>Bali bowl, kahve, yavaş başlangıç.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Beach club</strong><p>La Brisa / The Lawn.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Sunset + dinner</strong><p>Rezervasyonlu rahat akşam.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    diePips(value).forEach(pos=>{
-      const p=document.createElement('div');
-      p.className = `pip ${pos}`;
-      die.appendChild(p);
-    });
+    <details class="day">
+      <summary><div><div class="date">31 Temmuz · Seminyak</div><h3 class="serif">Chic Bali Day</h3></div><span class="mood">Şık</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Butik alışveriş</strong><p>Seminyak mağazaları.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Potato Head</strong><p>Daybed rezervasyonu iyi olur.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Modern Bali dinner</strong><p>Şık kombin gecesi.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    return die;
-  }
+    <details class="day">
+      <summary><div><div class="date">1–2 Ağustos · Canggu / Seminyak</div><h3 class="serif">Free Flow & Buffer Days</h3></div><span class="mood">Esnek</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Kahve rotası</strong><p>Canggu café hopping.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Otel / spa / alışveriş</strong><p>Yağmur alternatifi için ideal.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Favori mekana dönüş</strong><p>En sevdiğiniz yeri tekrar edin.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-  function addResultDie(container, value, delay){
-    const d = document.createElement('div');
-    d.className = 'resultDie';
-    d.style.animationDelay = `${delay}ms`;
-    if(value === 1) d.classList.add('badge1');
-    if(value === 6) d.classList.add('badge6');
+    <details class="day">
+      <summary><div><div class="date">3–4 Ağustos · Nusa Penida</div><h3 class="serif">Big Adventure</h3></div><span class="mood">Macera</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">1. Gün</div><div><strong>Broken Beach & Angel’s Billabong</strong><p>Fast boat sonrası daha hafif rota.</p></div></div>
+          <div class="slot"><div class="time">2. Gün</div><div><strong>Kelingking & Diamond Beach</strong><p>Manzara olağanüstü; iniş riskli olabilir.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Dinlenme</strong><p>Nusa Penida yorucu; akşamları basit tutun.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    diePips(value).forEach(pos=>{
-      const p=document.createElement('div');
-      p.className = `pip ${pos}`;
-      d.appendChild(p);
-    });
-    container.appendChild(d);
-  }
+    <details class="day">
+      <summary><div><div class="date">5 Ağustos · Nusa Penida → Uluwatu</div><h3 class="serif">Final Chapter’a Geçiş</h3></div><span class="mood">Transfer</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Boat back</strong><p>Bali ana adaya dönüş.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Uluwatu check-in</strong><p>Otel, havuz, dinlenme.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Cliff dinner</strong><p>Yavaş ve şık bir giriş.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-  function sceneDieCenterOnScreen(sceneEl){
-    const r = sceneEl.getBoundingClientRect();
-    return { x: r.left + r.width*0.5, y: r.top + r.height*0.55 };
-  }
+    <details class="day">
+      <summary><div><div class="date">6–10 Ağustos · Uluwatu</div><h3 class="serif">Beach, Sunset & Temple Days</h3></div><span class="mood">Final modu</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Plaj</div><div><strong>Padang Padang / Bingin / Melasti</strong><p>Her güne tek plaj veya tek beach club yeter.</p></div></div>
+          <div class="slot"><div class="time">Sunset</div><div><strong>Single Fin / Cliff bar</strong><p>Uluwatu’nun en iyi hissi gün batımında.</p></div></div>
+          <div class="slot"><div class="time">Kültür</div><div><strong>Uluwatu Temple & Kecak Dance</strong><p>Maymunlara dikkat; gözlük ve telefonu koruyun.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-  function pileCenterOnScreen(){
-    const r = el.pile.getBoundingClientRect();
-    return { x: r.left + r.width*0.5, y: r.top + r.height*0.5 };
-  }
+    <details class="day">
+      <summary><div><div class="date">11 Ağustos · Uluwatu</div><h3 class="serif">Final Dinner</h3></div><span class="mood">Romantik kapanış</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">Sabah</div><div><strong>Packing + kahvaltı</strong><p>Ertesi sabah uçuş var, valizi erkenden toparlayın.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Son plaj / spa</strong><p>Yormayan aktivite.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Okyanus manzaralı final dinner</strong><p>Tatilin kapanış sahnesi. Erken uyku.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-  function addMiniDieToPile(value){
-    const mini = document.createElement('div');
-    mini.className = 'miniDie';
-    // scatter inside pile
-    const pr = el.pile.getBoundingClientRect();
-    const x = 8 + Math.random() * (pr.width - 32);
-    const y = 8 + Math.random() * (pr.height - 32);
-    mini.style.left = `${x}px`;
-    mini.style.top  = `${y}px`;
-    mini.style.transform = `rotate(${Math.random()*50 - 25}deg)`;
+    <details class="day">
+      <summary><div><div class="date">12–13 Ağustos · Kuala Lumpur dönüş</div><h3 class="serif">Soft Return</h3></div><span class="mood">Rahat kapanış</span></summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot"><div class="time">12 Ağu</div><div><strong>Bali → Kuala Lumpur</strong><p>07:00 kalkış, 10:05 Kuala Lumpur varış. Dinlenme ve son şehir akşamı.</p></div></div>
+          <div class="slot"><div class="time">13 Ağu</div><div><strong>Son alışveriş</strong><p>Suria KLCC / Pavilion. Havalimanına rahat geçin.</p></div></div>
+          <div class="slot"><div class="time">19:15</div><div><strong>İstanbul uçuşu</strong><p>14 Ağustos 06:55 İstanbul varış.</p></div></div>
+        </div>
+      </div>
+    </details>
 
-    // simplest: show a center pip for 1 (since only 1 goes to pile)
-    const pip = document.createElement('div');
-    pip.className = 'miniPip c';
-    mini.appendChild(pip);
+  </div>
+</section>
 
-    el.pile.appendChild(mini);
-  }
+<section id="photos">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Traveler Style Photos</div>
+      <h2 class="serif">Gezgin fotoğrafı hissinde örnekler</h2>
+    </div>
+    <p class="lead">Instagram’dan izinsiz hotlink yerine güvenli, açık kaynak / ücretsiz lisanslı gezgin-fotoğrafçı görselleri.</p>
+  </div>
 
-  function flyDieToTarget(value, fromSceneEl, toPoint, delayMs, onDone){
-    // Create a floating die in body coordinates
-    const die = document.createElement('div');
-    die.className = 'die';
-    die.style.position = 'fixed';
-    die.style.zIndex = 9999;
-    die.style.pointerEvents = 'none';
-    die.style.opacity = 1;
+  <div class="gallery">
+    <div class="gal">
+      <img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Batu%20Caves%20stairs%202022-05.jpg?width=900" alt="Batu Caves">
+      <span>Batu Caves · gerçek lokasyon fotoğrafı</span>
+    </div>
+    <div class="gal">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=900&q=90" alt="Tegallalang Rice Terrace">
+      <span>Tegallalang · Ubud sabahı</span>
+    </div>
+    <div class="gal">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=900&q=90" alt="Bali coast">
+      <span>Bali coast · ada hissi</span>
+    </div>
+    <div class="gal">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=900&q=90" alt="Kuala Lumpur skyline">
+      <span>Kuala Lumpur · skyline</span>
+    </div>
+  </div>
+</section>
 
-    diePips(value).forEach(pos=>{
-      const p=document.createElement('div');
-      p.className = `pip ${pos}`;
-      die.appendChild(p);
-    });
+<section id="food">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Local Food Guide</div>
+      <h2 class="serif">Yemeniz gerekenler</h2>
+    </div>
+    <p class="lead">Malezya sokak lezzetleri, Bali warung kültürü ve tropikal kahvaltılar.</p>
+  </div>
 
-    const from = sceneDieCenterOnScreen(fromSceneEl);
-    const fx = from.x - 23; // half die
-    const fy = from.y - 23;
-    die.style.left = `${fx}px`;
-    die.style.top  = `${fy}px`;
+  <div class="foodgrid">
+    <div class="food">
+      <img loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Nasi%20Lemak%2C%20Mamak%2C%20Sydney.jpg?width=800" alt="Nasi Lemak">
+      <div class="body"><span class="tag">Malezya</span><h3 class="serif">Nasi Lemak</h3><p>Hindistan cevizi sütlü pirinç, sambal, yumurta, fıstık.</p></div>
+    </div>
 
-    const fr = (Math.random()*40 - 20) + "deg";
-    const tr = (Math.random()*60 - 30) + "deg";
+    <div class="food">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=90" alt="Satay">
+      <div class="body"><span class="tag">Malezya</span><h3 class="serif">Satay</h3><p>Izgara şişler ve fıstık sosu. Jalan Alor’da deneyin.</p></div>
+    </div>
 
-    // Movement vector in fixed-position transform
-    const tx = (toPoint.x - 23) - fx;
-    const ty = (toPoint.y - 23) - fy;
+    <div class="food">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1548943487-a2e4e43b4853?auto=format&fit=crop&w=800&q=90" alt="Nasi Goreng">
+      <div class="body"><span class="tag">Bali</span><h3 class="serif">Nasi Goreng</h3><p>Endonezya usulü kızarmış pilav. Warung’da daha iyi.</p></div>
+    </div>
 
-    die.style.setProperty("--fx", "0px");
-    die.style.setProperty("--fy", "0px");
-    die.style.setProperty("--fr", fr);
-    die.style.setProperty("--tx", tx + "px");
-    die.style.setProperty("--ty", ty + "px");
-    die.style.setProperty("--tr", tr);
+    <div class="food">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=90" alt="Bali Bowl">
+      <div class="body"><span class="tag">Bali</span><h3 class="serif">Bali Bowl</h3><p>Dragon fruit, mango, coconut, granola ve iyi kahve.</p></div>
+    </div>
+  </div>
+</section>
 
-    die.style.animation = `fly 520ms ease forwards, fadeOut 260ms ease forwards`;
-    die.style.animationDelay = `${delayMs}ms, ${delayMs + 520}ms`;
+<section id="reviews" class="dark">
+  <div class="dark-inner">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Traveler Notes</div>
+        <h2 class="serif">Gerçek tatilci yorumlarından özetler</h2>
+      </div>
+    </div>
 
-    document.body.appendChild(die);
+    <div class="reviewgrid">
+      <div class="review"><div class="quote">“</div><h3 class="serif">Batu Caves</h3><p>Sabah erken gidin; sıcak ve kalabalık daha yönetilebilir.</p></div>
+      <div class="review"><div class="quote">“</div><h3 class="serif">Jalan Alor</h3><p>Kalabalık ama atmosfer ve sokak lezzeti güçlü.</p></div>
+      <div class="review"><div class="quote">“</div><h3 class="serif">Uluwatu Temple</h3><p>Sunset harika; maymunlara karşı eşyaları koruyun.</p></div>
+      <div class="review"><div class="quote">“</div><h3 class="serif">Kelingking</h3><p>Manzara olağanüstü; iniş yorucu ve riskli olabilir.</p></div>
+    </div>
+  </div>
+</section>
 
-    setTimeout(() => {
-      die.remove();
-      onDone?.();
-    }, delayMs + 520 + 280);
-  }
+<section id="checklist">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Travel Ops</div>
+      <h2 class="serif">Kişisel checklist</h2>
+    </div>
+  </div>
 
-  function checkWin(){
-    if(state.p[1].dice === 0) return 1;
-    if(state.p[2].dice === 0) return 2;
-    return 0;
-  }
+  <div class="checklist">
+    <label class="todo"><input type="checkbox"> Pasaport geçerliliği kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Malezya MDAC kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Bali vize / levy kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Seyahat sigortası yapıldı</label>
+    <label class="todo"><input type="checkbox"> eSIM / roaming planlandı</label>
+    <label class="todo"><input type="checkbox"> Uluwatu final dinner rezervasyonu</label>
+    <label class="todo"><input type="checkbox"> Beach club daybed rezervasyonu</label>
+    <label class="todo"><input type="checkbox"> Spa rezervasyonu</label>
+    <label class="todo"><input type="checkbox"> Bali transferleri ayarlandı</label>
+    <label class="todo"><input type="checkbox"> Güneş kremi / sinek kovucu</label>
+    <label class="todo"><input type="checkbox"> Powerbank / adaptör</label>
+    <label class="todo"><input type="checkbox"> Şık akşam kombinleri</label>
+  </div>
+</section>
 
-  async function playTurn(player){
-    if(state.over || state.busy) return;
-    if(state.turn !== player) return;
-    if(state.p[player].dice <= 0){
-      endGame(player);
-      return;
-    }
+<footer>
+  <h3 class="serif">Kuala Lumpur & Bali Travel OS</h3>
+  <p>20 Temmuz – 14 Ağustos 2026 · kişisel takip + luxury guide</p>
+</footer>
 
-    const opponent = player === 1 ? 2 : 1;
-    const rollN = state.p[player].dice; // elindeki kadar atar (max 5 zaten)
-    const panelEl = player === 1 ? el.panel1 : el.panel2;
-    const sceneEl = player === 1 ? el.scene1 : el.scene2;
-    const spillEl = player === 1 ? el.spill1 : el.spill2;
-    const resEl   = player === 1 ? el.results1 : el.results2;
-
-    state.busy = true;
-    clearTurnVisuals();
-    render();
-
-    await animatePanel(panelEl);
-
-    let ones=0, sixes=0;
-    const rolls = [];
-    const movedOnes = [];
-    const movedSixes = [];
-
-    // Roll and apply ONLY 1 & 6 movement
-    for(let i=0;i<rollN;i++){
-      const v = rand1to6();
-      rolls.push(v);
-
-      if(v === 1){
-        ones++;
-        state.p[player].dice -= 1;
-        state.middle += 1;
-        movedOnes.push(v);
-      } else if(v === 6){
-        sixes++;
-        state.p[player].dice -= 1;
-        state.p[opponent].dice += 1;
-        movedSixes.push(v);
-      } else {
-        // 2-5 -> stays, no change
-      }
-    }
-
-    // Visual spill + results
-    rolls.forEach((v,i)=>{
-      const die = makeSceneDie(v, 40 + i*70, i);
-      spillEl.appendChild(die);
-      addResultDie(resEl, v, 80 + i*70);
-    });
-
-    render();
-
-    // Fly animations: 1 -> pile, 6 -> opponent scene
-    const pilePoint = pileCenterOnScreen();
-    const oppScene = opponent === 1 ? el.scene1 : el.scene2;
-    const oppPoint = sceneDieCenterOnScreen(oppScene);
-
-    // For each 1: fly to pile, then add mini die
-    movedOnes.forEach((v, idx) => {
-      flyDieToTarget(1, sceneEl, pilePoint, 180 + idx*90, () => addMiniDieToPile(1));
-    });
-
-    // For each 6: fly to opponent scene (just visual)
-    movedSixes.forEach((v, idx) => {
-      flyDieToTarget(6, sceneEl, oppPoint, 210 + idx*90);
-    });
-
-    const total = checkTotalInvariant();
-    logLine(
-      `Oyuncu ${player} ${rollN} zar attı: [${rolls.join(", ")}] | 1→orta: ${ones}, 6→rakip: ${sixes} | Toplam: ${total}`
-    );
-
-    const winner = checkWin();
-    if(winner){
-      // küçük bir bekleme, uçuşlar bitsin
-      setTimeout(() => endGame(winner), 400);
-      state.busy = false;
-      return;
-    }
-
-    state.turn = opponent;
-    state.busy = false;
-    render();
-  }
-
-  function reset(){
-    state.p[1].dice = 5;
-    state.p[2].dice = 5;
-    state.middle = 0;
-    state.turn = 1;
-    state.busy = false;
-    state.over = false;
-
-    el.winnerBox.style.display = "none";
-    el.log.innerHTML = "";
-    el.pile.innerHTML = "";
-    clearTurnVisuals();
-    render();
-    logLine("Yeni oyun başladı: Toplam 10 zar (5-5). Oyuncu 1 başlar.");
-  }
-
-  // Events
-  el.scene1.addEventListener('click', () => playTurn(1));
-  el.scene2.addEventListener('click', () => playTurn(2));
-  el.scene1.addEventListener('keydown', (e)=>{ if(e.key==="Enter" || e.key===" ") playTurn(1); });
-  el.scene2.addEventListener('keydown', (e)=>{ if(e.key==="Enter" || e.key===" ") playTurn(2); });
-
-  el.resetBtn.addEventListener('click', reset);
-  el.clearLogBtn.addEventListener('click', ()=> el.log.innerHTML="");
-
-  reset();
-})();
-</script>
 </body>
 </html>
