@@ -669,8 +669,10 @@ footer p{color:var(--muted); margin-top: 10px;}
   </div>
 
   <div class="accommodation-grid">
+    <!-- KUALA LUMPUR -->
     <div class="acc-card">
       <div class="acc-img">
+        <!-- Sunucu Bağımsız, Her Yerde Sorunsuz Açılan Güvenli CDN Görseli -->
         <img loading="lazy" src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=500&q=80" alt="Kuala Lumpur Premium Suite">
         <span class="acc-badge">Kuala Lumpur</span>
       </div>
@@ -684,8 +686,10 @@ footer p{color:var(--muted); margin-top: 10px;}
       </div>
     </div>
 
+    <!-- BALI UBUD -->
     <div class="acc-card">
       <div class="acc-img">
+        <!-- Sunucu Bağımsız, Her Yerde Sorunsuz Açılan Güvenli CDN Görseli -->
         <img loading="lazy" src="https://images.unsplash.com/photo-1546548970-71785318a17b?auto=format&fit=crop&w=500&q=80" alt="Ubud Ricefield Luxury Villa">
         <span class="acc-badge">Bali · Ubud</span>
       </div>
@@ -699,8 +703,10 @@ footer p{color:var(--muted); margin-top: 10px;}
       </div>
     </div>
 
+    <!-- BALI SEMINYAK -->
     <div class="acc-card">
       <div class="acc-img">
+        <!-- Sunucu Bağımsız, Her Yerde Sorunsuz Açılan Güvenli CDN Görseli -->
         <img loading="lazy" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=500&q=80" alt="Seminyak Pool Villa Oasis">
         <span class="acc-badge">Bali · Seminyak</span>
       </div>
@@ -852,17 +858,15 @@ footer p{color:var(--muted); margin-top: 10px;}
 <script>
 const SECRET_PASS = "bali2026"; 
 
-// Ücretsiz ve şifresiz, dünya genelinde ortak veri tutabilen Key-Value sunucusu (KVDB)
-// Sizin bu projenize özel benzersiz bir bulut kanalı (bucket) oluşturdum.
+// GitHub Pages sınırlarını aşan Key-Value bulut deposu
 const API_URL = "https://kvdb.io/MN87XgUasw4rA1XfG8qC1B/kl_travel_plans";
 
-// Sayfa yüklendiğinde gerçek bulut sunucusundan verileri çek
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('statusText').innerText = "Bulut sunucusundan güncel planlar yükleniyor...";
   
   fetch(API_URL)
     .then(response => {
-      if(!response.ok) throw new Error("Henüz sunucuda kayıt yok veya sunucu meşgul.");
+      if(!response.ok) throw new Error("Henüz sunucuda kayıt yok.");
       return response.json();
     })
     .then(plans => {
@@ -874,7 +878,7 @@ window.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => {
       console.log(err.message);
-      document.getElementById('statusText').innerText = "Varsayılan yerel planlar yüklendi. Düzenleme yapıp sunucuya gönderebilirsiniz.";
+      document.getElementById('statusText').innerText = "Varsayılan planlar yüklendi. Düzenleme yapıp buluta gönderebilirsiniz.";
     });
 });
 
@@ -896,7 +900,7 @@ function toggleEditMode() {
 }
 
 function savePlansToServer() {
-  document.getElementById('statusText').innerText = "Değişiklikler bulut sunucusuna şifrelenip gönderiliyor...";
+  document.getElementById('statusText').innerText = "Değişiklikler bulut sunucusuna gönderiliyor...";
   
   const editableElements = document.querySelectorAll('.editable-box');
   const plansData = {};
@@ -907,7 +911,6 @@ function savePlansToServer() {
     el.setAttribute('contenteditable', 'false');
   });
 
-  // Fetch API kullanarak veriyi doğrudan uzak bulut sunucusuna (POST) gönderiyoruz
   fetch(API_URL, {
     method: 'POST',
     headers: {
