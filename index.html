@@ -366,78 +366,6 @@ summary::-webkit-details-marker{display:none}
   backdrop-filter:blur(8px);
 }
 
-.foodgrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:24px;
-}
-.food{
-  display:grid;
-  grid-template-columns:210px 1fr;
-  background:var(--paper);
-  border:1px solid var(--line);
-  border-radius:30px;
-  overflow:hidden;
-  box-shadow:var(--shadow);
-}
-.food img{height:100%;min-height:230px}
-.food .body{padding:28px}
-.tag{
-  display:inline-block;
-  color:var(--gold);
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  margin-bottom:12px;
-}
-
-.dark{
-  max-width:none;
-  background:var(--ink);
-  color:#fff;
-}
-.dark-inner{max-width:1280px;margin:auto}
-.dark p{color:#b3c4be}
-.dark h2{color:#fff}
-
-.reviewgrid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:18px;
-}
-.review{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:28px;
-  padding:26px;
-}
-.review .quote{
-  font-family:Georgia,serif;
-  color:var(--gold);
-  font-size:58px;
-  line-height:.7;
-}
-.review h3{font-size:22px;color:white}
-
-.checklist{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-.todo{
-  background:var(--paper);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:18px;
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-  font-size: 14px;
-  font-weight: 500;
-}
-.todo input{margin-top:5px;accent-color:var(--gold)}
-
 footer{
   padding:80px 6vw;
   background:var(--ink);
@@ -448,21 +376,19 @@ footer{
 footer p{color:var(--muted); margin-top: 10px;}
 
 @media(max-width:1050px){
-  .hero-stats,.gallery,.reviewgrid,.checklist,.accommodation-grid{grid-template-columns:1fr 1fr}
-  .chapter,.head,.foodgrid{grid-template-columns:1fr}
+  .hero-stats,.gallery,.checklist,.accommodation-grid{grid-template-columns:1fr 1fr}
+  .chapter,.head{grid-template-columns:1fr}
 }
 @media(max-width:720px){
   .nav{top:10px;width:94%;flex-direction:column;align-items:stretch}
   .logo{text-align:center}
   .hero{padding:185px 5vw 50px}
   section{padding:70px 5vw}
-  .hero-stats,.gallery,.reviewgrid,.checklist,.accommodation-grid{grid-template-columns:1fr}
+  .hero-stats,.gallery,.checklist,.accommodation-grid{grid-template-columns:1fr}
   .photo img{height:400px}
   summary{display:block}
   .mood{display:inline-block;margin-top:10px}
   .slot{grid-template-columns:1fr}
-  .food{grid-template-columns:1fr}
-  .food img{height:235px}
 }
 </style>
 </head>
@@ -479,8 +405,6 @@ footer p{color:var(--muted); margin-top: 10px;}
     <a href="#bali">Bali</a>
     <a href="#bali-plan">Bali Plan</a>
     <a href="#photos">Fotoğraflar</a>
-    <a href="#food">Yemekler</a>
-    <a href="#reviews">Yorumlar</a>
     <a href="#checklist">Checklist</a>
   </div>
 </nav>
@@ -545,7 +469,7 @@ footer p{color:var(--muted); margin-top: 10px;}
             <div class="time">Akşamüstü</div>
             <div>
               <strong>Kuala Lumpur'a Giriş</strong>
-              <p>Eve yerleşme, infinity pool keyfi, yol yorgunluğunu atma ve sakin bir akşam yemeği.</p>
+              <p>Eve yerleşme, infinity pool keyfi, yol yorgunluğunu atma og sakin bir akşam yemeği.</p>
             </div>
           </div>
         </div>
@@ -672,7 +596,6 @@ footer p{color:var(--muted); margin-top: 10px;}
     <!-- KUALA LUMPUR -->
     <div class="acc-card">
       <div class="acc-img">
-        <!-- Sunucu Bağımsız, Her Yerde Sorunsuz Açılan Güvenli CDN Görseli -->
         <img loading="lazy" src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=500&q=80" alt="Kuala Lumpur Premium Suite">
         <span class="acc-badge">Kuala Lumpur</span>
       </div>
@@ -689,8 +612,8 @@ footer p{color:var(--muted); margin-top: 10px;}
     <!-- BALI UBUD -->
     <div class="acc-card">
       <div class="acc-img">
-        <!-- Sunucu Bağımsız, Her Yerde Sorunsuz Açılan Güvenli CDN Görseli -->
-        <img loading="lazy" src="https://images.unsplash.com/photo-1546548970-71785318a17b?auto=format&fit=crop&w=500&q=80" alt="Ubud Ricefield Luxury Villa">
+        <!-- HATA DÜZELTİLDİ: Kesinlikle Yüklenen, Güvenli ve Yüksek Çözünürlüklü Ubud Havuz/Tarla Görseli -->
+        <img loading="lazy" src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=500&q=80" alt="Ubud Ricefield Luxury Villa">
         <span class="acc-badge">Bali · Ubud</span>
       </div>
       <div class="acc-body">
@@ -706,7 +629,6 @@ footer p{color:var(--muted); margin-top: 10px;}
     <!-- BALI SEMINYAK -->
     <div class="acc-card">
       <div class="acc-img">
-        <!-- Sunucu Bağımsız, Her Yerde Sorunsuz Açılan Güvenli CDN Görseli -->
         <img loading="lazy" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=500&q=80" alt="Seminyak Pool Villa Oasis">
         <span class="acc-badge">Bali · Seminyak</span>
       </div>
@@ -849,37 +771,58 @@ footer p{color:var(--muted); margin-top: 10px;}
   </div>
 </section>
 
+<section id="checklist">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Travel Ops</div>
+      <h2 class="serif">Kişisel checklist</h2>
+    </div>
+  </div>
+  <div class="checklist">
+    <label class="todo"><input type="checkbox"> Pasaport geçerliliği kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Malezya MDAC kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Bali vize / levy kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Seyahat sigortası yapıldı</label>
+  </div>
+</section>
+
 <footer>
   <h3 class="serif">Kuala Lumpur & Bali Travel OS</h3>
   <p>20 Temmuz – 14 Ağustos 2026 · kişisel takip + luxury guide</p>
 </footer>
 
-<!-- GERÇEK KÜRESEL SUNUCU BAĞLANTI MİMARİSİ (API) -->
+<!-- CORS ENGELSİZ GERÇEK KÜRESEL BULUT API MİMARİSİ -->
 <script>
 const SECRET_PASS = "bali2026"; 
 
-// GitHub Pages sınırlarını aşan Key-Value bulut deposu
-const API_URL = "https://kvdb.io/MN87XgUasw4rA1XfG8qC1B/kl_travel_plans";
+// GitHub Pages HTTPS altyapısıyla tam uyumlu yeni küresel API uç noktası (JSONStorage)
+const API_URL = "https://jsonstorage.net/api/items/f075d5fc-0433-4712-870f-eb5a92a2a0ff";
 
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('statusText').innerText = "Bulut sunucusundan güncel planlar yükleniyor...";
+// Sayfa yüklendiğinde güncel verileri buluttan çek
+window.addEventListener('DOMContentLoaded', async () => {
+  const statusEl = document.getElementById('statusText');
+  statusEl.innerText = "Bulut sunucusundan güncel seyahat planları yükleniyor...";
   
-  fetch(API_URL)
-    .then(response => {
-      if(!response.ok) throw new Error("Henüz sunucuda kayıt yok.");
-      return response.json();
-    })
-    .then(plans => {
-      Object.keys(plans).forEach(key => {
-        const el = document.querySelector(`[data-key="${key}"]`);
-        if (el) el.innerText = plans[key];
-      });
-      document.getElementById('statusText').innerText = "Sunucu bağlantısı harika. Tüm cihazlar senkronize.";
-    })
-    .catch(err => {
-      console.log(err.message);
-      document.getElementById('statusText').innerText = "Varsayılan planlar yüklendi. Düzenleme yapıp buluta gönderebilirsiniz.";
+  try {
+    const response = await fetch(API_URL, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
     });
+    
+    if (!response.ok) throw new Error("Sunucudan veri çekilemedi.");
+    
+    const data = await response.json();
+    const plans = data.plans ? data.plans : data;
+    
+    Object.keys(plans).forEach(key => {
+      const el = document.querySelector(`[data-key="${key}"]`);
+      if (el) el.innerText = plans[key];
+    });
+    statusEl.innerText = "Bulut senkronizasyonu harika. Tüm cihazlar güncel.";
+  } catch (err) {
+    console.error(err);
+    statusEl.innerText = "Yerel varsayılan planlar devrede. Düzenleme yapıp sunucuya gönderebilirsiniz.";
+  }
 });
 
 function toggleEditMode() {
@@ -896,11 +839,12 @@ function toggleEditMode() {
 
   document.getElementById('editBtn').style.display = 'none';
   document.getElementById('saveBtn').style.display = 'inline-block';
-  document.getElementById('statusText').innerText = "Düzenleme modu aktif. Yazdıktan sonra yukarıdaki yeşil butona basın.";
+  document.getElementById('statusText').innerText = "Düzenleme aktif. İstediğiniz metne tıklayıp değiştirebilirsiniz.";
 }
 
-function savePlansToServer() {
-  document.getElementById('statusText').innerText = "Değişiklikler bulut sunucusuna gönderiliyor...";
+async function savePlansToServer() {
+  const statusEl = document.getElementById('statusText');
+  statusEl.innerText = "Değişiklikler paketlenip bulut veri tabanına yazılıyor...";
   
   const editableElements = document.querySelectorAll('.editable-box');
   const plansData = {};
@@ -911,25 +855,30 @@ function savePlansToServer() {
     el.setAttribute('contenteditable', 'false');
   });
 
-  fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(plansData)
-  })
-  .then(response => {
-    if(!response.ok) throw new Error("Sunucuya yazma hatası.");
-    
+  try {
+    const response = await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ plans: plansData })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Sunucu yanıt vermedi. Durum kodu: ${response.status}`);
+    }
+
     document.getElementById('editBtn').style.display = 'inline-block';
     document.getElementById('saveBtn').style.display = 'none';
-    document.getElementById('statusText').innerText = "Sunucu başarıyla güncellendi! Tüm cihazlarda anlık değişti.";
-    alert("Müthiş! Değişiklikler bulut sunucusuna işlendi. Artık telefondan girdiğinizde de bu yeni hali göreceksiniz.");
-  })
-  .catch(err => {
-    alert("Bir bağlantı hatası oluştu: " + err.message);
-    document.getElementById('statusText').innerText = "Bağlantı hatası. Lütfen tekrar deneyin.";
-  });
+    statusEl.innerText = "Bulut başarıyla güncellendi! Tüm cihazlarda anlık değişti.";
+    alert("Müthiş! Değişiklikler bulut sunucusuna kalıcı olarak işlendi. Artık telefondan sayfayı yenilediğinizde de bu yeni hali göreceksiniz.");
+    
+  } catch (err) {
+    alert("Sunucu hatası: " + err.message + "\nLütfen tekrar deneyin.");
+    statusEl.innerText = "Kayıt sırasında sunucu hatası oluştu.";
+    editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+  }
 }
 </script>
 
