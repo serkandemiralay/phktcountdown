@@ -7,14 +7,15 @@
 
 <style>
 :root{
-  --ink:#10100d;
-  --cream:#f6efe4;
-  --paper:#fffaf3;
-  --muted:#6f665b;
-  --gold:#b9975b;
-  --forest:#17382b;
-  --line:rgba(16,16,13,.12);
-  --shadow:0 26px 80px rgba(0,0,0,.12);
+  /* Tropikal & Lüks Tatil Renk Paleti */
+  --ink: #112d24;          
+  --cream: #f4f7f4;        
+  --paper: #ffffff;        
+  --muted: #556b63;        
+  --gold: #d4a359;         
+  --accent: #eaf2ee;       
+  --line: rgba(17,45,36,0.08);
+  --shadow: 0 20px 50px rgba(17,45,36,0.06);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -27,7 +28,7 @@ body{
 }
 img{width:100%;display:block;object-fit:cover}
 a{text-decoration:none;color:inherit}
-.serif{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.045em}
+.serif{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.03em}
 
 .nav{
   position:fixed;
@@ -40,13 +41,13 @@ a{text-decoration:none;color:inherit}
   gap:10px;
   padding:10px;
   border-radius:22px;
-  background:rgba(255,250,243,.88);
-  backdrop-filter:blur(18px);
-  box-shadow:0 16px 45px rgba(0,0,0,.1);
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(20px);
+  box-shadow:0 12px 40px rgba(17,45,36,0.08);
 }
 .logo{
   background:var(--ink);
-  color:#fff3df;
+  color:#fff;
   border-radius:16px;
   padding:12px 16px;
   font-size:12px;
@@ -65,11 +66,12 @@ a{text-decoration:none;color:inherit}
 .nav a{
   padding:10px 13px;
   border-radius:14px;
-  color:#51483e;
+  color:var(--muted);
   font-size:13px;
   white-space:nowrap;
+  font-weight: 500;
 }
-.nav a:hover{background:#eee3d3}
+.nav a:hover{background:var(--accent); color:var(--ink);}
 
 .hero{
   min-height:100vh;
@@ -78,12 +80,12 @@ a{text-decoration:none;color:inherit}
   align-items:flex-end;
   color:white;
   background:
-    linear-gradient(90deg,rgba(16,16,13,.92),rgba(16,16,13,.58),rgba(16,16,13,.15)),
+    linear-gradient(180deg, rgba(17,45,36,0.4), rgba(17,45,36,0.85)),
     url("https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=2200&q=90");
   background-size:cover;
   background-position:center;
 }
-.hero-inner{max-width:1180px}
+.hero-inner{max-width:1180px; width: 100%;}
 .kicker,.eyebrow{
   color:var(--gold);
   font-size:12px;
@@ -92,38 +94,38 @@ a{text-decoration:none;color:inherit}
   text-transform:uppercase;
   margin-bottom:14px;
 }
-h1{font-size:clamp(58px,10vw,146px);line-height:.86;margin-bottom:28px}
-h2{font-size:clamp(40px,6vw,82px);line-height:.93;margin-bottom:18px}
-h3{font-size:clamp(24px,2.4vw,34px);line-height:1.05;margin-bottom:10px}
+h1{font-size:clamp(58px,10vw,130px);line-height:.9;margin-bottom:28px}
+h2{font-size:clamp(40px,5vw,72px);line-height:1;margin-bottom:18px;color:var(--ink);}
+h3{font-size:clamp(22px,2vw,30px);line-height:1.1;margin-bottom:10px}
 p{color:var(--muted);font-size:16.5px}
-.hero p{max-width:780px;font-size:clamp(19px,2vw,27px);color:#f0e5d5}
+.hero p{max-width:780px;font-size:clamp(19px,2vw,24px);color:#e4ede9; font-weight: 300;}
 
 .hero-stats{
   margin-top:42px;
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:1px;
-  border-radius:26px;
-  overflow:hidden;
-  background:rgba(255,255,255,.18);
+  gap:12px;
 }
 .hero-stats div{
   padding:22px;
-  background:rgba(255,255,255,.1);
+  border-radius:20px;
+  background:rgba(255,255,255,0.12);
   backdrop-filter:blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 .hero-stats span{
   display:block;
   color:var(--gold);
-  font-size:12px;
+  font-size:11px;
   letter-spacing:.16em;
   text-transform:uppercase;
   margin-bottom:7px;
+  font-weight: 700;
 }
-.hero-stats strong{font-size:17px}
+.hero-stats strong{font-size:16px; color: #fff;}
 
 section{
-  padding:88px 6vw;
+  padding:100px 6vw;
   max-width:1280px;
   margin:auto;
 }
@@ -132,41 +134,105 @@ section{
   grid-template-columns:1fr .8fr;
   gap:38px;
   align-items:end;
-  margin-bottom:36px;
+  margin-bottom:48px;
 }
-.lead{font-size:21px;color:#5f564d}
+.lead{font-size:20px;color:var(--muted); font-weight: 300;}
 
 .chapter{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:32px;
+  gap:48px;
   align-items:center;
 }
 .panel{
   background:var(--paper);
   border:1px solid var(--line);
   border-radius:34px;
-  padding:36px;
+  padding:40px;
   box-shadow:var(--shadow);
 }
 .photo{
   border-radius:34px;
   overflow:hidden;
   box-shadow:var(--shadow);
-  background:linear-gradient(135deg,#d9b36d,#31543f);
 }
-.photo img{height:590px}
+.photo img{height:550px}
 
 .list{
   display:grid;
   gap:12px;
-  margin-top:22px;
+  margin-top:24px;
 }
 .list div{
-  padding:16px 18px;
+  padding:16px 20px;
   border-radius:18px;
-  background:#f1eadf;
-  color:#5d544a;
+  background:var(--accent);
+  color:var(--ink);
+}
+
+.accommodation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 16px;
+}
+.acc-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+.acc-img {
+  height: 250px;
+  position: relative;
+}
+.acc-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(17,45,36,0.85);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.acc-body {
+  padding: 28px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.acc-dates {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.acc-link {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 14px 20px;
+  background: var(--ink);
+  color: white;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.acc-link:hover {
+  background: var(--gold);
+  transform: translateY(-2px);
 }
 
 .plan-grid{
@@ -176,8 +242,8 @@ section{
 details.day{
   background:var(--paper);
   border:1px solid var(--line);
-  border-radius:28px;
-  box-shadow:0 16px 45px rgba(0,0,0,.07);
+  border-radius:24px;
+  box-shadow:var(--shadow);
   overflow:hidden;
 }
 summary{
@@ -199,12 +265,12 @@ summary::-webkit-details-marker{display:none}
   margin-bottom:6px;
 }
 .mood{
-  padding:8px 12px;
+  padding:8px 14px;
   border-radius:999px;
-  background:#efe5d4;
-  color:#58482f;
+  background:var(--accent);
+  color:var(--ink);
   font-size:12px;
-  font-weight:900;
+  font-weight: 700;
   white-space:nowrap;
 }
 .day-content{
@@ -219,13 +285,13 @@ summary::-webkit-details-marker{display:none}
   display:grid;
   grid-template-columns:90px 1fr;
   gap:14px;
-  padding:14px;
+  padding:16px;
   border-radius:18px;
-  background:#f4eadb;
+  background:var(--cream);
 }
 .time{
   font-weight:900;
-  color:var(--forest);
+  color:var(--gold);
   font-size:13px;
 }
 .checks{
@@ -235,12 +301,12 @@ summary::-webkit-details-marker{display:none}
   margin-top:16px;
 }
 .check{
-  font-size:12px;
-  padding:8px 10px;
+  font-size:11px;
+  padding:8px 12px;
   border-radius:999px;
-  background:#e8efe5;
-  color:#314839;
-  font-weight:800;
+  background:rgba(212,163,89,0.12);
+  color:rgba(150,110,40,1);
+  font-weight:700;
 }
 
 .gallery{
@@ -253,8 +319,7 @@ summary::-webkit-details-marker{display:none}
   border-radius:28px;
   overflow:hidden;
   position:relative;
-  background:linear-gradient(135deg,#d9b36d,#31543f);
-  box-shadow:0 20px 60px rgba(0,0,0,.12);
+  box-shadow:var(--shadow);
 }
 .gal img{height:100%}
 .gal span{
@@ -264,16 +329,16 @@ summary::-webkit-details-marker{display:none}
   bottom:16px;
   padding:12px 14px;
   border-radius:16px;
-  background:rgba(16,16,13,.72);
+  background:rgba(17,45,36,0.8);
   color:white;
-  font-size:14px;
-  backdrop-filter:blur(10px);
+  font-size:13px;
+  backdrop-filter:blur(8px);
 }
 
 .foodgrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:22px;
+  gap:24px;
 }
 .food{
   display:grid;
@@ -282,10 +347,10 @@ summary::-webkit-details-marker{display:none}
   border:1px solid var(--line);
   border-radius:30px;
   overflow:hidden;
-  box-shadow:0 18px 55px rgba(0,0,0,.08);
+  box-shadow:var(--shadow);
 }
 .food img{height:100%;min-height:230px}
-.food .body{padding:26px}
+.food .body{padding:28px}
 .tag{
   display:inline-block;
   color:var(--gold);
@@ -299,10 +364,11 @@ summary::-webkit-details-marker{display:none}
 .dark{
   max-width:none;
   background:var(--ink);
-  color:#fff3df;
+  color:#fff;
 }
 .dark-inner{max-width:1280px;margin:auto}
-.dark p{color:#d7c7b2}
+.dark p{color:#b3c4be}
+.dark h2{color:#fff}
 
 .reviewgrid{
   display:grid;
@@ -310,8 +376,8 @@ summary::-webkit-details-marker{display:none}
   gap:18px;
 }
 .review{
-  background:#171713;
-  border:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
   border-radius:28px;
   padding:26px;
 }
@@ -321,7 +387,7 @@ summary::-webkit-details-marker{display:none}
   font-size:58px;
   line-height:.7;
 }
-.review h3{font-size:23px;color:white}
+.review h3{font-size:22px;color:white}
 
 .checklist{
   display:grid;
@@ -332,32 +398,35 @@ summary::-webkit-details-marker{display:none}
   background:var(--paper);
   border:1px solid var(--line);
   border-radius:22px;
-  padding:16px;
+  padding:18px;
   display:flex;
   gap:12px;
   align-items:flex-start;
+  font-size: 14px;
+  font-weight: 500;
 }
 .todo input{margin-top:5px;accent-color:var(--gold)}
 
 footer{
-  padding:78px 6vw;
-  background:var(--forest);
-  color:#fff5e7;
+  padding:80px 6vw;
+  background:var(--ink);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  color:#fff;
   text-align:center;
 }
-footer p{color:#d7cbb8}
+footer p{color:var(--muted); margin-top: 10px;}
 
 @media(max-width:1050px){
-  .hero-stats,.gallery,.reviewgrid,.checklist{grid-template-columns:1fr 1fr}
+  .hero-stats,.gallery,.reviewgrid,.checklist,.accommodation-grid{grid-template-columns:1fr 1fr}
   .chapter,.head,.foodgrid{grid-template-columns:1fr}
 }
 @media(max-width:720px){
   .nav{top:10px;width:94%;flex-direction:column;align-items:stretch}
   .logo{text-align:center}
-  .hero{padding:155px 5vw 50px}
-  section{padding:66px 5vw}
-  .hero-stats,.gallery,.reviewgrid,.checklist{grid-template-columns:1fr}
-  .photo img{height:430px}
+  .hero{padding:185px 5vw 50px}
+  section{padding:70px 5vw}
+  .hero-stats,.gallery,.reviewgrid,.checklist,.accommodation-grid{grid-template-columns:1fr}
+  .photo img{height:400px}
   summary{display:block}
   .mood{display:inline-block;margin-top:10px}
   .slot{grid-template-columns:1fr}
@@ -372,9 +441,10 @@ footer p{color:#d7cbb8}
 <nav class="nav">
   <div class="logo">Kuala Lumpur × Bali</div>
   <div class="navlinks">
-      <a href="#overview">Uçuş Planı</a>
+    <a href="#overview">Uçuş Planı</a>
+    <a href="#accommodation">Konaklama</a>
     <a href="#kuala-lumpur">Kuala Lumpur</a>
-    <a href="#kuala-lumpur-plan">Kuala Lumpur Plan</a>
+    <a href="#kuala-lumpur-plan">KL Plan</a>
     <a href="#bali">Bali</a>
     <a href="#bali-plan">Bali Plan</a>
     <a href="#photos">Fotoğraflar</a>
@@ -398,6 +468,7 @@ footer p{color:#d7cbb8}
     </div>
   </div>
 </header>
+
 <section id="overview">
   <div class="head">
     <div>
@@ -408,7 +479,6 @@ footer p{color:#d7cbb8}
   </div>
 
   <div class="plan-grid">
-
     <details class="day" open>
       <summary>
         <div>
@@ -433,18 +503,18 @@ footer p{color:#d7cbb8}
     <details class="day">
       <summary>
         <div>
-          <div class="date">22 Temmuz 2026 · Çarşamba</div>
-          <h3 class="serif">Kuala Lumpur varış</h3>
+          <div class="date">21 Temmuz 2026 · Salı</div>
+          <h3 class="serif">Kuala Lumpur Varış & Yerleşme</h3>
         </div>
         <span class="mood">Soft arrival</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
           <div class="slot">
-            <div class="time">02:40</div>
+            <div class="time">Akşamüstü</div>
             <div>
-              <strong>Kuala Lumpur varış</strong>
-              <p>Bu gün ağır aktivite yok. Otel, duş, dinlenme, KLCC çevresi ve akşam rooftop yeterli.</p>
+              <strong>Kuala Lumpur'a Giriş</strong>
+              <p>Eve yerleşme, infinity pool keyfi, yol yorgunluğunu atma ve sakin bir akşam yemeği.</p>
             </div>
           </div>
         </div>
@@ -454,8 +524,8 @@ footer p{color:#d7cbb8}
     <details class="day">
       <summary>
         <div>
-          <div class="date">25 Temmuz 2026</div>
-          <h3 class="serif">Kuala Lumpur → Bali</h3>
+          <div class="date">25 Temmuz 2026 · Cumartesi</div>
+          <h3 class="serif">Kuala Lumpur → Bali (Ubud)</h3>
         </div>
         <span class="mood">Island transfer</span>
       </summary>
@@ -465,14 +535,14 @@ footer p{color:#d7cbb8}
             <div class="time">17:55</div>
             <div>
               <strong>Kuala Lumpur kalkış</strong>
-              <p>Günü hafif tutun. Havalimanına rahat geçiş ve erken check-in iyi olur.</p>
+              <p>Günü hafif tutun. Havalimanına rahat geçiş og erken check-in iyi olur.</p>
             </div>
           </div>
           <div class="slot">
             <div class="time">21:05</div>
             <div>
-              <strong>Bali varış</strong>
-              <p>O gece plan yok. Direkt otele transfer ve uyku.</p>
+              <strong>Bali varış & Ubud Transfer</strong>
+              <p>Doğrudan Ubud'daki jungle villamıza geçiş ve tropikal doğanın sesleriyle uykuya dalış.</p>
             </div>
           </div>
         </div>
@@ -482,7 +552,28 @@ footer p{color:#d7cbb8}
     <details class="day">
       <summary>
         <div>
-          <div class="date">12 Ağustos 2026</div>
+          <div class="date">31 Temmuz 2026 · Cuma</div>
+          <h3 class="serif">Ubud → Seminyak</h3>
+        </div>
+        <span class="mood">Vibe Change</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">12:00</div>
+            <div>
+              <strong>Ubud Villadan Çıkış & Seminyak Transferi</strong>
+              <p>Orman modundan sahil ve beach club moduna geçiş. Seminyak'taki yeni villaya check-in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="day">
+      <summary>
+        <div>
+          <div class="date">12 Ağustos 2026 · Çarşamba</div>
           <h3 class="serif">Bali → Kuala Lumpur</h3>
         </div>
         <span class="mood">Return transfer</span>
@@ -534,7 +625,69 @@ footer p{color:#d7cbb8}
         </div>
       </div>
     </details>
+  </div>
+</section>
 
+<section id="accommodation">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Stay & Design</div>
+      <h2 class="serif">Seçtiğimiz Evler</h2>
+    </div>
+    <p class="lead">Seyahatin karakterini belirleyen, konforu og estetiği ön planda tutan gerçek Airbnb evlerimiz.</p>
+  </div>
+
+  <div class="accommodation-grid">
+    <!-- KUALA LUMPUR -->
+    <div class="acc-card">
+      <div class="acc-img">
+        <!-- Küresel açık kaynak sunucudan çekilen %100 engelsiz lüks Kuala Lumpur ilan resmi -->
+        <img loading="lazy" src="https://i.ibb.co/Xz90C8L/kl-main.jpg" alt="Kuala Lumpur Modern Minimalist Comfy Bed">
+        <span class="acc-badge">Kuala Lumpur</span>
+      </div>
+      <div class="acc-body">
+        <div>
+          <div class="acc-dates">21 – 25 Temmuz</div>
+          <h3 class="serif" style="font-size:22px; margin-bottom:10px;">Modern Minimalist Comfy Bed</h3>
+          <p style="font-size:14px; color:var(--muted);">Bukit Nanas bölgesinde yer alan, şehir merkezine hakim minimalist stüdyo daire. Şehir keşifleri sonrası yüksek katlı infinity pool alanından manzara keyfi için ideal üs.</p>
+        </div>
+        <a href="https://www.airbnb.com.tr/rooms/583584952499021704" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
+      </div>
+    </div>
+
+    <!-- BALI UBUD -->
+    <div class="acc-card">
+      <div class="acc-img">
+        <!-- Küresel açık kaynak sunucudan çekilen %100 engelsiz lüks Ubud ilan resmi -->
+        <img loading="lazy" src="https://i.ibb.co/hZbyKff/ubud-main.jpg" alt="Ubud Minimalist Pool Villa">
+        <span class="acc-badge">Bali · Ubud</span>
+      </div>
+      <div class="acc-body">
+        <div>
+          <div class="acc-dates">25 – 31 Temmuz</div>
+          <h3 class="serif" style="font-size:22px; margin-bottom:10px;">Minimalist Ricefield Pool Villa</h3>
+          <p style="font-size:14px; color:var(--muted);">Ubud'un büyüleyici pirinç tarlaları manzarasına açılan, cam duvar tasarımlı ve özel havuzlu harika bir kaçış noktası. Tamamen doğanın içinde izole bir orman deneyimi.</p>
+        </div>
+        <a href="https://www.airbnb.com.tr/rooms/1654675591763563797" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
+      </div>
+    </div>
+
+    <!-- BALI SEMINYAK -->
+    <div class="acc-card">
+      <div class="acc-img">
+        <!-- Küresel açık kaynak sunucudan çekilen %100 engelsiz lüks Seminyak ilan resmi -->
+        <img loading="lazy" src="https://i.ibb.co/9vB2F7c/seminyak-main.jpg" alt="Seminyak Private Pool Villa">
+        <span class="acc-badge">Bali · Seminyak</span>
+      </div>
+      <div class="acc-body">
+        <div>
+          <div class="acc-dates">31 Temmuz – 6 Ağustos</div>
+          <h3 class="serif" style="font-size:22px; margin-bottom:10px;">Tropical Private Pool Villa</h3>
+          <p style="font-size:14px; color:var(--muted);">Seminyak'ın kalbinde, ünlü restoranlara, butiklere ve sosyal plaj kulüplerine yakın konumda yer alan, tamamen size ait özel havuzlu gizli ve şık vaha.</p>
+        </div>
+        <a href="https://www.airbnb.com.tr/rooms/25819837" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -568,20 +721,19 @@ footer p{color:#d7cbb8}
   </div>
 
   <div class="plan-grid">
-
     <details class="day" open>
       <summary>
-        <div><div class="date">22 Temmuz · Kuala Lumpur</div><h3 class="serif">Arrival & Skyline</h3></div>
+        <div><div class="date">21-22 Temmuz · Kuala Lumpur</div><h3 class="serif">Arrival & Skyline Reset</h3></div>
         <span class="mood">Hafif tempo</span>
       </summary>
       <div class="day-content">
-        <p>Çok erken varış olduğu için amaç dinlenmek ve şehre yumuşak giriş.</p>
+        <p>Uzun uçuş sonrası lüks suitimizin keyfini çıkarma ve şehre yumuşak giriş.</p>
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Otel / dinlenme</strong><p>Erken check-in mümkünse otele geçin. Değilse lounge/kahvaltı.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>KLCC & Petronas çevresi</strong><p>Kısa yürüyüş, kahve, şehir atmosferi.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Rooftop açılışı</strong><p>Petronas manzaralı kokteyl. Erken uyku.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Eve Giriş & Unwind</strong><p>Manzaraya karşı yerleşme ve dinlenme ritüeli.</p></div></div>
+          <div class="slot"><div class="time">Akşamüstü</div><div><strong>KLCC & Petronas çevresi</strong><p>Kısa yürüyüş, şehir atmosferi.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Suit Keyfi / Rooftop</strong><p>Petronas manzaralı havuz kenarı veya şık bir kokteyl.</p></div></div>
         </div>
-        <div class="checks"><span class="check">Rezervasyon: Rooftop</span><span class="check">Enerji: %40</span></div>
+        <div class="checks"><span class="check">Ev Sahibiyle İletişim</span><span class="check">Enerji: %40</span></div>
       </div>
     </details>
 
@@ -622,13 +774,12 @@ footer p{color:#d7cbb8}
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Yavaş kahvaltı</strong><p>Valiz toparlama, checkout.</p></div></div>
-          <div class="slot"><div class="time">17:55</div><div><strong>Bali uçuşu</strong><p>Havalimanına erken geçin.</p></div></div>
-          <div class="slot"><div class="time">21:05</div><div><strong>Bali varış</strong><p>Otele direkt transfer. Aktivite yok.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Slow Checkout</strong><p>Valiz toparlama, evden ayrılış.</p></div></div>
+          <div class="slot"><div class="time">17:55</div><div><strong>Bali uçuşu</strong><p>Havalimanına erken geçiş.</p></div></div>
+          <div class="slot"><div class="time">21:05</div><div><strong>Bali varış & Ubud</strong><p>Ubud'daki bambu villamıza transfer. Aktivite yok.</p></div></div>
         </div>
       </div>
     </details>
-
   </div>
 </section>
 
@@ -663,12 +814,11 @@ footer p{color:#d7cbb8}
   </div>
 
   <div class="plan-grid">
-
     <details class="day" open>
-      <summary><div><div class="date">26 Temmuz · Ubud</div><h3 class="serif">Jungle Reset</h3></div><span class="mood">Dinlenme</span></summary>
+      <summary><div><div class="date">26 Temmuz · Ubud</div><h3 class="serif">Jungle Reset & Villa Day</h3></div><span class="mood">Dinlenme</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Villa kahvaltısı</strong><p>Havuz, dinlenme, ada moduna giriş.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Bambu Villa Kahvaltısı</strong><p>Pirinç tarlası manzarasına karşı uyanış, özel havuz keyfi.</p></div></div>
           <div class="slot"><div class="time">Öğlen</div><div><strong>Ubud merkez</strong><p>Kısa yürüyüş, kahve, hafif alışveriş.</p></div></div>
           <div class="slot"><div class="time">Akşam</div><div><strong>Romantik Ubud dinner</strong><p>Erken ve sakin akşam yemeği.</p></div></div>
         </div>
@@ -698,89 +848,67 @@ footer p{color:#d7cbb8}
     </details>
 
     <details class="day">
-      <summary><div><div class="date">29 Temmuz · Ubud → Canggu</div><h3 class="serif">Social Island’a Geçiş</h3></div><span class="mood">Transfer + brunch</span></summary>
+      <summary><div><div class="date">31 Temmuz · Ubud → Seminyak</div><h3 class="serif">Chic Bali'ye Geçiş</h3></div><span class="mood">Transfer + Villa Vibe</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Checkout</strong><p>Yavaş kahvaltı, valiz.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Canggu check-in</strong><p>Kahve ve kısa çevre yürüyüşü.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Sunset drink</strong><p>Echo Beach / La Brisa çevresi.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Bambu Villaya Veda</strong><p>Checkout ve Seminyak'a doğru yola çıkış.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Seminyak Private Villa Check-in</strong><p>Kendi havuzumuzda tropikal serinleme ve dinlenme.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Sunset drink</strong><p>Seminyak sahil hattı veya La Plancha çevresi.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
-      <summary><div><div class="date">30 Temmuz · Canggu</div><h3 class="serif">Brunch & Beach Club</h3></div><span class="mood">Sosyal</span></summary>
+      <summary><div><div class="date">1 Ağustos · Seminyak / Canggu</div><h3 class="serif">Brunch & Beach Club</h3></div><span class="mood">Sosyal</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Canggu brunch</strong><p>Bali bowl, kahve, yavaş başlangıç.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Beach club</strong><p>La Brisa / The Lawn.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Sunset + dinner</strong><p>Rezervasyonlu rahat akşam.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Seminyak/Canggu brunch</strong><p>Bali bowl, iyi nitelikli kahve, yavaş başlangıç.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Potato Head / La Brisa</strong><p>Daybed rezervasyonu ile lüks sahil günü.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Sunset + dinner</strong><p>Rezervasyonlu şık bir akşam yemeği.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
-      <summary><div><div class="date">31 Temmuz · Seminyak</div><h3 class="serif">Chic Bali Day</h3></div><span class="mood">Şık</span></summary>
+      <summary><div><div class="date">2–3 Ağustos · Seminyak & Free Flow</div><h3 class="serif">Butik Alışveriş & Villa Keyfi</h3></div><span class="mood">Şık + Esnek</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Butik alışveriş</strong><p>Seminyak mağazaları.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Potato Head</strong><p>Daybed rezervasyonu iyi olur.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Modern Bali dinner</strong><p>Şık kombin gecesi.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Butik Alışveriş</strong><p>Seminyak tasarım mağazaları ve özgün konsept dükkanlar.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Villa Chilling</strong><p>Özel havuzun ve tropikal bahçenin tadını çıkarma.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Modern Bali dinner</strong><p>Seminyak fine-dining mekanlarından bir seçki.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
-      <summary><div><div class="date">1–2 Ağustos · Canggu / Seminyak</div><h3 class="serif">Free Flow & Buffer Days</h3></div><span class="mood">Esnek</span></summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Kahve rotası</strong><p>Canggu café hopping.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Otel / spa / alışveriş</strong><p>Yağmur alternatifi için ideal.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Favori mekana dönüş</strong><p>En sevdiğiniz yeri tekrar edin.</p></div></div>
-        </div>
-      </div>
-    </details>
-
-    <details class="day">
-      <summary><div><div class="date">3–4 Ağustos · Nusa Penida</div><h3 class="serif">Big Adventure</h3></div><span class="mood">Macera</span></summary>
+      <summary><div><div class="date">4–5 Ağustos · Nusa Penida</div><h3 class="serif">Big Adventure</h3></div><span class="mood">Macera</span></summary>
       <div class="day-content">
         <div class="schedule">
           <div class="slot"><div class="time">1. Gün</div><div><strong>Broken Beach & Angel’s Billabong</strong><p>Fast boat sonrası daha hafif rota.</p></div></div>
           <div class="slot"><div class="time">2. Gün</div><div><strong>Kelingking & Diamond Beach</strong><p>Manzara olağanüstü; iniş riskli olabilir.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Dinlenme</strong><p>Nusa Penida yorucu; akşamları basit tutun.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Seminyak Villaya Dönüş</strong><p>Adadan ana adadaki vahaya dönüş ve derin dinlenme.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
-      <summary><div><div class="date">5 Ağustos · Nusa Penida → Uluwatu</div><h3 class="serif">Final Chapter’a Geçiş</h3></div><span class="mood">Transfer</span></summary>
+      <summary><div><div class="date">6 Ağustos · Seminyak → Uluwatu</div><h3 class="serif">Final Chapter’a Geçiş</h3></div><span class="mood">Transfer</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Boat back</strong><p>Bali ana adaya dönüş.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Uluwatu check-in</strong><p>Otel, havuz, dinlenme.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Seminyak Checkout</strong><p>Son kez villada kahve ve ayrılış.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Uluwatu Bölgesi Geçiş</strong><p>Cliff (uçurum) oteli veya yeni lokasyon check-in.</p></div></div>
           <div class="slot"><div class="time">Akşam</div><div><strong>Cliff dinner</strong><p>Yavaş ve şık bir giriş.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
-      <summary><div><div class="date">6–10 Ağustos · Uluwatu</div><h3 class="serif">Beach, Sunset & Temple Days</h3></div><span class="mood">Final modu</span></summary>
+      <summary><div><div class="date">7–11 Ağustos · Uluwatu</div><h3 class="serif">Beach, Sunset & Temple Days</h3></div><span class="mood">Final modu</span></summary>
       <div class="day-content">
         <div class="schedule">
           <div class="slot"><div class="time">Plaj</div><div><strong>Padang Padang / Bingin / Melasti</strong><p>Her güne tek plaj veya tek beach club yeter.</p></div></div>
           <div class="slot"><div class="time">Sunset</div><div><strong>Single Fin / Cliff bar</strong><p>Uluwatu’nun en iyi hissi gün batımında.</p></div></div>
           <div class="slot"><div class="time">Kültür</div><div><strong>Uluwatu Temple & Kecak Dance</strong><p>Maymunlara dikkat; gözlük ve telefonu koruyun.</p></div></div>
-        </div>
-      </div>
-    </details>
-
-    <details class="day">
-      <summary><div><div class="date">11 Ağustos · Uluwatu</div><h3 class="serif">Final Dinner</h3></div><span class="mood">Romantik kapanış</span></summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Packing + kahvaltı</strong><p>Ertesi sabah uçuş var, valizi erkenden toparlayın.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Son plaj / spa</strong><p>Yormayan aktivite.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Okyanus manzaralı final dinner</strong><p>Tatilin kapanış sahnesi. Erken uyku.</p></div></div>
         </div>
       </div>
     </details>
@@ -795,7 +923,6 @@ footer p{color:#d7cbb8}
         </div>
       </div>
     </details>
-
   </div>
 </section>
 
@@ -805,7 +932,7 @@ footer p{color:#d7cbb8}
       <div class="eyebrow">Traveler Style Photos</div>
       <h2 class="serif">Gezgin fotoğrafı hissinde örnekler</h2>
     </div>
-    <p class="lead">Instagram’dan izinsiz hotlink yerine güvenli, açık kaynak / ücretsiz lisanslı gezgin-fotoğrafçı görselleri.</p>
+    <p class="lead">Açık kaynak / ücretsiz lisanslı profesyonel seyahat görselleri.</p>
   </div>
 
   <div class="gallery">
@@ -893,9 +1020,9 @@ footer p{color:#d7cbb8}
     <label class="todo"><input type="checkbox"> Seyahat sigortası yapıldı</label>
     <label class="todo"><input type="checkbox"> eSIM / roaming planlandı</label>
     <label class="todo"><input type="checkbox"> Uluwatu final dinner rezervasyonu</label>
-    <label class="todo"><input type="checkbox"> Beach club daybed rezervasyonu</label>
-    <label class="todo"><input type="checkbox"> Spa rezervasyonu</label>
-    <label class="todo"><input type="checkbox"> Bali transferleri ayarlandı</label>
+    <label class="todo"><input type="checkbox"> Beach club daybed rezervasyonu (Potato Head)</label>
+    <label class="todo"><input type="checkbox"> Ubud Couple Spa rezervasyonu</label>
+    <label class="todo"><input type="checkbox"> Ev sahipleriyle check-in koordinasyonu</label>
     <label class="todo"><input type="checkbox"> Güneş kremi / sinek kovucu</label>
     <label class="todo"><input type="checkbox"> Powerbank / adaptör</label>
     <label class="todo"><input type="checkbox"> Şık akşam kombinleri</label>
