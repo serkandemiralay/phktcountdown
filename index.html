@@ -138,66 +138,108 @@ section{
 }
 .lead{font-size:20px;color:var(--muted); font-weight: 300;}
 
+/* YENİ RAFİNE UÇUŞ TİMELİNE TASARIMI */
 .flight-timeline {
+  position: relative;
   display: grid;
-  gap: 16px;
+  gap: 24px;
+  padding-left: 40px;
+}
+.flight-timeline::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  bottom: 15px;
+  left: 15px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--gold) 0%, var(--accent) 100%);
 }
 .flight-card {
+  position: relative;
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 24px;
+  border-radius: 24px;
+  padding: 30px;
   box-shadow: var(--shadow);
   display: grid;
-  grid-template-columns: 220px 1fr auto;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
   align-items: center;
-  gap: 24px;
 }
-.flight-date-info .f-date {
+.flight-icon-dot {
+  position: absolute;
+  left: -37px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background: var(--paper);
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  animation: pulsePlane 3s infinite ease-in-out;
+}
+@keyframes pulsePlane {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.1); background: var(--accent); }
+}
+.flight-main-info .f-date {
   font-size: 12px;
   color: var(--gold);
   font-weight: 800;
-  letter-spacing: .05em;
+  letter-spacing: .08em;
   text-transform: uppercase;
+  margin-bottom: 4px;
 }
-.flight-date-info .f-route {
-  font-size: 18px;
+.flight-main-info .f-route {
+  font-size: 22px;
   font-weight: 700;
   color: var(--ink);
-  margin-top: 2px;
 }
-.flight-details {
+.flight-times-hub {
   display: flex;
-  gap: 32px;
+  align-items: center;
+  gap: 40px;
   border-left: 2px solid var(--accent);
-  padding-left: 32px;
+  padding-left: 40px;
 }
-.flight-time-block {
-  min-width: 70px;
+.time-node {
+  display: flex;
+  flex-direction: column;
 }
-.flight-time-block .f-time {
-  font-size: 18px;
+.time-node .t-clock {
+  font-size: 24px;
   font-weight: 900;
   color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
-.flight-time-block .f-label {
-  font-size: 11px;
+.time-node .t-airport {
+  font-size: 12px;
   color: var(--muted);
-  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 2px;
 }
-.flight-note {
+.flight-arrow-flow {
+  font-size: 20px;
+  color: var(--gold);
+  opacity: 0.7;
+  user-select: none;
+}
+.flight-remind {
+  margin-left: auto;
   font-size: 14px;
   color: var(--muted);
-  align-self: center;
-}
-.flight-card .mood {
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--ink);
-  font-size: 11px;
-  font-weight: 700;
-  text-align: center;
+  max-width: 260px;
+  line-height: 1.5;
+  font-style: italic;
+  border-left: 3px solid var(--gold);
+  padding-left: 14px;
 }
 
 .chapter{
@@ -356,20 +398,6 @@ summary::-webkit-details-marker{display:none}
   color:var(--gold);
   font-size:13px;
 }
-.checks{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:16px;
-}
-.check{
-  font-size:11px;
-  padding:8px 12px;
-  border-radius:999px;
-  background:rgba(212,163,89,0.12);
-  color:rgba(150,110,40,1);
-  font-weight:700;
-}
 
 .admin-panel {
   display: flex;
@@ -436,11 +464,14 @@ footer{
 }
 footer p{color:var(--muted); margin-top: 10px;}
 
+@media(max-width:1150px){
+  .flight-card { grid-template-columns: 1fr; gap: 20px; }
+  .flight-times-hub { border-left: none; padding-left: 0; }
+  .flight-remind { margin-left: 0; max-width: 100%; }
+}
 @media(max-width:1050px){
   .hero-stats,.gallery,.checklist,.accommodation-grid{grid-template-columns:1fr 1fr}
   .chapter,.head{grid-template-columns:1fr}
-  .flight-card { grid-template-columns: 1fr; gap: 12px; }
-  .flight-details { border-left: none; padding-left: 0; gap: 16px; }
 }
 @media(max-width:720px){
   .nav{top:10px;width:94%;flex-direction:column;align-items:stretch}
@@ -452,6 +483,9 @@ footer p{color:var(--muted); margin-top: 10px;}
   summary{display:block}
   .mood{display:inline-block;margin-top:10px}
   .slot{grid-template-columns:1fr}
+  .flight-timeline { padding-left: 20px; }
+  .flight-timeline::before { left: -5px; }
+  .flight-icon-dot { left: -32px; }
 }
 </style>
 </head>
@@ -490,119 +524,91 @@ footer p{color:var(--muted); margin-top: 10px;}
 <section id="overview">
   <div class="head">
     <div>
-      <div class="eyebrow">Flight Plan</div>
-      <h2 class="serif">Uçuş Planı</h2>
+      <div class="eyebrow">Flight Core</div>
+      <h2 class="serif">Uçuş Takvimi</h2>
     </div>
-    <p class="lead">Tüm rota bu uçuş akışının üzerine kuruluyor. Basit, net ve bir bakışta tüm ana geçişler.</p>
+    <p class="lead">Gereksiz detaylardan arındırılmış, sadece ana uçuş kodları ve net saatleri içeren ana seyahat hattı.</p>
   </div>
 
   <div class="flight-timeline">
-    <!-- UÇUŞ 1 -->
     <div class="flight-card">
-      <div class="flight-date-info">
+      <div class="flight-icon-dot">🛫</div>
+      <div class="flight-main-info">
         <div class="f-date">20 Temmuz 2026 · Pazartesi</div>
-        <div class="f-route">İstanbul → Kuala Lumpur</div>
+        <div class="f-route">İstanbul ➔ Kuala Lumpur</div>
       </div>
-      <div class="flight-details">
-        <div class="flight-time-block">
-          <div class="f-time">22:15</div>
-          <div class="f-label">Kalkış (IST)</div>
+      <div class="flight-times-hub">
+        <div class="time-node">
+          <div class="t-clock">22:15</div>
+          <div class="t-airport">Kalkış · IST</div>
         </div>
-        <div class="flight-note">Uçuş ritüeli: Rahat kıyafet, kulaklık, uyku maskesi ve hafif bakım kiti hazır olsun.</div>
+        <div class="flight-arrow-flow">✈</div>
+        <div class="time-node">
+          <div class="t-clock">Ertesi Gün</div>
+          <div class="t-airport">Varış · KUL</div>
+        </div>
+        <div class="flight-remind">Tatilin ilk ritüeli: Uzun ve sakin gece uçuşu için konfor kiti hazır olsun.</div>
       </div>
-      <span class="mood">Uzun Uçuş</span>
     </div>
 
-    <!-- UÇUŞ 2 -->
     <div class="flight-card">
-      <div class="flight-date-info">
-        <div class="f-date">21 Temmuz 2026 · Salı</div>
-        <div class="f-route">Kuala Lumpur Varış</div>
-      </div>
-      <div class="flight-details">
-        <div class="flight-time-block">
-          <div class="f-time">Akşamüstü</div>
-          <div class="f-label">İniş (KUL)</div>
-        </div>
-        <div class="flight-note">Otele yerleşme, infinity pool keyfi, yol yorgunluğunu atma ve sakin bir akşam.</div>
-      </div>
-      <span class="mood">Soft Arrival</span>
-    </div>
-
-    <!-- UÇUŞ 3 -->
-    <div class="flight-card">
-      <div class="flight-date-info">
+      <div class="flight-icon-dot">🌴</div>
+      <div class="flight-main-info">
         <div class="f-date">25 Temmuz 2026 · Cumartesi</div>
-        <div class="f-route">Kuala Lumpur → Bali</div>
+        <div class="f-route">Kuala Lumpur ➔ Bali</div>
       </div>
-      <div class="flight-details">
-        <div class="flight-time-block">
-          <div class="f-time">17:55</div>
-          <div class="f-label">Kalkış (KUL)</div>
+      <div class="flight-times-hub">
+        <div class="time-node">
+          <div class="t-clock">17:55</div>
+          <div class="t-airport">Kalkış · KUL</div>
         </div>
-        <div class="flight-time-block">
-          <div class="f-time">21:05</div>
-          <div class="f-label">İniş (DPS)</div>
+        <div class="flight-arrow-flow">✈</div>
+        <div class="time-node">
+          <div class="t-clock">21:05</div>
+          <div class="t-airport">Varış · DPS</div>
         </div>
-        <div class="flight-note">Doğrudan Ubud'daki jungle villamıza geçiş ve tropikal doğanın sesleriyle uyku.</div>
+        <div class="flight-remind">Doğrudan Ubud'daki jungle villamıza geçiş ve tropikal doğa sesleri.</div>
       </div>
-      <span class="mood">Ada Transferi</span>
     </div>
 
-    <!-- UÇUŞ 4 -->
     <div class="flight-card">
-      <div class="flight-date-info">
-        <div class="f-date">31 Temmuz 2026 · Cuma</div>
-        <div class="f-route">Ubud → Seminyak</div>
-      </div>
-      <div class="flight-details">
-        <div class="flight-time-block">
-          <div class="f-time">12:00</div>
-          <div class="f-label">Bölge Değişimi</div>
-        </div>
-        <div class="flight-note">Orman modundan sahil ve beach club moduna geçiş. Seminyak villasına check-in.</div>
-      </div>
-      <span class="mood">Vibe Değişimi</span>
-    </div>
-
-    <!-- UÇUŞ 5 -->
-    <div class="flight-card">
-      <div class="flight-date-info">
+      <div class="flight-icon-dot">🏙</div>
+      <div class="flight-main-info">
         <div class="f-date">12 Ağustos 2026 · Çarşamba</div>
-        <div class="f-route">Bali → Kuala Lumpur</div>
+        <div class="f-route">Bali ➔ Kuala Lumpur</div>
       </div>
-      <div class="flight-details">
-        <div class="flight-time-block">
-          <div class="f-time">07:00</div>
-          <div class="f-label">Kalkış (DPS)</div>
+      <div class="flight-times-hub">
+        <div class="time-node">
+          <div class="t-clock">07:00</div>
+          <div class="t-airport">Kalkış · DPS</div>
         </div>
-        <div class="flight-time-block">
-          <div class="f-time">10:05</div>
-          <div class="f-label">İniş (KUL)</div>
+        <div class="flight-arrow-flow">✈</div>
+        <div class="time-node">
+          <div class="t-clock">10:05</div>
+          <div class="t-airport">Varış · KUL</div>
         </div>
-        <div class="flight-note">Dönüş öncesi son Kuala Lumpur günü: Dinlenme, hafif alışveriş ve sakin akşam.</div>
+        <div class="flight-remind">Erken transfer. Dönüş öncesi son Kuala Lumpur günü ve rahat bir alışveriş zamanı.</div>
       </div>
-      <span class="mood">Geri Dönüş</span>
     </div>
 
-    <!-- UÇUŞ 6 -->
     <div class="flight-card">
-      <div class="flight-date-info">
-        <div class="f-date">13–14 Ağustos 2026</div>
-        <div class="f-route">Kuala Lumpur → İstanbul</div>
+      <div class="flight-icon-dot">🏡</div>
+      <div class="flight-main-info">
+        <div class="f-date">13 Ağustos 2026 · Perşembe</div>
+        <div class="f-route">Kuala Lumpur ➔ İstanbul</div>
       </div>
-      <div class="flight-details">
-        <div class="flight-time-block">
-          <div class="f-time">19:15</div>
-          <div class="f-label">Kalkış (KUL)</div>
+      <div class="flight-times-hub">
+        <div class="time-node">
+          <div class="t-clock">19:15</div>
+          <div class="t-airport">Kalkış · KUL</div>
         </div>
-        <div class="flight-time-block">
-          <div class="f-time">06:55</div>
-          <div class="f-label">Varış (IST)</div>
+        <div class="flight-arrow-flow">✈</div>
+        <div class="time-node">
+          <div class="t-clock">06:55 <span style="font-size:12px; color:var(--muted); font-weight:normal;">(14 Ağs)</span></div>
+          <div class="t-airport">Varış · IST</div>
         </div>
-        <div class="flight-note">14 Ağustos Cuma sabahı İstanbul'a varış. Tatilin resmi, dinlendirici kapanışı.</div>
+        <div class="flight-remind">14 Ağustos Cuma sabahı İstanbul. Yavaş ve dinlendirici bir eve dönüş günü.</div>
       </div>
-      <span class="mood">Final Flight</span>
     </div>
   </div>
 </section>
@@ -617,7 +623,6 @@ footer p{color:var(--muted); margin-top: 10px;}
   </div>
 
   <div class="accommodation-grid">
-    <!-- KUALA LUMPUR -->
     <div class="acc-card">
       <div class="acc-img">
         <img loading="lazy" src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80" alt="Kuala Lumpur Sky Luxury Suite">
@@ -633,7 +638,6 @@ footer p{color:var(--muted); margin-top: 10px;}
       </div>
     </div>
 
-    <!-- BALI UBUD -->
     <div class="acc-card">
       <div class="acc-img">
         <img loading="lazy" src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=80" alt="Ubud Jungle Private Pool Villa">
@@ -649,7 +653,6 @@ footer p{color:var(--muted); margin-top: 10px;}
       </div>
     </div>
 
-    <!-- BALI SEMINYAK -->
     <div class="acc-card">
       <div class="acc-img">
         <img loading="lazy" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80" alt="Seminyak Tropical Oasis Villa">
@@ -678,248 +681,4 @@ footer p{color:var(--muted); margin-top: 10px;}
       <h2 class="serif">Kuala Lumpur şehirli açılış.</h2>
       <p class="lead">Bali öncesi modern Asya enerjisi: Petronas, rooftop, Batu Caves, Chinatown ve Jalan Alor.</p>
       <div class="list">
-        <div><strong>Petronas:</strong> Akşam ışıklı hali en etkileyici.</div>
-        <div><strong>Batu Caves:</strong> Sabah erken gidin; maymunlara dikkat.</div>
-        <div><strong>Chinatown:</strong> Central Market + kahve + kısa yürüyüş.</div>
-        <div><strong>Jalan Alor:</strong> Sokak lezzeti ve canlı gece pazarı.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="kuala-lumpur-plan">
-  <div class="head">
-    <div>
-      <div class="eyebrow">Kuala Lumpur Daily Plan</div>
-      <h2 class="serif">Kuala Lumpur günlük planları</h2>
-      <div class="admin-panel">
-        <button class="admin-btn" id="editBtn" onclick="toggleEditMode()">Planları Düzenle ✎</button>
-        <button class="admin-btn save-btn" id="saveBtn" onclick="savePlansToServer()">Değişiklikleri Buluta Kaydet ✓</button>
-      </div>
-    </div>
-    <p class="lead" id="statusText">Sunucu bağlantısı kuruluyor...</p>
-  </div>
-
-  <div class="plan-grid" id="kl-plans-container">
-    <details class="day" open>
-      <summary>
-        <div><div class="date">21-22 Temmuz · Kuala Lumpur</div><h3 class="serif editable-box" data-key="day1-title">Arrival & Skyline Reset</h3></div>
-        <span class="mood">Hafif tempo</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">Öğlen</div><div><strong class="editable-box" data-key="day1-s1-t">Eve Giriş & Unwind</strong><p class="editable-box" data-key="day1-s1-p">Manzaraya karşı yerleşme ve dinlenme ritüeli.</p></div></div>
-          <div class="slot"><div class="time">Akşamüstü</div><div><strong class="editable-box" data-key="day1-s2-t">KLCC & Petronas çevresi</strong><p class="editable-box" data-key="day1-s2-p">Kısa yürüyüş, şehir atmosferi.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong class="editable-box" data-key="day1-s3-t">Suit Keyfi / Rooftop</strong><p class="editable-box" data-key="day1-s3-p">Petronas manzaralı havuz kenarı veya şık bir kokteyl.</p></div></div>
-        </div>
-      </div>
-    </details>
-
-    <details class="day">
-      <summary>
-        <div><div class="date">23 Temmuz · Kuala Lumpur</div><h3 class="serif editable-box" data-key="day2-title">Batu Caves & Chinatown</h3></div>
-        <span class="mood">Kültür + sokak lezzeti</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">07:30</div><div><strong class="editable-box" data-key="day2-s1-t">Batu Caves</strong><p class="editable-box" data-key="day2-s1-p">Sabah erken gidin. Daha serin, daha az kalabalık. Maymunlara dikkat.</p></div></div>
-          <div class="slot"><div class="time">13:00</div><div><strong class="editable-box" data-key="day2-s2-t">Chinatown & Central Market</strong><p class="editable-box" data-key="day2-s2-p">Kahve, kısa alışveriş, culture walk.</p></div></div>
-          <div class="slot"><div class="time">19:30</div><div><strong class="editable-box" data-key="day2-s3-t">Jalan Alor</strong><p class="editable-box" data-key="day2-s3-p">Satay, noodle, seafood. Kalabalık ama atmosfer güçlü.</p></div></div>
-        </div>
-      </div>
-    </details>
-
-    <details class="day">
-      <summary>
-        <div><div class="date">24 Temmuz · Kuala Lumpur</div><h3 class="serif editable-box" data-key="day3-title">Luxury City Day</h3></div>
-        <span class="mood">Şık + rahat</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong class="editable-box" data-key="day3-s1-t">Geç kahvaltı</strong><p class="editable-box" data-key="day3-s1-p">Otel kahvaltısı veya iyi bir şehir kafesi.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong class="editable-box" data-key="day3-s2-t">Spa / alışveriş</strong><p class="editable-box" data-key="day3-s2-p">Pavilion Kuala Lumpur veya Suria KLCC.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong class="editable-box" data-key="day3-s3-t">Fine dining</strong><p class="editable-box" data-key="day3-s3-p">Michelin seçkisi veya modern Malay mutfağı.</p></div></div>
-        </div>
-      </div>
-    </details>
-  </div>
-</section>
-
-<section id="bali-plan">
-  <div class="head">
-    <div>
-      <div class="eyebrow">Ubud Daily Plan</div>
-      <h2 class="serif">Bali Ubud günlük planları</h2>
-    </div>
-    <p class="lead">Ubud'un doğası, pirinç tarlaları ve dinlendirici atmosferine göre düzenlenen seyahat akışımız.</p>
-  </div>
-
-  <div class="plan-grid">
-    <details class="day" open>
-      <summary><div><div class="date">26 Temmuz · Ubud</div><h3 class="serif">Jungle Reset & Villa Day</h3></div><span class="mood">Dinlenme</span></summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Bambu Villa Kahvaltısı</strong><p>Pirinç tarlası manzarasına karşı uyanış, özel havuz keyfi.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Ubud Merkez</strong><p>Kısa yürüyüş, kahve, hafif el sanatları alışverişi.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Romantik Ubud Dinner</strong><p>Lokal warung kültürü veya orman manzaralı lüks bir restoran akşamı.</p></div></div>
-        </div>
-      </div>
-    </details>
-
-    <details class="day">
-      <summary><div><div class="date">27 Temmuz · Ubud</div><h3 class="serif">Rice Terrace & Culture Day</h3></div><span class="mood">Doğa + Kültür</span></summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">07:00</div><div><strong>Tegallalang Rice Terrace</strong><p>En iyi ışık ve az kalabalık yakalamak için sabah erken çıkış.</p></div></div>
-          <div class="slot"><div class="time">11:30</div><div><strong>Tirta Empul</strong><p>Kutsal tapınak ritüeli ziyareti. Sarong ve saygılı kıyafet kullanımı.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Villa Chilling</strong><p>Günü yavaşlatıp villada dinlenme moduna geçiş.</p></div></div>
-        </div>
-      </div>
-    </details>
-
-    <details class="day">
-      <summary><div><div class="date">28 Temmuz · Ubud</div><h3 class="serif">Waterfall & Spa Ritual</h3></div><span class="mood">Romantik & Relax</span></summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div><strong>Kanto Lampo / Tibumana</strong><p>Gizli orman şelaleleri keşfi. Kaymaz terlik ve su geçirmez çanta önemli.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div><strong>Healthy Lunch</strong><p>Ubud'da organik smoothie bowl veya taze tropikal meyve öğünü.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div><strong>Couple Spa & Flower Bath</strong><p>Adanın imza masaj ritüeli ve çiçek banyosu deneyimi.</p></div></div>
-        </div>
-      </div>
-    </details>
-  </div>
-</section>
-
-<section id="photos">
-  <div class="head">
-    <div>
-      <div class="eyebrow">Traveler Style Photos</div>
-      <h2 class="serif">Gezgin fotoğrafı hissinde örnekler</h2>
-    </div>
-  </div>
-  <div class="gallery">
-    <div class="gal">
-      <img loading="lazy" src="https://images.unsplash.com/photo-1561131428-f579565cf4e8?auto=format&fit=crop&w=500&q=80" alt="Batu Caves Alternative">
-      <span>Batu Caves · Şehir Dokusu</span>
-    </div>
-    <div class="gal">
-      <img loading="lazy" src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=500&q=80" alt="Tegallalang Rice Terrace">
-      <span>Tegallalang · Ubud sabahı</span>
-    </div>
-    <div class="gal">
-      <img loading="lazy" src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=500&q=80" alt="Bali coast">
-      <span>Bali coast · ada hissi</span>
-    </div>
-    <div class="gal">
-      <img loading="lazy" src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=500&q=80" alt="Kuala Lumpur skyline">
-      <span>Kuala Lumpur · skyline</span>
-    </div>
-  </div>
-</section>
-
-<section id="checklist">
-  <div class="head">
-    <div>
-      <div class="eyebrow">Travel Ops</div>
-      <h2 class="serif">Kişisel checklist</h2>
-    </div>
-  </div>
-  <div class="checklist">
-    <label class="todo"><input type="checkbox"> Pasaport geçerliliği kontrol edildi</label>
-    <label class="todo"><input type="checkbox"> Malezya MDAC kontrol edildi</label>
-    <label class="todo"><input type="checkbox"> Bali vize / levy kontrol edildi</label>
-    <label class="todo"><input type="checkbox"> Seyahat sigortası yapıldı</label>
-  </div>
-</section>
-
-<footer>
-  <h3 class="serif">Kuala Lumpur & Bali Travel OS</h3>
-  <p>20 Temmuz – 14 Ağustos 2026 · kişisel takip + luxury guide</p>
-</footer>
-
-<script>
-const SECRET_PASS = "bali2026"; 
-const API_URL = "https://api.getcountapi.com/v1/endpoint/serkandemiralay_travel_os";
-
-window.addEventListener('DOMContentLoaded', async () => {
-  const statusEl = document.getElementById('statusText');
-  statusEl.innerText = "Bulut sunucusundan seyahat planları pürüzsüz yükleniyor...";
-  
-  try {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("Yeni veri havuzu hazır.");
-    
-    const resData = await response.json();
-    if (resData && resData.value) {
-      const plans = JSON.parse(resData.value);
-      Object.keys(plans).forEach(key => {
-        const el = document.querySelector(`[data-key="${key}"]`);
-        if (el) el.innerText = plans[key];
-      });
-      statusEl.innerText = "Bulut senkronizasyonu harika. Tüm cihazlar güncel.";
-    }
-  } catch (err) {
-    console.log(err.message);
-    statusEl.innerText = "Bulut bağlantısı stabil. İstediğiniz an düzenleyip kaydedebilirsiniz.";
-  }
-});
-
-function toggleEditMode() {
-  const password = prompt("Düzenleme modunu açmak için gizli şifreyi girin:");
-  if (password !== SECRET_PASS) {
-    alert("Hatalı şifre! Düzenleme yetkiniz yok.");
-    return;
-  }
-
-  const editableElements = document.querySelectorAll('.editable-box');
-  editableElements.forEach(el => {
-    el.setAttribute('contenteditable', 'true');
-  });
-
-  document.getElementById('editBtn').style.display = 'none';
-  document.getElementById('saveBtn').style.display = 'inline-block';
-  document.getElementById('statusText').innerText = "Düzenleme modu aktif. Metinleri değiştirip yeşil butona basabilirsiniz.";
-}
-
-async function savePlansToServer() {
-  const statusEl = document.getElementById('statusText');
-  statusEl.innerText = "Değişiklikler CORS engelsiz bulut hattına yazılıyor...";
-  
-  const editableElements = document.querySelectorAll('.editable-box');
-  const plansData = {};
-
-  editableElements.forEach(el => {
-    const key = el.getAttribute('data-key');
-    plansData[key] = el.innerText;
-    el.setAttribute('contenteditable', 'false');
-  });
-
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ value: JSON.stringify(plansData) })
-    });
-
-    if (!response.ok) throw new Error("Sunucu yanıt hatası.");
-
-    document.getElementById('editBtn').style.display = 'inline-block';
-    document.getElementById('saveBtn').style.display = 'none';
-    statusEl.innerText = "Bulut başarıyla güncellendi! Tüm cihazlarda anlık eşitlendi.";
-    alert("Harika! Tüm seyahat planları bulut veri tabanına pürüzsüz şekilde işlendi.");
-    
-  } catch (err) {
-    console.error(err);
-    alert("Değişiklikler başarıyla kaydedildi!"); 
-    statusEl.innerText = "Senkronizasyon tamamlandı.";
-    document.getElementById('editBtn').style.display = 'inline-block';
-    document.getElementById('saveBtn').style.display = 'none';
-  }
-}
-</script>
-
-</body>
-</html>
+        <div><strong>
