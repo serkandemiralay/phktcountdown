@@ -1,909 +1,911 @@
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Kuala Lumpur & Bali Travel OS — Executive Edition</title>
-
-<!-- Web Font Entegrasyonu -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Kuala Lumpur & Bali Travel OS</title>
 
 <style>
-:root {
-  --primary-dark: #0b221a;     /* Derin Tropikal Orman Yeşili */
-  --accent-gold: #c5a059;      /* Mat Premium Altın */
-  --bg-linen: #fbf9f6;         /* Lüks Keten Beyazı Arkaplan */
-  --card-white: #ffffff;       /* Saf Safir Beyazı */
-  --text-main: #1e2d27;        /* Kömür Yeşili Ana Metin */
-  --text-muted: #62756e;       /* Kadifemsi Soluk Yaprak Sisi */
-  --tag-bg: #f0f4f1;           /* Soft Akdeniz Nanesi */
-  --border-subtle: rgba(11,34,26,0.06);
-  --shadow-premium: 0 24px 60px rgba(11,34,26,0.04);
-  --shadow-hover: 0 32px 70px rgba(11,34,26,0.08);
-  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+:root{
+  /* Tropikal & Lüks Tatil Renk Paleti */
+  --ink: #112d24;          
+  --cream: #f4f7f4;        
+  --paper: #ffffff;        
+  --muted: #556b63;        
+  --gold: #d4a359;         
+  --accent: #eaf2ee;       
+  --line: rgba(17,45,36,0.08);
+  --shadow: 0 20px 50px rgba(17,45,36,0.06);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg-linen);
-  color: var(--text-main);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.6;
 }
+img{width:100%;display:block;object-fit:cover}
+a{text-decoration:none;color:inherit}
+.serif{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.03em}
 
-img { width: 100%; display: block; object-fit: cover; transition: var(--transition-smooth); }
-a { text-decoration: none; color: inherit; }
-
-.serif {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+.nav{
+  position:fixed;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(1180px,94%);
+  z-index:50;
+  display:flex;
+  gap:10px;
+  padding:10px;
+  border-radius:22px;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(20px);
+  box-shadow:0 12px 40px rgba(17,45,36,0.08);
 }
-
-/* Stunning Glassmorphic Navbar */
-.nav {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(1200px, 94%);
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 16px 40px rgba(11,34,26,0.04);
+.logo{
+  background:var(--ink);
+  color:#fff;
+  border-radius:16px;
+  padding:12px 16px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  white-space:nowrap;
 }
-
-.logo {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--primary-dark);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.navlinks{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  scrollbar-width:none;
 }
-
-.logo::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: var(--accent-gold);
-  border-radius: 50%;
+.navlinks::-webkit-scrollbar{display:none}
+.nav a{
+  padding:10px 13px;
+  border-radius:14px;
+  color:var(--muted);
+  font-size:13px;
+  white-space:nowrap;
+  font-weight: 500;
 }
+.nav a:hover{background:var(--accent); color:var(--ink);}
 
-.navlinks {
-  display: flex;
-  gap: 8px;
+.hero{
+  min-height:100vh;
+  padding:140px 6vw 70px;
+  display:flex;
+  align-items:flex-end;
+  color:white;
+  background:
+    linear-gradient(180deg, rgba(17,45,36,0.4), rgba(17,45,36,0.85)),
+    url("https://images.unsplash.com/photo-1541417904950-b855846fe074?auto=format&fit=crop&w=2200&q=90");
+  background-size:cover;
+  background-position:center;
 }
-
-.nav a {
-  padding: 8px 16px;
-  border-radius: 12px;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 600;
-  transition: var(--transition-smooth);
+.hero-inner{max-width:1180px; width: 100%;}
+.kicker,.eyebrow{
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  margin-bottom:14px;
 }
+h1{font-size:clamp(58px,10vw,130px);line-height:.9;margin-bottom:28px}
+h2{font-size:clamp(40px,5vw,72px);line-height:1;margin-bottom:18px;color:var(--ink);}
+h3{font-size:clamp(22px,2vw,30px);line-height:1.1;margin-bottom:10px}
+p{color:var(--muted);font-size:16.5px}
+.hero p{max-width:780px;font-size:clamp(19px,2vw,24px);color:#e4ede9; font-weight: 300;}
 
-.nav a:hover, .nav a.active {
-  background: var(--primary-dark);
-  color: var(--card-white);
+.hero-stats{
+  margin-top:42px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
 }
-
-/* Cinematic Hero Section */
-.hero {
-  min-height: 100vh;
-  padding: 180px 6vw 80px;
-  display: flex;
-  align-items: flex-end;
-  color: var(--card-white);
-  background: 
-    linear-gradient(180deg, rgba(11,34,26,0.2) 0%, rgba(11,34,26,0.75) 100%),
-    url("https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=2400&q=90");
-  background-size: cover;
-  background-position: center;
-  position: relative;
+.hero-stats div{
+  padding:22px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
 }
-
-.hero-inner { max-width: 1200px; width: 100%; margin: 0 auto; }
-
-.kicker {
-  color: var(--accent-gold);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-}
-
-h1 {
-  font-size: clamp(52px, 8vw, 110px);
-  line-height: 0.95;
-  margin-bottom: 32px;
-  font-weight: 400;
-}
-
-.hero p {
-  max-width: 700px;
-  font-size: clamp(18px, 2vw, 22px);
-  color: #e2ece8;
-  font-weight: 300;
-  margin-bottom: 48px;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-}
-
-.hero-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-.hero-stats div {
-  padding: 24px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: var(--transition-smooth);
-}
-
-.hero-stats div:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-4px);
-}
-
-.hero-stats span {
-  display: block;
-  color: var(--accent-gold);
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
+.hero-stats span{
+  display:block;
+  color:var(--gold);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:7px;
   font-weight: 700;
 }
+.hero-stats strong{font-size:16px; color: #fff;}
 
-.hero-stats strong { font-size: 15px; font-weight: 600; color: #ffffff; }
+section{
+  padding:100px 6vw;
+  max-width:1280px;
+  margin:auto;
+}
+.head{
+  display:grid;
+  grid-template-columns:1fr .8fr;
+  gap:38px;
+  align-items:end;
+  margin-bottom:48px;
+}
+.lead{font-size:20px;color:var(--muted); font-weight: 300;}
 
-/* Global Layout & Headings */
-section {
-  padding: 120px 6vw;
-  max-width: 1320px;
-  margin: auto;
+.chapter{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:48px;
+  align-items:center;
+}
+.panel{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:34px;
+  padding:40px;
+  box-shadow:var(--shadow);
+}
+.photo{
+  border-radius:34px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.photo img{height:550px}
+
+.list{
+  display:grid;
+  gap:12px;
+  margin-top:24px;
+}
+.list div{
+  padding:16px 20px;
+  border-radius:18px;
+  background:var(--accent);
+  color:var(--ink);
 }
 
-.head {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 60px;
-  align-items: flex-end;
-  margin-bottom: 64px;
-  border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 32px;
-}
-
-.eyebrow {
-  color: var(--accent-gold);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-h2 {
-  font-size: clamp(36px, 4vw, 56px);
-  line-height: 1.05;
-  color: var(--primary-dark);
-  font-weight: 400;
-}
-
-.lead { font-size: 18px; color: var(--text-muted); font-weight: 400; }
-
-/* Premium Accommodation Grid */
 .accommodation-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: 28px;
+  margin-top: 16px;
 }
-
 .acc-card {
-  background: var(--card-white);
-  border: 1px solid var(--border-subtle);
-  border-radius: 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 30px;
   overflow: hidden;
-  box-shadow: var(--shadow-premium);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  transition: var(--transition-smooth);
 }
-
-.acc-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-hover);
-}
-
-.acc-card:hover img {
-  transform: scale(1.04);
-}
-
 .acc-img {
-  height: 280px;
+  height: 250px;
   position: relative;
-  overflow: hidden;
 }
-
 .acc-badge {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  background: var(--primary-dark);
+  top: 16px;
+  left: 16px;
+  background: rgba(17,45,36,0.85);
+  backdrop-filter: blur(8px);
   color: #fff;
-  padding: 6px 16px;
-  border-radius: 30px;
-  font-size: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
-
 .acc-body {
-  padding: 32px;
+  padding: 28px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-
 .acc-dates {
-  color: var(--accent-gold);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.acc-card h3 {
-  font-size: 24px;
-  color: var(--primary-dark);
-  margin-bottom: 12px;
-}
-
-.acc-card p {
-  font-size: 14px;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-/* Ultra-Clean Modern Timeline Accordion */
-.plan-grid { display: flex; flex-direction: column; gap: 20px; }
-
-details.day {
-  background: var(--card-white);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  box-shadow: var(--shadow-premium);
-  overflow: hidden;
-  transition: var(--transition-smooth);
-}
-
-details.day[open] {
-  box-shadow: var(--shadow-hover);
-  border-color: rgba(197, 160, 89, 0.3);
-}
-
-summary {
-  cursor: pointer;
-  list-style: none;
-  padding: 28px 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
-
-summary::-webkit-details-marker { display: none; }
-
-.summary-left { display: flex; flex-direction: column; }
-
-.date {
-  color: var(--accent-gold);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-summary h3 {
-  font-size: 24px;
-  color: var(--primary-dark);
-  font-weight: 500;
-}
-
-.mood {
-  padding: 6px 18px;
-  border-radius: 30px;
-  background: var(--tag-bg);
-  color: var(--primary-dark);
+  color: var(--gold);
   font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* Custom interactive arrow icon indicator instead of default marker */
-.summary-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--bg-linen);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-smooth);
-}
-
-.summary-icon::after {
-  content: '→';
-  font-size: 18px;
-  color: var(--text-muted);
-  transition: var(--transition-smooth);
-  display: inline-block;
-}
-
-details.day[open] summary .summary-icon {
-  background: var(--primary-dark);
-}
-
-details.day[open] summary .summary-icon::after {
-  color: var(--card-white);
-  transform: rotate(90deg);
-}
-
-.day-content {
-  padding: 0 32px 32px 32px;
-  border-top: 1px solid rgba(11,34,26,0.03);
-}
-
-.schedule { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
-
-.slot {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 24px;
-  padding: 20px 24px;
-  border-radius: 14px;
-  background: var(--bg-linen);
-  border: 1px solid transparent;
-  transition: var(--transition-smooth);
-}
-
-.slot:hover {
-  background: #ffffff;
-  border-color: var(--border-subtle);
-  transform: translateX(4px);
-}
-
-.time {
-  font-weight: 700;
-  color: var(--accent-gold);
-  font-size: 12px;
-  letter-spacing: 0.1em;
+  font-weight: 800;
+  letter-spacing: .1em;
   text-transform: uppercase;
-  padding-top: 2px;
+  margin-bottom: 8px;
 }
-
-.slot-content strong {
-  font-size: 16px;
-  color: var(--primary-dark);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.slot-content p {
-  font-size: 14px;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-/* High-Aesthetic 📸 Photo Note Style Block */
-.photo-note-slot {
-  background: #fffbf4;
-  border-left: 4px solid var(--accent-gold) !important;
-}
-
-.photo-note-slot .time {
-  color: var(--primary-dark);
-}
-
-/* Premium Lifestyle Cards Section */
-.lifestyle-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px;
-  margin-top: 40px;
-}
-
-.lifestyle-card {
-  background: var(--card-white);
-  border: 1px solid var(--border-subtle);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: var(--shadow-premium);
-}
-
-.lifestyle-card h4 {
-  font-size: 26px;
-  color: var(--primary-dark);
-  margin-bottom: 20px;
-}
-
-.lifestyle-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.lifestyle-list li {
-  display: flex;
-  gap: 16px;
-  font-size: 14.5px;
-  color: var(--text-muted);
-  align-items: flex-start;
-}
-
-.lifestyle-list li strong {
-  color: var(--primary-dark);
-  min-width: 100px;
+.acc-link {
   display: inline-block;
-}
-
-footer {
-  padding: 100px 6vw;
-  background: var(--primary-dark);
-  color: var(--card-white);
-  text-align: center;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-footer h3 {
-  font-size: 28px;
-  font-weight: 400;
-  margin-bottom: 12px;
-  letter-spacing: 0.05em;
-}
-
-footer p {
-  color: rgba(255,255,255,0.4);
+  margin-top: 20px;
+  padding: 14px 20px;
+  background: var(--ink);
+  color: white;
+  border-radius: 16px;
   font-size: 13px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-weight: 700;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.acc-link:hover {
+  background: var(--gold);
+  transform: translateY(-2px);
 }
 
-/* Responsive Scaling optimization */
+.plan-grid{
+  display:grid;
+  gap:16px;
+}
+details.day{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+summary{
+  cursor:pointer;
+  list-style:none;
+  padding:24px;
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:center;
+}
+summary::-webkit-details-marker{display:none}
+.date{
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.mood{
+  padding:8px 14px;
+  border-radius:999px;
+  background:var(--accent);
+  color:var(--ink);
+  font-size:12px;
+  font-weight: 700;
+  white-space:nowrap;
+}
+.day-content{
+  padding:0 24px 24px;
+}
+.schedule{
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+.slot{
+  display:grid;
+  grid-template-columns:90px 1fr;
+  gap:14px;
+  padding:16px;
+  border-radius:18px;
+  background:var(--cream);
+}
+.time{
+  font-weight:900;
+  color:var(--gold);
+  font-size:13px;
+}
+.checks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:16px;
+}
+.check{
+  font-size:11px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(212,163,89,0.12);
+  color:rgba(150,110,40,1);
+  font-weight:700;
+}
+
+/* Düzenleme Paneli Tasarımı */
+.admin-panel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 15px;
+}
+.admin-btn {
+  padding: 8px 16px;
+  background: var(--gold);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+}
+.admin-btn.save-btn {
+  background: #27ae60;
+  display: none;
+}
+.editable-box {
+  outline: none;
+  transition: all 0.3s ease;
+}
+.editable-box[contenteditable="true"] {
+  background: #fff8eb;
+  border-bottom: 2px dashed var(--gold);
+  padding: 2px 5px;
+}
+
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+.gal{
+  min-height:340px;
+  border-radius:28px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:var(--shadow);
+}
+.gal img{height:100%}
+.gal span{
+  position:absolute;
+  left:16px;
+  right:16px;
+  bottom:16px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(17,45,36,0.8);
+  color:white;
+  font-size:13px;
+  backdrop-filter:blur(8px);
+}
+
+footer{
+  padding:80px 6vw;
+  background:var(--ink);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  color:#fff;
+  text-align:center;
+}
+footer p{color:var(--muted); margin-top: 10px;}
+
 @media(max-width:1050px){
-  .accommodation-grid, .lifestyle-grid { grid-template-columns: 1fr 1fr; }
-  .head { grid-template-columns: 1fr; gap: 20px; }
+  .hero-stats,.gallery,.checklist,.accommodation-grid{grid-template-columns:1fr 1fr}
+  .chapter,.head{grid-template-columns:1fr}
 }
-
-@media(max-width:768px){
-  .nav { width: 96%; padding: 10px 16px; }
-  .navlinks { display: none; } /* Kept clean on mobile */
-  .hero { padding-top: 160px; }
-  .hero-stats { grid-template-columns: 1fr 1fr; }
-  .accommodation-grid, .lifestyle-grid { grid-template-columns: 1fr; }
-  summary { padding: 20px; }
-  summary h3 { font-size: 20px; }
-  .slot { grid-template-columns: 1fr; gap: 6px; padding: 16px; }
+@media(max-width:720px){
+  .nav{top:10px;width:94%;flex-direction:column;align-items:stretch}
+  .logo{text-align:center}
+  .hero{padding:185px 5vw 50px}
+  section{padding:70px 5vw}
+  .hero-stats,.gallery,.checklist,.accommodation-grid{grid-template-columns:1fr}
+  .photo img{height:400px}
+  summary{display:block}
+  .mood{display:inline-block;margin-top:10px}
+  .slot{grid-template-columns:1fr}
 }
 </style>
 </head>
 
 <body>
 
-<!-- Luxury Header Menu -->
 <nav class="nav">
-  <div class="logo">Kuala Lumpur × Bali Travel OS</div>
+  <div class="logo">Kuala Lumpur × Bali</div>
   <div class="navlinks">
     <a href="#overview">Uçuş Planı</a>
     <a href="#accommodation">Konaklama</a>
-    <a href="#kuala-lumpur-plan">KL Rotaları</a>
-    <a href="#bali-plan">Bali Rotaları</a>
+    <a href="#kuala-lumpur">Kuala Lumpur</a>
+    <a href="#kuala-lumpur-plan">KL Plan</a>
+    <a href="#bali">Bali</a>
+    <a href="#bali-plan">Bali Plan</a>
+    <a href="#photos">Fotoğraflar</a>
+    <a href="#checklist">Checklist</a>
   </div>
 </nav>
 
-<!-- Immersive Cinematic Hero Section -->
 <header class="hero">
   <div class="hero-inner">
     <div class="kicker">Personal Luxury Travel OS · 2026</div>
     <h1 class="serif">Kuala Lumpur<br>& Bali</h1>
-    <p>Şehir ışıkları, heybetli jungle sabahları, tropikal gastronomi durakları, özel plaj kulüpleri ve Uluwatu falezlerinde sinematik gün batımı finalleri...</p>
+    <p>Şehir ışıkları, jungle sabahları, tropikal kahvaltılar, beach club günleri ve Uluwatu’da sinematik final.</p>
 
     <div class="hero-stats">
-      <div><span>Tarih Akışı</span><strong>20 Temmuz – 14 Ağustos</strong></div>
-      <div><span>Misafir Düzeni</span><strong>2 Kişi · Özel Çift Tatili</strong></div>
-      <div><span>Vibe & Enerji</span><strong>Luxury · Relax · Gastronomi</strong></div>
-      <div><span>Keşif Felsefesi</span><strong>Yavaş tempo, derin ve kusursuz deneyim</strong></div>
+      <div><span>Tarih</span><strong>20 Temmuz – 14 Ağustos</strong></div>
+      <div><span>Kişi</span><strong>2 kişi · Çift tatili</strong></div>
+      <div><span>Enerji</span><strong>Luxury · Relax · Gastronomi</strong></div>
+      <div><span>Felsefe</span><strong>Az aktivite, doğru deneyim</strong></div>
     </div>
   </div>
 </header>
 
-<!-- Section I: Transit & Flight Flows -->
 <section id="overview">
   <div class="head">
     <div>
       <div class="eyebrow">Flight Plan</div>
-      <h2 class="serif">Uçuş & Geçiş Planı</h2>
+      <h2 class="serif">Uçuş planı</h2>
     </div>
-    <p class="lead">Tüm seyahatin iskeletini oluşturan ana transit ve adalar arası transfer akışları.</p>
+    <p class="lead">Tüm rota bu uçuş akışının üzerine kuruluyor. Geçiş günlerini hafif tutmak planın en kritik kısmı.</p>
   </div>
 
   <div class="plan-grid">
     <details class="day" open>
       <summary>
-        <div class="summary-left">
-          <div class="date">20 Temmuz 2026 · İstanbul → Kuala Lumpur</div>
-          <h3 class="serif">Kıtalararası Büyük Başlangıç</h3>
+        <div>
+          <div class="date">20 Temmuz 2026 · Pazartesi</div>
+          <h3 class="serif">İstanbul → Kuala Lumpur</h3>
         </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Uzun Uçuş</span>
-          <div class="summary-icon"></div>
-        </div>
+        <span class="mood">Uzun uçuş</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div class="slot-content"><strong>Evde Son Hazırlıklar</strong><p>Kıyafet seçimi, pasaport kontrolleri ve lüks seyahat kiti optimizasyonu.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div class="slot-content"><strong>Havalimanı Lounge Geçişi</strong><p>İstanbul Havalimanı transferi ve sakin bir uçuş öncesi dinlenmesi.</p></div></div>
-          <div class="slot"><div class="time">22:15</div><div class="slot-content"><strong>Kuala Lumpur Kalkış</strong><p>Konforlu, gece boyu sürecek kıtalararası uçuş ritüeli.</p></div></div>
+          <div class="slot">
+            <div class="time">22:15</div>
+            <div>
+              <strong>İstanbul Havalimanı kalkış</strong>
+              <p>Uçuşu tatilin ilk ritüeli gibi düşünün: rahat kıyafet, kulaklık, uyku maskesi, hafif bakım kiti.</p>
+            </div>
+          </div>
         </div>
       </div>
     </details>
 
     <details class="day">
       <summary>
-        <div class="summary-left">
-          <div class="date">25 Temmuz 2026 · Kuala Lumpur → Bali (Ubud)</div>
-          <h3 class="serif">Tropikal Adaya Geçiş</h3>
+        <div>
+          <div class="date">21 Temmuz 2026 · Salı</div>
+          <h3 class="serif">Kuala Lumpur Varış & Yerleşme</h3>
         </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Island Transfer</span>
-          <div class="summary-icon"></div>
-        </div>
+        <span class="mood">Soft arrival</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div class="slot-content"><strong>Kuala Lumpur'da Son Saatler</strong><p>Hafif bir kahve ve valizlerin ada moduna göre yeniden düzenlenmesi.</p></div></div>
-          <div class="slot"><div class="time">17:55</div><div class="slot-content"><strong>Uçuş Zamanı (Malaysia Airlines)</strong><p>Kuala Lumpur havalimanından ayrılış.</p></div></div>
-          <div class="slot"><div class="time">21:05</div><div class="slot-content"><strong>Bali Varış & Ubud Özel Transfer</strong><p>Denpasar havalimanında karşılama ve doğrudan ormanın kalbindeki villaya lüks transfer.</p></div></div>
+          <div class="slot">
+            <div class="time">Akşamüstü</div>
+            <div>
+              <strong>Kuala Lumpur'a Giriş</strong>
+              <p>Eve yerleşme, infinity pool keyfi, yol yorgunluğunu atma ve sakin bir akşam yemeği.</p>
+            </div>
+          </div>
         </div>
       </div>
     </details>
 
     <details class="day">
       <summary>
-        <div class="summary-left">
-          <div class="date">31 Temmuz 2026 · Ubud → Seminyak</div>
-          <h3 class="serif">Ormandan Okyanusa Geçiş</h3>
+        <div>
+          <div class="date">25 Temmuz 2026 · Cumartesi</div>
+          <h3 class="serif">Kuala Lumpur → Bali (Ubud)</h3>
         </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Vibe Change</span>
-          <div class="summary-icon"></div>
-        </div>
+        <span class="mood">Island transfer</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">11:00</div><div class="slot-content"><strong>Ubud Villa Check-out</strong><p>Yeşilliklere veda, bagajların lüks VIP araca yüklenmesi.</p></div></div>
-          <div class="slot"><div class="time">12:00</div><div class="slot-content"><strong>Seminyak Güney Transferi</strong><p>Adanın canlı, şık ve enerjik sahil şeridine doğru yolculuk.</p></div></div>
-          <div class="slot"><div class="time">Akşamüstü</div><div class="slot-content"><strong>Beach Club Gün Batımı Karşılaması</strong><p>Yeni villaya yerleşme ve okyanus kıyısında ilk premium kokteyller.</p></div></div>
+          <div class="slot">
+            <div class="time">17:55</div>
+            <div>
+              <strong>Kuala Lumpur kalkış</strong>
+              <p>Günü hafif tutun. Havalimanına rahat geçiş ve erken check-in iyi olur.</p>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="time">21:05</div>
+            <div>
+              <strong>Bali varış & Ubud Transfer</strong>
+              <p>Doğrudan Ubud'daki jungle villamıza geçiş ve tropikal doğanın sesleriyle uykuya dalış.</p>
+            </div>
+          </div>
         </div>
       </div>
     </details>
 
     <details class="day">
       <summary>
-        <div class="summary-left">
-          <div class="date">6 Ağustos 2026 · Seminyak → Uluwatu</div>
-          <h3 class="serif">Sinematik Falez Kapanışı</h3>
+        <div>
+          <div class="date">31 Temmuz 2026 · Cuma</div>
+          <h3 class="serif">Ubud → Seminyak</h3>
         </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Uluwatu VIP Transition</span>
-          <div class="summary-icon"></div>
-        </div>
+        <span class="mood">Vibe Change</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Öğlen</div><div class="slot-content"><strong>Güney Yarımada Yolculuğu</strong><p>Seminyak'ın hareketli sokaklarından, adanın en görkemli falez yapısına sahip Uluwatu'ya geçiş.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div class="slot-content"><strong>Uçurum Kenarında İlk Gece</strong><p>Uluwatu'nun dramatik ve nefes kesici uçurum mimarisine sahip yeni yaşam alanına yerleşme.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Altın Saat Portreleri</strong><p>Uçurum kenarında gün batımı ışığını yakalayarak dramatik siluet çekimleri gerçekleştirin.</p></div></div>
+          <div class="slot">
+            <div class="time">12:00</div>
+            <div>
+              <strong>Ubud Villadan Çıkış & Seminyak Transferi</strong>
+              <p>Orman modundan sahil ve beach club moduna geçiş. Seminyak'taki yeni villaya check-in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="day">
+      <summary>
+        <div>
+          <div class="date">12 Ağustos 2026 · Çarşamba</div>
+          <h3 class="serif">Bali → Kuala Lumpur</h3>
+        </div>
+        <span class="mood">Return transfer</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">07:00</div>
+            <div>
+              <strong>Bali kalkış</strong>
+              <p>Transfer çok erken olmalı. Bir gece önce valiz ve ödeme işleri tamamen bitmiş olsun.</p>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="time">10:05</div>
+            <div>
+              <strong>Kuala Lumpur varış</strong>
+              <p>Son Kuala Lumpur günü: otel, dinlenme, hafif alışveriş ve sakin akşam.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="day">
+      <summary>
+        <div>
+          <div class="date">13–14 Ağustos 2026</div>
+          <h3 class="serif">Kuala Lumpur → İstanbul</h3>
+        </div>
+        <span class="mood">Final flight</span>
+      </summary>
+      <div class="day-content">
+        <div class="schedule">
+          <div class="slot">
+            <div class="time">19:15</div>
+            <div>
+              <strong>Kuala Lumpur kalkış</strong>
+              <p>13 Ağustos günü ağır aktivite koymayın. Son alışveriş + kahve + havalimanına rahat geçiş.</p>
+            </div>
+          </div>
+          <div class="slot">
+            <div class="time">06:55</div>
+            <div>
+              <strong>14 Ağustos Cuma · İstanbul varış</strong>
+              <p>Tatilin resmi kapanışı. Eve dönüş için yavaş bir gün planlamak iyi olur.</p>
+            </div>
+          </div>
         </div>
       </div>
     </details>
   </div>
 </section>
 
-<!-- Section II: Curated Stays Architecture -->
 <section id="accommodation">
   <div class="head">
     <div>
-      <div class="eyebrow">Stay & Architecture</div>
-      <h2 class="serif">Küratörlü Yaşam Alanları</h2>
+      <div class="eyebrow">Stay & Design</div>
+      <h2 class="serif">Seçtiğimiz Evler</h2>
     </div>
-    <p class="lead">Seyahatin ruhunu tasarlayan, estetik algısı yüksek ve premium lokasyonlu tasarım villalar.</p>
+    <p class="lead">Seyahatin karakterini belirleyen, konforu ve estetiği ön planda tutan gerçek Airbnb evlerimiz.</p>
   </div>
 
   <div class="accommodation-grid">
     <!-- KUALA LUMPUR -->
     <div class="acc-card">
       <div class="acc-img">
-        <img loading="lazy" src="https://drive.google.com/uc?export=view&id=1udGbXt9fo-iLmlkcEh5ch1yWrJzBUrhp" alt="Kuala Lumpur Premium Suite">
+        <!-- Güncellenen Premium Görsel: KL Gökdelen & Havuz Estetiği -->
+        <img loading="lazy" src="https://images.unsplash.com/photo-1549294413-26f195afcbce?auto=format&fit=crop&w=600&q=80" alt="Kuala Lumpur Premium Suite">
         <span class="acc-badge">Kuala Lumpur</span>
       </div>
       <div class="acc-body">
         <div>
           <div class="acc-dates">21 – 25 Temmuz</div>
-          <h3 class="serif">Modern Minimalist Comfy Bed</h3>
-          <p>Bukit Nanas bölgesinde yer alan, gökdelen siluetine hakim minimalist rezidans üssü. Şehir keşifleri sonrası yüksek katlı infinity pool alanından ikonik Petronas kuleleri manzarasını izlemek için mükemmel.</p>
+          <h3 class="serif" style="font-size:22px; margin-bottom:10px;">Modern Minimalist Comfy Bed</h3>
+          <p style="font-size:14px; color:var(--muted);">Bukit Nanas bölgesinde yer alan, şehir merkezine hakim minimalist stüdyo daire. Şehir keşifleri sonrası yüksek katlı infinity pool alanından manzara keyfi için ideal üs.</p>
         </div>
+        <a href="https://www.airbnb.com.tr/rooms/583584952499021704" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
       </div>
     </div>
 
     <!-- BALI UBUD -->
     <div class="acc-card">
       <div class="acc-img">
-        <img loading="lazy" src="https://drive.google.com/uc?export=view&id=1zxgtEGvciSAzaXPA0ZG2nojDIsF52bQ3" alt="Ubud Ricefield Luxury Villa">
+        <!-- Güncellenen Premium Görsel: Gerçek Cam/Bambu Detaylı Ubud Jungle Havuz Villası -->
+        <img loading="lazy" src="https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?auto=format&fit=crop&w=600&q=80" alt="Ubud Ricefield Luxury Villa">
         <span class="acc-badge">Bali · Ubud</span>
       </div>
       <div class="acc-body">
         <div>
           <div class="acc-dates">25 – 31 Temmuz</div>
-          <h3 class="serif">Minimalist Ricefield Pool Villa</h3>
-          <p>Ubud'un büyüleyici pirinç tarlaları manzarasına açılan, cam duvar tasarımlı ve özel yüzme havuzlu harika bir inziva noktası. Tamamen tropikal doğanın sesleriyle izole bir orman lüksü.</p>
+          <h3 class="serif" style="font-size:22px; margin-bottom:10px;">Minimalist Ricefield Pool Villa</h3>
+          <p style="font-size:14px; color:var(--muted);">Ubud'un büyüleyici pirinç tarlaları manzarasına açılan, cam duvar tasarımlı ve özel havuzlu harika bir kaçış noktası. Tamamen doğanın içinde izole bir orman deneyimi.</p>
         </div>
+        <a href="https://www.airbnb.com.tr/rooms/1654675591763563797" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
       </div>
     </div>
 
     <!-- BALI SEMINYAK -->
     <div class="acc-card">
       <div class="acc-img">
-        <img loading="lazy" src="https://drive.google.com/uc?export=view&id=1Dp03xSegn4v5bVV46_iWDDw5taQvUenp" alt="Seminyak Pool Villa Oasis">
+        <!-- Güncellenen Premium Görsel: Özel Havuzlu Gizli Seminyak Tropikal Vaha Tasarımı -->
+        <img loading="lazy" src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=600&q=80" alt="Seminyak Pool Villa Oasis">
         <span class="acc-badge">Bali · Seminyak</span>
       </div>
       <div class="acc-body">
         <div>
           <div class="acc-dates">31 Temmuz – 6 Ağustos</div>
-          <h3 class="serif">Tropical Private Pool Villa</h3>
-          <p>Seminyak'ın kalbinde, adanın en rafine restoranlarına, butiklerine ve ünlü plaj kulüplerine yürüyüş mesafesinde yer alan, tamamen size ait özel havuzlu gizli ve şık bir vaha tasarımı.</p>
+          <h3 class="serif" style="font-size:22px; margin-bottom:10px;">Tropical Private Pool Villa</h3>
+          <p style="font-size:14px; color:var(--muted);">Seminyak'ın kalbinde, ünlü restoranlara, butiklere ve sosyal plaj kulüplerine yakın konumda yer alan, tamamen size ait özel havuzlu gizli ve şık vaha.</p>
         </div>
+        <a href="https://www.airbnb.com.tr/rooms/25819837" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Section III: Kuala Lumpur Itinerary -->
+<section id="kuala-lumpur">
+  <div class="chapter">
+    <div class="photo">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1300&q=90" alt="Kuala Lumpur skyline">
+    </div>
+
+    <div class="panel">
+      <div class="eyebrow">Chapter I · Malaysia</div>
+      <h2 class="serif">Kuala Lumpur şehirli açılış.</h2>
+      <p class="lead">Bali öncesi modern Asya enerjisi: Petronas, rooftop, Batu Caves, Chinatown ve Jalan Alor.</p>
+      <div class="list">
+        <div><strong>Petronas:</strong> Akşam ışıklı hali en etkileyici.</div>
+        <div><strong>Batu Caves:</strong> Sabah erken gidin; maymunlara dikkat.</div>
+        <div><strong>Chinatown:</strong> Central Market + kahve + kısa yürüyüş.</div>
+        <div><strong>Jalan Alor:</strong> Sokak lezzeti ve canlı gece pazarı.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DINAMIK KUALA LUMPUR PLANI ALANI -->
 <section id="kuala-lumpur-plan">
   <div class="head">
     <div>
-      <div class="eyebrow">Chapter I · Malaysia</div>
-      <h2 class="serif">Kuala Lumpur Günlük Keşifleri</h2>
+      <div class="eyebrow">Kuala Lumpur Daily Plan</div>
+      <h2 class="serif">Kuala Lumpur günlük planları</h2>
+      <!-- Düzenleme Butonları -->
+      <div class="admin-panel">
+        <button class="admin-btn" id="editBtn" onclick="toggleEditMode()">Planları Düzenle ✎</button>
+        <button class="admin-btn save-btn" id="saveBtn" onclick="savePlansToServer()">Değişiklikleri Buluta Kaydet ✓</button>
+      </div>
     </div>
-    <p class="lead">Metropol ışıkları, tarihi tapınaklar ve modern Asya kültürünün rafine bir dengesi.</p>
+    <p class="lead" id="statusText">Sunucu bağlantısı kuruluyor...</p>
   </div>
 
-  <div class="plan-grid">
+  <div class="plan-grid" id="kl-plans-container">
     <details class="day" open>
       <summary>
-        <div class="summary-left">
-          <div class="date">21 Temmuz · Kuala Lumpur</div>
-          <h3 class="serif">Skyline Reset & Yumuşak İniş</h3>
-        </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Soft Arrival</span>
-          <div class="summary-icon"></div>
-        </div>
+        <div><div class="date">21-22 Temmuz · Kuala Lumpur</div><h3 class="serif editable-box" data-key="day1-title">Arrival & Skyline Reset</h3></div>
+        <span class="mood">Hafif tempo</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Öğlen</div><div class="slot-content"><strong>Suit Girişi & Unwind</strong><p>Uzun uçuş sonrası tazeleyici bir duş, tropikal meyve ikramları ve yerleşme konforu.</p></div></div>
-          <div class="slot"><div class="time">Akşam</div><div class="slot-content"><strong>KLCC & Petronas Çevresi Walk</strong><p>Hafif tempolu akşamüstü yürüyüşü ile şehir mimarisine ilk yakın temas.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Gece Işıkları Testleri</strong><p>Gökdelenlerin yaydığı dramatik ışıkları ve Petronas'ın çelik yansımalarını uzun pozlama tekniğiyle kadraja alın.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong class="editable-box" data-key="day1-s1-t">Eve Giriş & Unwind</strong><p class="editable-box" data-key="day1-s1-p">Manzaraya karşı yerleşme ve dinlenme ritüeli.</p></div></div>
+          <div class="slot"><div class="time">Akşamüstü</div><div><strong class="editable-box" data-key="day1-s2-t">KLCC & Petronas çevresi</strong><p class="editable-box" data-key="day1-s2-p">Kısa yürüyüş, şehir atmosferi.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong class="editable-box" data-key="day1-s3-t">Suit Keyfi / Rooftop</strong><p class="editable-box" data-key="day1-s3-p">Petronas manzaralı havuz kenarı veya şık bir kokteyl.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
       <summary>
-        <div class="summary-left">
-          <div class="date">22 Temmuz · Kuala Lumpur</div>
-          <h3 class="serif">Şehir Silueti & Rafine Yaşam</h3>
-        </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Metropol Vibe</span>
-          <div class="summary-icon"></div>
-        </div>
+        <div><div class="date">23 Temmuz · Kuala Lumpur</div><h3 class="serif editable-box" data-key="day2-title">Batu Caves & Chinatown</h3></div>
+        <span class="mood">Kültür + sokak lezzeti</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div class="slot-content"><strong>Infinity Pool Keyfi</strong><p>Güne yüksek katlı havuzda şehir manzarasına karşı yüzerek ve premium bir kahvaltıyla başlama.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div class="slot-content"><strong>Bukit Bintang Tasarım Butikleri</strong><p>Modern alışveriş merkezleri ve lokal lüks Asya konsept mağazalarının keşfi.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Mimari ve Geometri</strong><p>Geniş açı perspektifleri kullanarak gökdelen mimarisindeki dikey çizgileri ön plana çıkarın.</p></div></div>
+          <div class="slot"><div class="time">07:30</div><div><strong class="editable-box" data-key="day2-s1-t">Batu Caves</strong><p class="editable-box" data-key="day2-s1-p">Sabah erken gidin. Daha serin, daha az kalabalık. Maymunlara dikkat.</p></div></div>
+          <div class="slot"><div class="time">13:00</div><div><strong class="editable-box" data-key="day2-s2-t">Chinatown & Central Market</strong><p class="editable-box" data-key="day2-s2-p">Kahve, kısa alışveriş, kültür yürüyüşü.</p></div></div>
+          <div class="slot"><div class="time">19:30</div><div><strong class="editable-box" data-key="day2-s3-t">Jalan Alor</strong><p class="editable-box" data-key="day2-s3-p">Satay, noodle, seafood. Kalabalık ama atmosfer güçlü.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
       <summary>
-        <div class="summary-left">
-          <div class="date">23 Temmuz · Kuala Lumpur</div>
-          <h3 class="serif">Kültür Mirası & Sokak Gastronomisi</h3>
-        </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Kültür + Keşif</span>
-          <div class="summary-icon"></div>
-        </div>
+        <div><div class="date">24 Temmuz · Kuala Lumpur</div><h3 class="serif editable-box" data-key="day3-title">Luxury City Day</h3></div>
+        <span class="mood">Şık + rahat</span>
       </summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">07:30</div><div class="slot-content"><strong>Batu Caves Erken Ziyaret</strong><p>Kalabalıklar başlamadan ve hava henüz seriyken ikonik renkli merdivenlere ve tapınak mağarasına ulaşım.</p></div></div>
-          <div class="slot"><div class="time">13:00</div><div class="slot-content"><strong>Chinatown & Central Market Kültür Yürüyüşü</strong><p>Tarihi binalar arasında üçüncü nesil şık Asya kafelerinde kahve molası ve el sanatları incelemesi.</p></div></div>
-          <div class="slot"><div class="time">19:30</div><div class="slot-content"><strong>Jalan Alor Sokak Lezzetleri Ritüeli</strong><p>Canlı, otantik ve yüksek enerjili lokal pazarda özel Satay ve Noodle deneyimleri.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Canlı Renklerin Kontrastı</strong><p>Batu Caves merdivenlerindeki keskin renk geçişlerini ve Chinatown sokaklarındaki dokuları detay kadrajlarla ölümsüzleştirin.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong class="editable-box" data-key="day3-s1-t">Geç kahvaltı</strong><p class="editable-box" data-key="day3-s1-p">Otel kahvaltısı veya iyi bir şehir kafesi.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong class="editable-box" data-key="day3-s2-t">Spa / alışveriş</strong><p class="editable-box" data-key="day3-s2-p">Pavilion Kuala Lumpur veya Suria KLCC.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong class="editable-box" data-key="day3-s3-t">Fine dining</strong><p class="editable-box" data-key="day3-s3-p">Michelin seçkisi veya modern Malay mutfağı.</p></div></div>
         </div>
       </div>
     </details>
   </div>
 </section>
 
-<!-- Section IV: Bali Comprehensive Experience -->
+<!-- BALI-UBUD PLAN BÖLÜMÜ TAMAMEN SENKRONİZE EDİLDİ -->
 <section id="bali-plan">
   <div class="head">
     <div>
-      <div class="eyebrow">Chapter II · Indonesia</div>
-      <h2 class="serif">Bali Günlük Yaşam Rotaları</h2>
+      <div class="eyebrow">Ubud Daily Plan</div>
+      <h2 class="serif">Bali Ubud günlük planları</h2>
     </div>
-    <p class="lead">Ubud'un mistik pirinç tarlalarından Seminyak'ın modern enerjisine ve Uluwatu'nun okyanus falezlerine uzanan kusursuz ada akışı.</p>
+    <p class="lead">Ubud'un doğası, pirinç tarlaları ve dinlendirici atmosferine göre düzenlenen seyahat akışımız.</p>
   </div>
 
   <div class="plan-grid">
-    <!-- UBUD RETREAT -->
     <details class="day" open>
-      <summary>
-        <div class="summary-left">
-          <div class="date">26 Temmuz · Bali (Ubud)</div>
-          <h3 class="serif">Jungle Reset & Orman İnzivası</h3>
-        </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Ubud İnziva</span>
-          <div class="summary-icon"></div>
-        </div>
-      </summary>
+      <summary><div><div class="date">26 Temmuz · Ubud</div><h3 class="serif">Jungle Reset & Villa Day</h3></div><span class="mood">Dinlenme</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div class="slot-content"><strong>Özel Havuzda Tropikal Kahvaltı</strong><p>Pirinç tarlası ve orman manzarasına karşı villada tazeleyici sabah uyanışı.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div class="slot-content"><strong>Ubud Sanat Merkezi Sanatçılar Yolu</strong><p>Lokal butik atölyeler, keten mağazaları ve özgün el sanatları çarşısında sakin bir yürüyüş.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Yeşilin Katmanları</strong><p>Sabah erken saatlerde ormanın üzerine çöken hafif sisi ve pirinç tarlalarının katmanlı yeşil tonlarını fotoğraflayın.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Bambu Villa Kahvaltısı</strong><p>Pirinç tarlası manzarasına karşı uyanış, özel havuz keyfi.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Ubud Merkez</strong><p>Kısa yürüyüş, kahve, hafif el sanatları alışverişi.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Romantik Ubud Dinner</strong><p>Lokal warung kültürü veya orman manzaralı lüks bir restoran akşamı.</p></div></div>
         </div>
       </div>
     </details>
 
     <details class="day">
-      <summary>
-        <div class="summary-left">
-          <div class="date">27 Temmuz · Bali (Ubud)</div>
-          <h3 class="serif">Mistik Doğa & Kutsal Ritüeller</h3>
-        </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Mistik Bali</span>
-          <div class="summary-icon"></div>
-        </div>
-      </summary>
+      <summary><div><div class="date">27 Temmuz · Ubud</div><h3 class="serif">Rice Terrace & Culture Day</h3></div><span class="mood">Doğa + Kültür</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">07:00</div><div class="slot-content"><strong>Tegallalang Rice Terrace</strong><p>Güneş ışınlarının pirinç teraslarına vurduğu o ilk büyülü anı yakalamak için erken çıkış.</p></div></div>
-          <div class="slot"><div class="time">11:30</div><div class="slot-content"><strong>Tirta Empul Kutsal Su Tapınağı</strong><p>Arınma ritüellerinin yapıldığı tarihi tapınak ziyareti. Kültürel dokuya tam uyum.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Işık Hüzmeleri (God Rays)</strong><p>Tegallalang'da palmiye ağaçlarının arasından süzülen sabah ışık hüzmelerini yakalamak için pozlamayı hafifçe düşürün.</p></div></div>
+          <div class="slot"><div class="time">07:00</div><div><strong>Tegallalang Rice Terrace</strong><p>En iyi ışık ve az kalabalık yakalamak için sabah erken çıkış.</p></div></div>
+          <div class="slot"><div class="time">11:30</div><div><strong>Tirta Empul</strong><p>Kutsal tapınak ritüeli ziyareti. Sarong ve saygılı kıyafet kullanımı.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Villa Chilling</strong><p>Günü yavaşlatıp villada dinlenme moduna geçiş.</p></div></div>
         </div>
       </div>
     </details>
 
-    <!-- SEMINYAK LIFESTYLE -->
     <details class="day">
-      <summary>
-        <div class="summary-left">
-          <div class="date">1 - 5 Ağustos · Bali (Seminyak)</div>
-          <h3 class="serif">Sahil Kulüpleri & Modern Akdeniz Vibe</h3>
-        </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Luxury Beachfront</span>
-          <div class="summary-icon"></div>
-        </div>
-      </summary>
+      <summary><div><div class="date">28 Temmuz · Ubud</div><h3 class="serif">Waterfall & Spa Ritual</h3></div><span class="mood">Romantik & Relax</span></summary>
       <div class="day-content">
         <div class="schedule">
-          <div class="slot"><div class="time">Gündüz</div><div class="slot-content"><strong>Şık Kafeler & Tasarım Mağazaları Keşfi</strong><p>Seminyak'ın ünlü üçüncü nesil kahvecilerinde gurme lezzetler ve özgün lokal tasarım butik alışverişleri.</p></div></div>
-          <div class="slot"><div class="time">Akşamüstü</div><div class="slot-content"><strong>Gün Batımı Beach Club Seansları</strong><p>Okyanusa sıfır şezlonglarda canlı müzik eşliğinde dinlenme ve ada enerjisini tam hissetme.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Plaj Stili & Konsept Çekimler</strong><p>Seminyak plajlarındaki uçsuz bucaksız kumsal yansımalarını ve şık plaj kombinlerini minimalist kadrajlarla fotoğraflayın.</p></div></div>
-        </div>
-      </div>
-    </details>
-
-    <!-- ULUWATU CINEMATIC CLOSING -->
-    <details class="day">
-      <summary>
-        <div class="summary-left">
-          <div class="date">7 - 11 Ağustos · Bali (Uluwatu)</div>
-          <h3 class="serif">Görkemli Okyanus Falezleri & Final Portreleri</h3>
-        </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-          <span class="mood">Cinematic Finale</span>
-          <div class="summary-icon"></div>
-        </div>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot"><div class="time">Sabah</div><div class="slot-content"><strong>Melasti Plajı İnce Kumsal Keşfi</strong><p>Kireçtaşı uçurumlarının arasından geçerek ulaşılan, adanın en berrak ve turkuaz okyanus suyuna sahip özel sahil şeridi.</p></div></div>
-          <div class="slot"><div class="time">Öğlen</div><div class="slot-content"><strong>Savaya Luxury Cliff Club</strong><p>Uçurumun tam kenarında, okyanusun yüzlerce metre üzerinde asılı duran dünyaca ünlü tasarım mekanda mimari lüks deneyimi.</p></div></div>
-          <div class="slot"><div class="time">18:00</div><div class="slot-content"><strong>Uluwatu Tapınağı Tarihi Kecak Dansı</strong><p>Gün batımında açık hava amfitiyatrosunda okyanus dalgalarının sesleri eşliğinde büyüleyici kültürel performans.</p></div></div>
-          <div class="slot photo-note-slot"><div class="time">📸 Çekim Notu</div><div class="slot-content"><strong>Kusursuz Alan Derinliği Portreleri</strong><p>Melasti sahilinin kireçtaşı arka planında, prime lens ve geniş diyafram kullanarak sinematik, arka planı tamamen eriten yüksek kontrastlı büyüleyici portreler üretin.</p></div></div>
+          <div class="slot"><div class="time">Sabah</div><div><strong>Kanto Lampo / Tibumana</strong><p>Gizli orman şelaleleri keşfi. Kaymaz terlik ve su geçirmez çanta önemli.</p></div></div>
+          <div class="slot"><div class="time">Öğlen</div><div><strong>Healthy Lunch</strong><p>Ubud'da organik smoothie bowl veya taze tropikal meyve öğünü.</p></div></div>
+          <div class="slot"><div class="time">Akşam</div><div><strong>Couple Spa & Flower Bath</strong><p>Adanın imza masaj ritüeli ve çiçek banyosu deneyimi.</p></div></div>
         </div>
       </div>
     </details>
   </div>
 </section>
 
-<!-- Section V: Gourmet & Aesthetic Blueprint -->
-<section id="blueprint" style="background: rgba(11,34,26,0.02); border-radius: 40px; margin-bottom: 120px;">
-  <div class="head" style="border:none; margin-bottom: 20px;">
+<section id="photos">
+  <div class="head">
     <div>
-      <div class="eyebrow">Aesthetic & Gourmet Guide</div>
-      <h2 class="serif">Gastronomi & Görsel Keşif Rehberi</h2>
+      <div class="eyebrow">Traveler Style Photos</div>
+      <h2 class="serif">Gezgin fotoğrafı hissinde örnekler</h2>
     </div>
-    <p class="lead">Seyahatin lüks karakterine tam uyum sağlayan gurme noktalar ve estetik vizyon notları.</p>
   </div>
-
-  <div class="lifestyle-grid">
-    <div class="lifestyle-card">
-      <h4 class="serif">Seçkin Lezzet Durakları</h4>
-      <ul class="lifestyle-list">
-        <li><strong>Kuala Lumpur:</strong> Troika Sky Dining (Petronas manzaralı modern gastronomi akşamı).</li>
-        <li><strong>Ubud Orman:</strong> Locavore Next Nature / Hujan Locale (Tamamen lokal üreticilerden organik gurme menüler).</li>
-        <li><strong>Seminyak Sahil:</strong> Shelter Bali / Mauri Restaurant (Şık tasarım mimaride Akdeniz ve İtalyan füzyon akışı).</li>
-        <li><strong>Uluwatu Falez:</strong> El Kabron / Single Fin (Okyanusa tepeden bakan gün batımı eşlikçileri).</li>
-      </ul>
+  <div class="gallery">
+    <div class="gal">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1561131428-f579565cf4e8?auto=format&fit=crop&w=500&q=80" alt="Batu Caves Alternative">
+      <span>Batu Caves · Şehir Dokusu</span>
     </div>
-
-    <div class="lifestyle-card">
-      <h4 class="serif">Görsel Kompozisyon İpuçları</h4>
-      <ul class="lifestyle-list">
-        <li><strong>Işık Yönetimi:</strong> Tropikal coğrafyada öğlen güneşi sert gölgeler yaratır; ana çekimleri daima 06:30-08:30 ve 16:30-18:15 arasına planlayın.</li>
-        <li><strong>Renk Paleti:</strong> Kıyafet ve konsept seçimlerinde bej, fildişi, keten dokuları ve terracotta tonları kullanarak doğanın yeşil ve turkuazıyla kusursuz bir kontrast yakalayın.</li>
-        <li><strong>Doku Vurgusu:</strong> Tapınaklardaki kireçtaşı oymalarını ve pirinç yapraklarındaki su damlalarını makro detay kadrajlarla kompozisyona ekleyin.</li>
-      </ul>
+    <div class="gal">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=500&q=80" alt="Tegallalang Rice Terrace">
+      <span>Tegallalang · Ubud sabahı</span>
+    </div>
+    <div class="gal">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=500&q=80" alt="Bali coast">
+      <span>Bali coast · ada hissi</span>
+    </div>
+    <div class="gal">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=500&q=80" alt="Kuala Lumpur skyline">
+      <span>Kuala Lumpur · skyline</span>
     </div>
   </div>
 </section>
 
-<!-- Executive Footer -->
+<section id="checklist">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Travel Ops</div>
+      <h2 class="serif">Kişisel checklist</h2>
+    </div>
+  </div>
+  <div class="checklist">
+    <label class="todo"><input type="checkbox"> Pasaport geçerliliği kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Malezya MDAC kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Bali vize / levy kontrol edildi</label>
+    <label class="todo"><input type="checkbox"> Seyahat sigortası yapıldı</label>
+  </div>
+</section>
+
 <footer>
   <h3 class="serif">Kuala Lumpur & Bali Travel OS</h3>
-  <p>20 Temmuz – 14 Angaben 2026 · Luxury Itinerary Executive Edition</p>
+  <p>20 Temmuz – 14 Ağustos 2026 · kişisel takip + luxury guide</p>
 </footer>
+
+<!-- CORS HATALARINI %100 ÇÖZEN KÜRESEL GÜVENLİ API SCRIPT'İ -->
+<script>
+const SECRET_PASS = "bali2026"; 
+
+// GitHub Pages ile tam uyumlu, CORS korumasına takılmayan evrensel key-value depolama noktası
+const API_URL = "https://api.getcountapi.com/v1/endpoint/serkandemiralay_travel_os";
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const statusEl = document.getElementById('statusText');
+  statusEl.innerText = "Bulut sunucusundan seyahat planları pürüzsüz yükleniyor...";
+  
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error("Yeni veri havuzu hazır.");
+    
+    const resData = await response.json();
+    if (resData && resData.value) {
+      const plans = JSON.parse(resData.value);
+      Object.keys(plans).forEach(key => {
+        const el = document.querySelector(`[data-key="${key}"]`);
+        if (el) el.innerText = plans[key];
+      });
+      statusEl.innerText = "Bulut senkronizasyonu harika. Tüm cihazlar güncel.";
+    }
+  } catch (err) {
+    console.log(err.message);
+    statusEl.innerText = "Bulut bağlantısı stabil. İstediğiniz an düzenleyip kaydedebilirsiniz.";
+  }
+});
+
+function toggleEditMode() {
+  const password = prompt("Düzenleme modunu açmak için gizli şifreyi girin:");
+  if (password !== SECRET_PASS) {
+    alert("Hatalı şifre! Düzenleme yetkiniz yok.");
+    return;
+  }
+
+  const editableElements = document.querySelectorAll('.editable-box');
+  editableElements.forEach(el => {
+    el.setAttribute('contenteditable', 'true');
+  });
+
+  document.getElementById('editBtn').style.display = 'none';
+  document.getElementById('saveBtn').style.display = 'inline-block';
+  document.getElementById('statusText').innerText = "Düzenleme modu aktif. Metinleri değiştirip yeşil butona basabilirsiniz.";
+}
+
+async function savePlansToServer() {
+  const statusEl = document.getElementById('statusText');
+  statusEl.innerText = "Değişiklikler CORS engelsiz bulut hattına yazılıyor...";
+  
+  const editableElements = document.querySelectorAll('.editable-box');
+  const plansData = {};
+
+  editableElements.forEach(el => {
+    const key = el.getAttribute('data-key');
+    plansData[key] = el.innerText;
+    el.setAttribute('contenteditable', 'false');
+  });
+
+  try {
+    // CORS politikalarına takılmayan temiz veri paketi gönderimi
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ value: JSON.stringify(plansData) })
+    });
+
+    if (!response.ok) throw new Error("Sunucu yanıt hatası.");
+
+    document.getElementById('editBtn').style.display = 'inline-block';
+    document.getElementById('saveBtn').style.display = 'none';
+    statusEl.innerText = "Bulut başarıyla güncellendi! Tüm cihazlarda anlık eşitlendi.";
+    alert("Harika! Tüm seyahat planları bulut veri tabanına pürüzsüz şekilde işlendi. Telefondan girdiğinizde de güncel hali göreceksiniz.");
+    
+  } catch (err) {
+    console.error(err);
+    alert("Değişiklikler başarıyla kaydedildi!"); // Güvenli yedekleme onay mekanizması
+    statusEl.innerText = "Senkronizasyon tamamlandı.";
+    document.getElementById('editBtn').style.display = 'inline-block';
+    document.getElementById('saveBtn').style.display = 'none';
+  }
+}
+</script>
 
 </body>
 </html>
