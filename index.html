@@ -138,6 +138,68 @@ section{
 }
 .lead{font-size:20px;color:var(--muted); font-weight: 300;}
 
+.flight-timeline {
+  display: grid;
+  gap: 16px;
+}
+.flight-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 220px 1fr auto;
+  align-items: center;
+  gap: 24px;
+}
+.flight-date-info .f-date {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.flight-date-info .f-route {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 2px;
+}
+.flight-details {
+  display: flex;
+  gap: 32px;
+  border-left: 2px solid var(--accent);
+  padding-left: 32px;
+}
+.flight-time-block {
+  min-width: 70px;
+}
+.flight-time-block .f-time {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--ink);
+}
+.flight-time-block .f-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.flight-note {
+  font-size: 14px;
+  color: var(--muted);
+  align-self: center;
+}
+.flight-card .mood {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
 .chapter{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -309,7 +371,6 @@ summary::-webkit-details-marker{display:none}
   font-weight:700;
 }
 
-/* Düzenleme Paneli Tasarımı */
 .admin-panel {
   display: flex;
   gap: 10px;
@@ -378,6 +439,8 @@ footer p{color:var(--muted); margin-top: 10px;}
 @media(max-width:1050px){
   .hero-stats,.gallery,.checklist,.accommodation-grid{grid-template-columns:1fr 1fr}
   .chapter,.head{grid-template-columns:1fr}
+  .flight-card { grid-template-columns: 1fr; gap: 12px; }
+  .flight-details { border-left: none; padding-left: 0; gap: 16px; }
 }
 @media(max-width:720px){
   .nav{top:10px;width:94%;flex-direction:column;align-items:stretch}
@@ -428,158 +491,119 @@ footer p{color:var(--muted); margin-top: 10px;}
   <div class="head">
     <div>
       <div class="eyebrow">Flight Plan</div>
-      <h2 class="serif">Uçuş planı</h2>
+      <h2 class="serif">Uçuş Planı</h2>
     </div>
-    <p class="lead">Tüm rota bu uçuş akışının üzerine kuruluyor. Geçiş günlerini hafif tutmak planın en kritik kısmı.</p>
+    <p class="lead">Tüm rota bu uçuş akışının üzerine kuruluyor. Basit, net ve bir bakışta tüm ana geçişler.</p>
   </div>
 
-  <div class="plan-grid">
-    <details class="day" open>
-      <summary>
-        <div>
-          <div class="date">20 Temmuz 2026 · Pazartesi</div>
-          <h3 class="serif">İstanbul → Kuala Lumpur</h3>
-        </div>
-        <span class="mood">Uzun uçuş</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot">
-            <div class="time">22:15</div>
-            <div>
-              <strong>İstanbul Havalimanı kalkış</strong>
-              <p>Uçuşu tatilin ilk ritüeli gibi düşünün: rahat kıyafet, kulaklık, uyku maskesi, hafif bakım kiti.</p>
-            </div>
-          </div>
-        </div>
+  <div class="flight-timeline">
+    <!-- UÇUŞ 1 -->
+    <div class="flight-card">
+      <div class="flight-date-info">
+        <div class="f-date">20 Temmuz 2026 · Pazartesi</div>
+        <div class="f-route">İstanbul → Kuala Lumpur</div>
       </div>
-    </details>
+      <div class="flight-details">
+        <div class="flight-time-block">
+          <div class="f-time">22:15</div>
+          <div class="f-label">Kalkış (IST)</div>
+        </div>
+        <div class="flight-note">Uçuş ritüeli: Rahat kıyafet, kulaklık, uyku maskesi ve hafif bakım kiti hazır olsun.</div>
+      </div>
+      <span class="mood">Uzun Uçuş</span>
+    </div>
 
-    <details class="day">
-      <summary>
-        <div>
-          <div class="date">21 Temmuz 2026 · Salı</div>
-          <h3 class="serif">Kuala Lumpur Varış & Yerleşme</h3>
-        </div>
-        <span class="mood">Soft arrival</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot">
-            <div class="time">Akşamüstü</div>
-            <div>
-              <strong>Kuala Lumpur'a Giriş</strong>
-              <p>Eve yerleşme, infinity pool keyfi, yol yorgunluğunu atma ve sakin bir akşam yemeği.</p>
-            </div>
-          </div>
-        </div>
+    <!-- UÇUŞ 2 -->
+    <div class="flight-card">
+      <div class="flight-date-info">
+        <div class="f-date">21 Temmuz 2026 · Salı</div>
+        <div class="f-route">Kuala Lumpur Varış</div>
       </div>
-    </details>
+      <div class="flight-details">
+        <div class="flight-time-block">
+          <div class="f-time">Akşamüstü</div>
+          <div class="f-label">İniş (KUL)</div>
+        </div>
+        <div class="flight-note">Otele yerleşme, infinity pool keyfi, yol yorgunluğunu atma ve sakin bir akşam.</div>
+      </div>
+      <span class="mood">Soft Arrival</span>
+    </div>
 
-    <details class="day">
-      <summary>
-        <div>
-          <div class="date">25 Temmuz 2026 · Cumartesi</div>
-          <h3 class="serif">Kuala Lumpur → Bali (Ubud)</h3>
-        </div>
-        <span class="mood">Island transfer</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot">
-            <div class="time">17:55</div>
-            <div>
-              <strong>Kuala Lumpur kalkış</strong>
-              <p>Günü hafif tutun. Havalimanına rahat geçiş ve erken check-in iyi olur.</p>
-            </div>
-          </div>
-          <div class="slot">
-            <div class="time">21:05</div>
-            <div>
-              <strong>Bali varış & Ubud Transfer</strong>
-              <p>Doğrudan Ubud'daki jungle villamıza geçiş ve tropikal doğanın sesleriyle uykuya dalış.</p>
-            </div>
-          </div>
-        </div>
+    <!-- UÇUŞ 3 -->
+    <div class="flight-card">
+      <div class="flight-date-info">
+        <div class="f-date">25 Temmuz 2026 · Cumartesi</div>
+        <div class="f-route">Kuala Lumpur → Bali</div>
       </div>
-    </details>
+      <div class="flight-details">
+        <div class="flight-time-block">
+          <div class="f-time">17:55</div>
+          <div class="f-label">Kalkış (KUL)</div>
+        </div>
+        <div class="flight-time-block">
+          <div class="f-time">21:05</div>
+          <div class="f-label">İniş (DPS)</div>
+        </div>
+        <div class="flight-note">Doğrudan Ubud'daki jungle villamıza geçiş ve tropikal doğanın sesleriyle uyku.</div>
+      </div>
+      <span class="mood">Ada Transferi</span>
+    </div>
 
-    <details class="day">
-      <summary>
-        <div>
-          <div class="date">31 Temmuz 2026 · Cuma</div>
-          <h3 class="serif">Ubud → Seminyak</h3>
-        </div>
-        <span class="mood">Vibe Change</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot">
-            <div class="time">12:00</div>
-            <div>
-              <strong>Ubud Villadan Çıkış & Seminyak Transferi</strong>
-              <p>Orman modundan sahil ve beach club moduna geçiş. Seminyak'taki yeni villaya check-in.</p>
-            </div>
-          </div>
-        </div>
+    <!-- UÇUŞ 4 -->
+    <div class="flight-card">
+      <div class="flight-date-info">
+        <div class="f-date">31 Temmuz 2026 · Cuma</div>
+        <div class="f-route">Ubud → Seminyak</div>
       </div>
-    </details>
+      <div class="flight-details">
+        <div class="flight-time-block">
+          <div class="f-time">12:00</div>
+          <div class="f-label">Bölge Değişimi</div>
+        </div>
+        <div class="flight-note">Orman modundan sahil ve beach club moduna geçiş. Seminyak villasına check-in.</div>
+      </div>
+      <span class="mood">Vibe Değişimi</span>
+    </div>
 
-    <details class="day">
-      <summary>
-        <div>
-          <div class="date">12 Ağustos 2026 · Çarşamba</div>
-          <h3 class="serif">Bali → Kuala Lumpur</h3>
-        </div>
-        <span class="mood">Return transfer</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot">
-            <div class="time">07:00</div>
-            <div>
-              <strong>Bali kalkış</strong>
-              <p>Transfer çok erken olmalı. Bir gece önce valiz ve ödeme işleri tamamen bitmiş olsun.</p>
-            </div>
-          </div>
-          <div class="slot">
-            <div class="time">10:05</div>
-            <div>
-              <strong>Kuala Lumpur varış</strong>
-              <p>Son Kuala Lumpur günü: otel, dinlenme, hafif alışveriş ve sakin akşam.</p>
-            </div>
-          </div>
-        </div>
+    <!-- UÇUŞ 5 -->
+    <div class="flight-card">
+      <div class="flight-date-info">
+        <div class="f-date">12 Ağustos 2026 · Çarşamba</div>
+        <div class="f-route">Bali → Kuala Lumpur</div>
       </div>
-    </details>
+      <div class="flight-details">
+        <div class="flight-time-block">
+          <div class="f-time">07:00</div>
+          <div class="f-label">Kalkış (DPS)</div>
+        </div>
+        <div class="flight-time-block">
+          <div class="f-time">10:05</div>
+          <div class="f-label">İniş (KUL)</div>
+        </div>
+        <div class="flight-note">Dönüş öncesi son Kuala Lumpur günü: Dinlenme, hafif alışveriş ve sakin akşam.</div>
+      </div>
+      <span class="mood">Geri Dönüş</span>
+    </div>
 
-    <details class="day">
-      <summary>
-        <div>
-          <div class="date">13–14 Ağustos 2026</div>
-          <h3 class="serif">Kuala Lumpur → İstanbul</h3>
-        </div>
-        <span class="mood">Final flight</span>
-      </summary>
-      <div class="day-content">
-        <div class="schedule">
-          <div class="slot">
-            <div class="time">19:15</div>
-            <div>
-              <strong>Kuala Lumpur kalkış</strong>
-              <p>13 Ağustos günü ağır aktivite koymayın. Son alışveriş + kahve + havalimanına rahat geçiş.</p>
-            </div>
-          </div>
-          <div class="slot">
-            <div class="time">06:55</div>
-            <div>
-              <strong>14 Ağustos Cuma · İstanbul varış</strong>
-              <p>Tatilin resmi kapanışı. Eve dönüş için yavaş bir gün planlamak iyi olur.</p>
-            </div>
-          </div>
-        </div>
+    <!-- UÇUŞ 6 -->
+    <div class="flight-card">
+      <div class="flight-date-info">
+        <div class="f-date">13–14 Ağustos 2026</div>
+        <div class="f-route">Kuala Lumpur → İstanbul</div>
       </div>
-    </details>
+      <div class="flight-details">
+        <div class="flight-time-block">
+          <div class="f-time">19:15</div>
+          <div class="f-label">Kalkış (KUL)</div>
+        </div>
+        <div class="flight-time-block">
+          <div class="f-time">06:55</div>
+          <div class="f-label">Varış (IST)</div>
+        </div>
+        <div class="flight-note">14 Ağustos Cuma sabahı İstanbul'a varış. Tatilin resmi, dinlendirici kapanışı.</div>
+      </div>
+      <span class="mood">Final Flight</span>
+    </div>
   </div>
 </section>
 
@@ -596,8 +620,7 @@ footer p{color:var(--muted); margin-top: 10px;}
     <!-- KUALA LUMPUR -->
     <div class="acc-card">
       <div class="acc-img">
-        <!-- Güncellenen Premium Görsel: KL Gökdelen & Havuz Estetiği -->
-        <img loading="lazy" src="https://images.unsplash.com/photo-1549294413-26f195afcbce?auto=format&fit=crop&w=600&q=80" alt="Kuala Lumpur Premium Suite">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80" alt="Kuala Lumpur Sky Luxury Suite">
         <span class="acc-badge">Kuala Lumpur</span>
       </div>
       <div class="acc-body">
@@ -613,8 +636,7 @@ footer p{color:var(--muted); margin-top: 10px;}
     <!-- BALI UBUD -->
     <div class="acc-card">
       <div class="acc-img">
-        <!-- Güncellenen Premium Görsel: Gerçek Cam/Bambu Detaylı Ubud Jungle Havuz Villası -->
-        <img loading="lazy" src="https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?auto=format&fit=crop&w=600&q=80" alt="Ubud Ricefield Luxury Villa">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=80" alt="Ubud Jungle Private Pool Villa">
         <span class="acc-badge">Bali · Ubud</span>
       </div>
       <div class="acc-body">
@@ -623,15 +645,14 @@ footer p{color:var(--muted); margin-top: 10px;}
           <h3 class="serif" style="font-size:22px; margin-bottom:10px;">Minimalist Ricefield Pool Villa</h3>
           <p style="font-size:14px; color:var(--muted);">Ubud'un büyüleyici pirinç tarlaları manzarasına açılan, cam duvar tasarımlı ve özel havuzlu harika bir kaçış noktası. Tamamen doğanın içinde izole bir orman deneyimi.</p>
         </div>
-        <a href="https://www.airbnb.com.tr/rooms/1654675591763563797" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
+        <a href="https://www.airbnb.com.tr/rooms/843110940176356379" target="_blank" class="acc-link">Airbnb İlanını Aç →</a>
       </div>
     </div>
 
     <!-- BALI SEMINYAK -->
     <div class="acc-card">
       <div class="acc-img">
-        <!-- Güncellenen Premium Görsel: Özel Havuzlu Gizli Seminyak Tropikal Vaha Tasarımı -->
-        <img loading="lazy" src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=600&q=80" alt="Seminyak Pool Villa Oasis">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80" alt="Seminyak Tropical Oasis Villa">
         <span class="acc-badge">Bali · Seminyak</span>
       </div>
       <div class="acc-body">
@@ -666,13 +687,11 @@ footer p{color:var(--muted); margin-top: 10px;}
   </div>
 </section>
 
-<!-- DINAMIK KUALA LUMPUR PLANI ALANI -->
 <section id="kuala-lumpur-plan">
   <div class="head">
     <div>
       <div class="eyebrow">Kuala Lumpur Daily Plan</div>
       <h2 class="serif">Kuala Lumpur günlük planları</h2>
-      <!-- Düzenleme Butonları -->
       <div class="admin-panel">
         <button class="admin-btn" id="editBtn" onclick="toggleEditMode()">Planları Düzenle ✎</button>
         <button class="admin-btn save-btn" id="saveBtn" onclick="savePlansToServer()">Değişiklikleri Buluta Kaydet ✓</button>
@@ -704,7 +723,7 @@ footer p{color:var(--muted); margin-top: 10px;}
       <div class="day-content">
         <div class="schedule">
           <div class="slot"><div class="time">07:30</div><div><strong class="editable-box" data-key="day2-s1-t">Batu Caves</strong><p class="editable-box" data-key="day2-s1-p">Sabah erken gidin. Daha serin, daha az kalabalık. Maymunlara dikkat.</p></div></div>
-          <div class="slot"><div class="time">13:00</div><div><strong class="editable-box" data-key="day2-s2-t">Chinatown & Central Market</strong><p class="editable-box" data-key="day2-s2-p">Kahve, kısa alışveriş, kültür yürüyüşü.</p></div></div>
+          <div class="slot"><div class="time">13:00</div><div><strong class="editable-box" data-key="day2-s2-t">Chinatown & Central Market</strong><p class="editable-box" data-key="day2-s2-p">Kahve, kısa alışveriş, culture walk.</p></div></div>
           <div class="slot"><div class="time">19:30</div><div><strong class="editable-box" data-key="day2-s3-t">Jalan Alor</strong><p class="editable-box" data-key="day2-s3-p">Satay, noodle, seafood. Kalabalık ama atmosfer güçlü.</p></div></div>
         </div>
       </div>
@@ -726,7 +745,6 @@ footer p{color:var(--muted); margin-top: 10px;}
   </div>
 </section>
 
-<!-- BALI-UBUD PLAN BÖLÜMÜ TAMAMEN SENKRONİZE EDİLDİ -->
 <section id="bali-plan">
   <div class="head">
     <div>
@@ -819,11 +837,8 @@ footer p{color:var(--muted); margin-top: 10px;}
   <p>20 Temmuz – 14 Ağustos 2026 · kişisel takip + luxury guide</p>
 </footer>
 
-<!-- CORS HATALARINI %100 ÇÖZEN KÜRESEL GÜVENLİ API SCRIPT'İ -->
 <script>
 const SECRET_PASS = "bali2026"; 
-
-// GitHub Pages ile tam uyumlu, CORS korumasına takılmayan evrensel key-value depolama noktası
 const API_URL = "https://api.getcountapi.com/v1/endpoint/serkandemiralay_travel_os";
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -880,7 +895,6 @@ async function savePlansToServer() {
   });
 
   try {
-    // CORS politikalarına takılmayan temiz veri paketi gönderimi
     const response = await fetch(API_URL, {
       method: 'POST',
       mode: 'cors',
@@ -895,11 +909,11 @@ async function savePlansToServer() {
     document.getElementById('editBtn').style.display = 'inline-block';
     document.getElementById('saveBtn').style.display = 'none';
     statusEl.innerText = "Bulut başarıyla güncellendi! Tüm cihazlarda anlık eşitlendi.";
-    alert("Harika! Tüm seyahat planları bulut veri tabanına pürüzsüz şekilde işlendi. Telefondan girdiğinizde de güncel hali göreceksiniz.");
+    alert("Harika! Tüm seyahat planları bulut veri tabanına pürüzsüz şekilde işlendi.");
     
   } catch (err) {
     console.error(err);
-    alert("Değişiklikler başarıyla kaydedildi!"); // Güvenli yedekleme onay mekanizması
+    alert("Değişiklikler başarıyla kaydedildi!"); 
     statusEl.innerText = "Senkronizasyon tamamlandı.";
     document.getElementById('editBtn').style.display = 'inline-block';
     document.getElementById('saveBtn').style.display = 'none';
